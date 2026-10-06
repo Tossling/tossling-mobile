@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_pause">Pause sending</string>
+    <string name="settings_pause_note">The phone clipboard does not go to the Mac</string>
+    <string name="settings_images">Send images</string>
+    <string name="settings_images_note">When off, only text</string>
+    <string name="settings_instant">Instant delivery</string>
+    <string name="settings_instant_note">Wakes the app with a push. Otherwise, when the app opens</string>
+    <string name="settings_instant_unavailable">Firebase is not set up in this build: keep a connection instead</string>
+    <string name="settings_live">Keep a connection</string>
+    <string name="settings_live_note">For servers without push: new items come at once, a quiet notification stays in the shade</string>
+    <string name="settings_about_note">Tossling for Android</string>
+    <string name="settings_group_clipboard">Clipboard</string>
+    <string name="settings_group_notifications">Notifications</string>
+    <string name="settings_group_devices">Devices</string>
+    <string name="settings_group_about">About</string>
+    <string name="settings_projects">Projects</string>
+    <string name="settings_quiet">Quiet hours</string>
+    <string name="settings_quiet_note">23:00–08:00 · urgent ones always come through</string>
+    <string name="settings_devices">Devices in the room</string>
+    <string name="settings_instant_server">This server cannot send pushes: keep a connection instead</string>
+</resources>

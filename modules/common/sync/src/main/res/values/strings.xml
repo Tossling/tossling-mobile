@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_tile_label">Clipboard → Mac</string>
+    <string name="sync_share_label">Send to Mac</string>
+    <string name="sync_channel_received">From the Mac</string>
+    <string name="sync_channel_work">Syncing</string>
+    <string name="sync_channel_errors">Errors</string>
+    <string name="sync_received_title">Copied from %1$s</string>
+    <string name="sync_received_image">Image, ready to paste</string>
+    <string name="sync_missed_title">%1$s did not arrive</string>
+    <string name="sync_missed_text">%1$s sent it over 3 hours ago and the server has already deleted it. Ask to send it again.</string>
+    <string name="sync_open_link">Open link</string>
+    <string name="sync_send_failed">Could not send to the Mac</string>
+    <string name="sync_working">Syncing the clipboard</string>
+    <string name="sync_not_paired">Tossling is not paired with a Mac yet</string>
+    <string name="sync_too_large">Too large: up to 1 MB of text, 15 MB per image or 500 MB per file</string>
+    <string name="sync_clipboard_empty">The clipboard is empty</string>
+    <plurals name="sync_sending_files">
+        <item quantity="one">Sending %1$d file, progress is in the notification</item>
+        <item quantity="other">Sending %1$d files, progress is in the notification</item>
+    </plurals>
+    <plurals name="sync_sending_some">
+        <item quantity="one">Sending %1$d of %2$d files, the rest are too large or unreadable</item>
+        <item quantity="other">Sending %1$d of %2$d files, the rest are too large or unreadable</item>
+    </plurals>
+    <string name="sync_sending">Sending to the Mac</string>
+    <string name="sync_paused">Sending is paused</string>
+    <string name="sync_images_off">Images are turned off in settings</string>
+    <string name="sync_channel_projects">Projects</string>
+    <string name="sync_channel_room">Room</string>
+    <string name="sync_joined_title">New device in the room: %1$s</string>
+    <string name="sync_joined_text">It can now see the shared clipboard. Not you? Open Devices.</string>
+    <string name="sync_removed_title">This phone was removed from the room</string>
+    <string name="sync_removed_text">%1$s revoked its key. Pair again to share the clipboard.</string>
+    <string name="sync_channel_urgent">Urgent</string>
+    <string name="sync_channel_important">Important</string>
+    <string name="sync_channel_normal">Normal</string>
+    <string name="sync_channel_quiet">Quiet</string>
+    <string name="sync_alert_open">Open</string>
+    <string name="sync_alert_read">Mark read</string>
+    <string name="sync_received_file_title">File from %1$s</string>
+    <string name="sync_received_file">%1$s · in Downloads/Tossling</string>
+    <string name="sync_unreadable">Could not read it</string>
+    <string name="sync_channel_transfer">File transfers</string>
+    <string name="sync_transfer_send">Sending “%1$s”</string>
+    <string name="sync_transfer_send_to">Sending “%1$s” to %2$s</string>
+    <string name="sync_transfer_receive">Receiving “%1$s” from %2$s</string>
+    <string name="sync_transfer_progress">%1$d%% · %2$s of %3$s</string>
+    <string name="sync_transfer_cancel">Cancel</string>
+    <string name="sync_sent_title">Sent “%1$s”</string>
+    <string name="sync_sent_to">To %1$s</string>
+    <string name="sync_sent_all">To every device in the room</string>
+    <string name="sync_sending_file">Sending “%1$s”, progress is in the notification</string>
+    <string name="sync_widget_label">Tossling</string>
+    <string name="sync_widget_description">Last clip and a button to send the clipboard</string>
+    <string name="sync_widget_send">Send clipboard</string>
+    <string name="sync_widget_empty">Nothing yet: copy something on the Mac</string>
+    <string name="sync_widget_from">From %1$s</string>
+    <string name="sync_widget_sent">Sent</string>
+    <string name="sync_widget_to">To %1$s</string>
+    <string name="sync_widget_image">Image</string>
+    <string name="sync_channel_live">Connection</string>
+    <string name="sync_live_title">Tossling is connected</string>
+    <string name="sync_live_text">Keeps the connection open so clips and alerts arrive at once</string>
+</resources>

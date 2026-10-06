@@ -1,0 +1,88 @@
+[versions]
+appversion = "0.2.0"
+
+agp = "9.4.0"
+kotlin = "2.4.20"
+
+android-compileSdk = "37"
+android-minSdk = "33"
+android-targetSdk = "37"
+
+composeBom = "2026.09.00"
+androidx-activityCompose = "1.13.0"
+androidx-lifecycle = "2.11.0"
+androidx-core = "1.19.0"
+androidx-work = "2.12.0"
+
+decompose = "3.5.0"
+decompose-essenty = "2.6.0"
+
+koin = "4.2.2"
+
+kotlinxCoroutines = "1.11.0"
+kotlinxSerialization = "1.11.0"
+kotlinx-collections-immutable = "0.5.2"
+kotlinx-atomicfu = "0.33.0"
+
+firebaseBom = "34.19.0"
+googleServices = "4.5.0"
+playServicesCodeScanner = "16.1.0"
+playServicesBlockstore = "16.4.0"
+
+junit = "4.13.2"
+
+filekit = "0.16.0"
+haze = "1.7.2"
+
+[libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
+
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
+
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-runtime = { module = "androidx.compose.runtime:runtime" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+decompose-extensions-compose-experimental = { module = "com.arkivanov.decompose:extensions-compose-experimental", version.ref = "decompose" }
+decompose-essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "decompose-essenty" }
+decompose-essenty-stateKeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "decompose-essenty" }
+decompose-essenty-instanceKeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "decompose-essenty" }
+decompose-essenty-backHandler = { module = "com.arkivanov.essenty:back-handler", version.ref = "decompose-essenty" }
+
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
+
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
+play-services-blockstore = { module = "com.google.android.gms:play-services-auth-blockstore", version.ref = "playServicesBlockstore" }
+
+junit = { module = "junit:junit", version.ref = "junit" }
+
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

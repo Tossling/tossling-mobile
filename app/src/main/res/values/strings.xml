@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tossling</string>
+    <string name="tab_buffer">Clipboard</string>
+    <string name="tab_notifications">Notifications</string>
+    <string name="tab_send">To Mac</string>
+    <string name="room_joined">New device in the room: %1$s</string>
+</resources>

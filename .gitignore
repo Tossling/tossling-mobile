@@ -1,0 +1,18 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/.kotlin
+/app/google-services.json
+*.jks
+
+# fastlane: run artifacts stay out of git
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output

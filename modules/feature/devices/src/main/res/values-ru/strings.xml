@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="devices_back">Назад</string>
+    <string name="devices_title">Устройства</string>
+    <string name="devices_subtitle">Одна комната: что скопировано на любом из них, видят все остальные</string>
+    <string name="devices_online">на связи</string>
+    <string name="devices_self">это устройство</string>
+    <string name="devices_self_title">Это устройство</string>
+    <string name="devices_add_mac">Добавить Mac</string>
+    <string name="devices_note">Устройство без связи получит буфер, когда появится. Другой телефон подключается по QR из tossling pair на любом Mac комнаты.</string>
+    <string name="devices_name">Имя</string>
+    <string name="devices_own_name">Своё имя</string>
+    <string name="devices_system_name">Имя в Android</string>
+    <string name="devices_server">Сервер</string>
+    <string name="devices_last_contact">Последняя связь</string>
+    <string name="devices_now">сейчас</string>
+    <string name="devices_since">Подключён</string>
+    <string name="devices_name_shared">Имя видно всем устройствам в комнате.</string>
+    <string name="devices_name_local">Это имя видно только на этом телефоне. Оставь пустым, чтобы вернуть устройству его собственное имя.</string>
+    <string name="devices_leave">Выйти из комнаты</string>
+    <string name="devices_unpair">Отключить</string>
+    <string name="devices_remove_mac">Отключить этот Mac</string>
+    <string name="devices_remove_phone">Отключить это устройство</string>
+    <string name="devices_sheet_title">Отключить %1$s?</string>
+    <string name="devices_sheet_self">Телефон удалит ключ комнаты и перестанет получать буфер. Вернуться можно через tossling pair.</string>
+    <string name="devices_sheet_other">Устройство потеряет доступ к комнате: остальные перейдут на новый ключ и продолжат работать.</string>
+    <string name="devices_sheet_legacy">Ключ шифрования будет удалён с телефона. Чтобы снова делить буфер, придётся подключиться заново.</string>
+    <string name="devices_sheet_self_confirm">Выйти и удалить ключ</string>
+    <string name="devices_sheet_other_confirm">Отключить и отозвать ключ</string>
+    <string name="devices_sheet_legacy_confirm">Отключить и удалить ключ</string>
+    <string name="devices_cancel">Отмена</string>
+    <string name="add_title">Добавить Mac</string>
+    <string name="add_subtitle">Новый Mac войдёт в комнату и увидит общий буфер</string>
+    <string name="add_step_invite">На Mac, который уже подключён, выполни</string>
+    <string name="add_step_join">На новом — команду, которую он покажет</string>
+    <string name="add_join_example">tossling join %1$s/ABCD-EFGH</string>
+    <string name="add_join_note">Пример: у нового Mac будет свой код</string>
+    <string name="add_waiting">Жду новое устройство…</string>
+    <string name="add_joined">%1$s в комнате</string>
+    <string name="add_scan">или отсканируй QR нового Mac</string>
+    <string name="add_done">Готово</string>
+    <string name="add_copy">Скопировать</string>
+    <string name="devices_owner_title">Создатель комнаты</string>
+    <string name="devices_owner_note">Комнату создали на этом Mac, поэтому отключить его нельзя. Если его буфер больше не нужен, выйди из комнаты на главном экране.</string>
+    <string name="devices_sheet_owner_title">Выйти из комнаты?</string>
+    <string name="devices_sheet_owner">Этот Mac создал комнату, его нельзя отключить. Телефон удалит ключ комнаты и перестанет получать буфер от всех её устройств.</string>
+</resources>

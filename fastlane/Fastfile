@@ -1,0 +1,44 @@
+require "tempfile"
+
+# Hand Android builds to testers through Firebase App Distribution.
+#
+#   fastlane upload                          build and distribute the app
+#   fastlane upload notes:"what changed"     with release notes for testers
+#   fastlane check                           verify Firebase access and the tester group
+
+ANDROID_SCRIPT = "deploy/distribute-android.sh"
+def local_property(key)
+  path = File.expand_path("../local.properties", __dir__)
+  return nil unless File.exist?(path)
+  File.foreach(path).map { |line| line.strip.split("=", 2) }.find { |name, _| name == key }&.last
+end
+
+PROJECT = ENV["FIREBASE_PROJECT"] || local_property("firebase_project")
+DEFAULT_NOTES = "Fixes and improvements"
+
+def release_notes(options)
+  options[:notes] || options[:changelog] || ENV.fetch("RELEASE_NOTES", DEFAULT_NOTES)
+end
+
+desc "Verify Firebase access and list App Distribution tester groups"
+lane :check do
+  UI.user_error!("Set FIREBASE_PROJECT or firebase_project in local.properties") unless PROJECT
+  sh("firebase appdistribution:groups:list --project #{PROJECT}")
+end
+
+desc "Build a release APK and send it to Firebase App Distribution testers"
+lane :upload do |options|
+  # Through our own script rather than the fastlane plugin: the Firebase plugin needs `AppExtension`,
+  # which AGP 9 no longer has. The script also verifies the signature and bumps the build number.
+  #
+  # The notes go through a file, not a variable: `shellescape` puts a backslash before every
+  # non-ASCII letter, and the log turns into a picket fence instead of text.
+  notes = Tempfile.new("tossy-release-notes")
+  begin
+    notes.write(release_notes(options))
+    notes.close
+    sh("NOTES_FILE=#{notes.path} ../#{ANDROID_SCRIPT}")
+  ensure
+    notes.unlink
+  end
+end

@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Crypto test vectors shared with tossling-desktop"
+paths = ['''modules/common/sync/src/test/resources/vectors\.json''']

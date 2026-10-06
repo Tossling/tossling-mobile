@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sync_widget_start">#FFD0CAFD</color>
+    <color name="sync_widget_end">#FF9BD4F0</color>
+    <color name="sync_widget_card">#8CFFFFFF</color>
+    <color name="sync_widget_stroke">#F2FFFFFF</color>
+    <color name="sync_widget_ink">#FF1C1C1E</color>
+    <color name="sync_widget_ink2">#993C3C43</color>
+    <color name="sync_widget_accent">#FF3067B8</color>
+    <color name="sync_widget_on_accent">#FFFFFFFF</color>
+</resources>
