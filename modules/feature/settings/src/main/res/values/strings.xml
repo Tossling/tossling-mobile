@@ -3,7 +3,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>
     <string name="settings_pause">Pause sending</string>
-    <string name="settings_pause_note">The phone clipboard does not go to the Mac</string>
+    <string name="settings_pause_note">The phone clipboard does not go to the computer</string>
     <string name="settings_images">Send images</string>
     <string name="settings_images_note">When off, only text</string>
     <string name="settings_instant">Instant delivery</string>

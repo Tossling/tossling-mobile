@@ -31,7 +31,7 @@ internal fun DevicesContent(
                 if (index > 0) Hairline(start = 74f.dp)
                 DeviceRow(
                     name = device.name,
-                    isMac = device.kind == DeviceKind.MAC,
+                    isComputer = device.kind == DeviceKind.COMPUTER,
                     isOnline = device.isOnline,
                     status = if (device.isOnline) stringResource(R.string.devices_online) else seenAgo(time = device.seen),
                     ownName = device.shownOwnName,

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_title">Tossling</string>
-    <string name="welcome_lead">Общий буфер обмена с Mac: скопировал там — вставил здесь.</string>
+    <string name="welcome_lead">Общий буфер обмена с компьютером: скопировал там — вставил здесь.</string>
     <string name="welcome_note">Через ваш сервер, с шифрованием на устройствах.</string>
-    <string name="welcome_pair">Подключить Mac</string>
+    <string name="welcome_pair">Подключить компьютер</string>
     <string name="pairing_title">Подключение</string>
     <string name="pairing_subtitle">Около минуты, один раз</string>
     <string name="pairing_back">Назад</string>
     <string name="pairing_step_mac">На Mac выполни</string>
     <string name="pairing_copy">Скопировать команду</string>
-    <string name="pairing_step_qr">Mac покажет QR-код</string>
+    <string name="pairing_step_qr">Mac покажет QR-код. На Windows он в меню Tossling: «Устройства → Подключить телефон…»</string>
     <string name="pairing_step_scan">Отсканируй его камерой телефона</string>
     <string name="pairing_scan">Сканировать QR</string>
     <string name="pairing_scan_again">Сканировать снова</string>
@@ -21,7 +21,7 @@
     <string name="pairing_error_not_tossling">Это не код Tossling</string>
     <string name="pairing_error_not_tossling_text">QR-код не похож на код подключения. Запусти на Mac команду ниже и отсканируй код из терминала.</string>
     <string name="pairing_error_token">Сервер не принял токен</string>
-    <string name="pairing_error_token_text">Код устарел или уже использован. Получи новый на Mac — и отсканируй ещё раз.</string>
+    <string name="pairing_error_token_text">Код устарел или уже использован. Получи новый на компьютере — и отсканируй ещё раз.</string>
     <string name="pairing_error_network">Нет связи с сервером</string>
     <string name="pairing_error_network_text">%1$s не отвечает. Проверь интернет на телефоне и что сервер запущен.</string>
     <string name="pairing_paired_title">Связались</string>
@@ -35,7 +35,7 @@
     <string name="welcome_saved_room">Комната с %1$s</string>
     <string name="welcome_saved_note">Ключ остался на телефоне после удаления Tossling. Вернись тем же устройством, без QR-кода.</string>
     <string name="welcome_restore">Вернуться в комнату</string>
-    <string name="welcome_pair_other">Подключить другой Mac</string>
+    <string name="welcome_pair_other">Подключить другой компьютер</string>
     <string name="welcome_restore_token">Комната сменила ключ без этого телефона. Подключись заново по QR-коду.</string>
     <string name="welcome_restore_network">%1$s не отвечает. Проверь интернет и попробуй ещё раз.</string>
     <string name="welcome_restore_broken">Сохранённую комнату не удалось прочитать. Подключись заново по QR-коду.</string>

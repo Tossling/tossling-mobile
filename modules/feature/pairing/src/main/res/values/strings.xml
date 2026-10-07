@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_title">Tossling</string>
-    <string name="welcome_lead">One clipboard with the Mac: copy there, paste here.</string>
+    <string name="welcome_lead">One clipboard with your computer: copy there, paste here.</string>
     <string name="welcome_note">Through your own server, encrypted on the devices.</string>
-    <string name="welcome_pair">Pair with a Mac</string>
+    <string name="welcome_pair">Pair with a computer</string>
     <string name="pairing_title">Pairing</string>
     <string name="pairing_subtitle">About a minute, only once</string>
     <string name="pairing_back">Back</string>
     <string name="pairing_step_mac">On the Mac, run</string>
     <string name="pairing_copy">Copy the command</string>
-    <string name="pairing_step_qr">The Mac shows a QR code</string>
+    <string name="pairing_step_qr">The Mac shows a QR code. On Windows it is in the Tossling menu: «Devices → Connect a Phone…»</string>
     <string name="pairing_step_scan">Scan it with the phone camera</string>
     <string name="pairing_scan">Scan QR</string>
     <string name="pairing_scan_again">Scan again</string>
@@ -21,7 +21,7 @@
     <string name="pairing_error_not_tossling">This is not a Tossling code</string>
     <string name="pairing_error_not_tossling_text">The QR code does not look like a pairing code. Run the command below on the Mac and scan the code from the terminal.</string>
     <string name="pairing_error_token">The server did not accept the token</string>
-    <string name="pairing_error_token_text">The code is outdated or already used. Get a new one on the Mac and scan it again.</string>
+    <string name="pairing_error_token_text">The code is outdated or already used. Get a new one on the computer and scan it again.</string>
     <string name="pairing_error_network">No connection to the server</string>
     <string name="pairing_error_network_text">%1$s does not respond. Check the internet on the phone and that the server is running.</string>
     <string name="pairing_paired_title">Paired</string>
@@ -35,7 +35,7 @@
     <string name="welcome_saved_room">Room with %1$s</string>
     <string name="welcome_saved_note">The key stayed on this phone after Tossling was removed. Return as the same device, no QR code needed.</string>
     <string name="welcome_restore">Return to the room</string>
-    <string name="welcome_pair_other">Pair with another Mac</string>
+    <string name="welcome_pair_other">Pair with another computer</string>
     <string name="welcome_restore_token">The room has moved on without this phone. Pair again with the QR code.</string>
     <string name="welcome_restore_network">%1$s does not respond. Check the internet and try again.</string>
     <string name="welcome_restore_broken">The kept room could not be read. Pair again with the QR code.</string>

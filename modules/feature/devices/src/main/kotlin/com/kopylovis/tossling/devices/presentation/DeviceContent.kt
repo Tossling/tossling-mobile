@@ -117,7 +117,7 @@ internal fun DeviceContent(
                 when {
                     !device.isRoom -> R.string.devices_unpair
                     device.isSelf || device.isOwner -> R.string.devices_leave
-                    device.kind == DeviceKind.MAC -> R.string.devices_remove_mac
+                    device.kind == DeviceKind.COMPUTER -> R.string.devices_remove_mac
                     else -> R.string.devices_remove_phone
                 },
             ),
@@ -142,7 +142,7 @@ private fun DeviceHeader(device: RoomDevice) {
         verticalArrangement = Arrangement.spacedBy(10f.dp),
     ) {
         CircleBadge(
-            icon = if (device.kind == DeviceKind.MAC) TosslingIcons.Laptop else TosslingIcons.Phone,
+            icon = if (device.kind == DeviceKind.COMPUTER) TosslingIcons.Laptop else TosslingIcons.Phone,
             tint = if (device.isOnline) palette.onAccent else palette.ink2,
             background = if (device.isOnline) palette.accent else palette.glassWeak,
             size = 80f.dp,

@@ -55,12 +55,12 @@ data class Member(
     val alias: String = "",
     val pk: String = "",
 ) {
-    val isMac: Boolean get() = source == "mac"
+    val isComputer: Boolean get() = source in COMPUTER_SOURCES
 
     val title: String get() = alias.ifEmpty { name }
 }
 
-enum class DeviceKind { MAC, PHONE }
+enum class DeviceKind { COMPUTER, PHONE }
 
 data class RoomDevice(
     val id: String,
@@ -179,3 +179,5 @@ data class Transfer(
 ) {
     val percent: Int get() = if (total <= 0) 0 else (done * 100 / total).toInt().coerceIn(0, 100)
 }
+
+val COMPUTER_SOURCES = setOf("mac", "windows", "linux")

@@ -633,7 +633,7 @@ class ClipRepository internal constructor(
     }
 
     private fun macsOf(pairing: Pairing, link: LinkStatus): List<MacDevice> {
-        val macMembers = pairing.members.filter { it.isMac }
+        val macMembers = pairing.members.filter { it.isComputer }
         return when {
             !pairing.isRoom -> listOf(MacDevice(id = pairing.id, pairingId = pairing.id, name = pairing.macName.ifEmpty { "Mac" }, host = pairing.host, link = link))
             macMembers.isNotEmpty() -> macMembers.map { MacDevice(id = it.id, pairingId = pairing.id, name = it.title, host = pairing.host, link = link) }
@@ -662,7 +662,7 @@ class ClipRepository internal constructor(
                     id = member.id,
                     pairingId = pairing.id,
                     name = member.title,
-                    kind = if (member.isMac) DeviceKind.MAC else DeviceKind.PHONE,
+                    kind = if (member.isComputer) DeviceKind.COMPUTER else DeviceKind.PHONE,
                     isSelf = false,
                     isOnline = now - member.seen < ONLINE_MS,
                     seen = member.seen,
@@ -680,7 +680,7 @@ class ClipRepository internal constructor(
                     id = mac.id,
                     pairingId = pairing.id,
                     name = mac.name,
-                    kind = DeviceKind.MAC,
+                    kind = DeviceKind.COMPUTER,
                     isSelf = false,
                     isOnline = link.isOnline,
                     seen = link.lastContact,

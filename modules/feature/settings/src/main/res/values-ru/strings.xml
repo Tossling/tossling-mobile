@@ -3,7 +3,7 @@
     <string name="settings_title">Настройки</string>
     <string name="settings_back">Назад</string>
     <string name="settings_pause">Пауза отправки</string>
-    <string name="settings_pause_note">Буфер телефона не уходит на Mac</string>
+    <string name="settings_pause_note">Буфер телефона не уходит на компьютер</string>
     <string name="settings_images">Передавать картинки</string>
     <string name="settings_images_note">Если выключено — только текст</string>
     <string name="settings_instant">Мгновенная доставка</string>

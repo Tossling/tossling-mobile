@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sync_tile_label">Буфер → Mac</string>
-    <string name="sync_share_label">На Mac</string>
-    <string name="sync_channel_received">С Mac</string>
+    <string name="sync_tile_label">Буфер → компьютер</string>
+    <string name="sync_share_label">На компьютер</string>
+    <string name="sync_channel_received">С компьютера</string>
     <string name="sync_channel_work">Синхронизация</string>
     <string name="sync_channel_errors">Ошибки</string>
     <string name="sync_received_title">Скопировано с %1$s</string>
@@ -10,9 +10,9 @@
     <string name="sync_missed_title">Файл %1$s не дошёл</string>
     <string name="sync_missed_text">%1$s отправил его больше 3 часов назад, и сервер его уже удалил. Отправьте ещё раз.</string>
     <string name="sync_open_link">Открыть ссылку</string>
-    <string name="sync_send_failed">Не отправилось на Mac</string>
+    <string name="sync_send_failed">Не отправилось на компьютер</string>
     <string name="sync_working">Синхронизирую буфер</string>
-    <string name="sync_not_paired">Tossling ещё не подключён к Mac</string>
+    <string name="sync_not_paired">Tossling ещё не подключён к компьютеру</string>
     <string name="sync_too_large">Слишком большое: текст до 1 МБ, картинка до 15 МБ, файл до 500 МБ</string>
     <string name="sync_clipboard_empty">Буфер обмена пуст</string>
     <plurals name="sync_sending_files">
@@ -27,7 +27,7 @@
         <item quantity="many">Отправляю %1$d из %2$d: остальные слишком большие или не читаются</item>
         <item quantity="other">Отправляю %1$d из %2$d: остальные слишком большие или не читаются</item>
     </plurals>
-    <string name="sync_sending">Отправляю на Mac</string>
+    <string name="sync_sending">Отправляю на компьютер</string>
     <string name="sync_paused">Отправка на паузе</string>
     <string name="sync_images_off">Картинки выключены в настройках</string>
     <string name="sync_channel_projects">Проекты</string>
@@ -58,7 +58,7 @@
     <string name="sync_widget_label">Tossling</string>
     <string name="sync_widget_description">Последний клип и кнопка «Отправить буфер»</string>
     <string name="sync_widget_send">Отправить буфер</string>
-    <string name="sync_widget_empty">Пока пусто: скопируй что-нибудь на Mac</string>
+    <string name="sync_widget_empty">Пока пусто: скопируй что-нибудь на компьютере</string>
     <string name="sync_widget_from">С %1$s</string>
     <string name="sync_widget_sent">Отправлено</string>
     <string name="sync_widget_to">На %1$s</string>

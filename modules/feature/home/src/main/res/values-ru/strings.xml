@@ -2,7 +2,7 @@
 <resources>
     <string name="home_title">Tossling</string>
     <string name="home_title_room">Буфер</string>
-    <string name="home_subtitle">Общий буфер с Mac</string>
+    <string name="home_subtitle">Общий буфер с компьютером</string>
     <string name="home_room">Комната · %1$s</string>
     <string name="home_room_number">Комната %1$d</string>
     <string name="home_owner">создатель</string>
@@ -15,9 +15,9 @@
     <string name="home_delivery_on_open">при открытии приложения</string>
     <string name="home_last_contact">Последняя связь</string>
     <string name="home_self">это устройство</string>
-    <string name="home_add_mac">Добавить Mac</string>
+    <string name="home_add_mac">Добавить компьютер</string>
     <string name="home_tile_action">Добавить плитку в шторку</string>
-    <string name="home_tile_rest">" — отправка на Mac одним касанием"</string>
+    <string name="home_tile_rest">" — отправка на компьютер одним касанием"</string>
     <string name="home_tile_close">Скрыть подсказку</string>
     <string name="home_search">Поиск</string>
     <string name="home_search_hint">Текст, имя файла или устройство</string>
@@ -28,18 +28,18 @@
     <string name="home_history">Недавнее</string>
     <string name="home_history_count">%1$d</string>
     <string name="home_history_empty_title">Пока пусто</string>
-    <string name="home_history_empty">Скопируй текст или картинку на Mac — через секунду они появятся здесь.</string>
+    <string name="home_history_empty">Скопируй текст или картинку на компьютере — через секунду они появятся здесь.</string>
     <string name="home_from">С %1$s</string>
     <string name="home_to">На %1$s</string>
-    <string name="home_from_mac">С Mac</string>
-    <string name="home_to_mac">На Mac</string>
+    <string name="home_from_mac">С компьютера</string>
+    <string name="home_to_mac">На компьютер</string>
     <string name="home_to_all">На все устройства</string>
     <string name="home_pick_title">Куда отправить?</string>
     <string name="home_pick_preview">В буфере: «%1$s»</string>
     <string name="home_pick_all">Все устройства</string>
-    <string name="home_pick_all_note">%1$s: Mac и телефоны</string>
+    <string name="home_pick_all_note">%1$s: компьютеры и телефоны</string>
     <string name="home_pick_later">%1$s · получит, когда появится</string>
-    <string name="home_pick_note">Телефоны и Mac в комнате получат одновременно</string>
+    <string name="home_pick_note">Телефоны и компьютеры в комнате получат одновременно</string>
     <plurals name="home_devices">
         <item quantity="one">%d устройство</item>
         <item quantity="few">%d устройства</item>
@@ -56,6 +56,6 @@
     <string name="home_devices_title">Устройства</string>
     <string name="home_leave">Выйти из комнаты</string>
     <string name="home_leave_title">Выйти из комнаты?</string>
-    <string name="home_leave_text">Телефон удалит ключ комнаты и перестанет делить буфер с её устройствами. Вернуться — отсканировать QR на Mac.</string>
+    <string name="home_leave_text">Телефон удалит ключ комнаты и перестанет делить буфер с её устройствами. Вернуться — отсканировать QR на компьютере.</string>
     <string name="home_leave_confirm">Выйти и удалить ключ</string>
 </resources>

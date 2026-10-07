@@ -96,7 +96,7 @@ fun PageTitle(title: String, modifier: Modifier = Modifier, subtitle: String? = 
 @Composable
 fun DeviceRow(
     name: String,
-    isMac: Boolean,
+    isComputer: Boolean,
     isOnline: Boolean,
     status: String,
     selfLabel: String?,
@@ -115,7 +115,7 @@ fun DeviceRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CircleBadge(
-            icon = if (isMac) TosslingIcons.Laptop else TosslingIcons.Phone,
+            icon = if (isComputer) TosslingIcons.Laptop else TosslingIcons.Phone,
             tint = if (isOnline) palette.onAccent else palette.ink2,
             background = if (isOnline) palette.accent else palette.glassWeak,
             size = 44f.dp,

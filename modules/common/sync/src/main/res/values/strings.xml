@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sync_tile_label">Clipboard → Mac</string>
-    <string name="sync_share_label">Send to Mac</string>
-    <string name="sync_channel_received">From the Mac</string>
+    <string name="sync_tile_label">Clipboard → Computer</string>
+    <string name="sync_share_label">Send to Computer</string>
+    <string name="sync_channel_received">From the computer</string>
     <string name="sync_channel_work">Syncing</string>
     <string name="sync_channel_errors">Errors</string>
     <string name="sync_received_title">Copied from %1$s</string>
@@ -10,9 +10,9 @@
     <string name="sync_missed_title">%1$s did not arrive</string>
     <string name="sync_missed_text">%1$s sent it over 3 hours ago and the server has already deleted it. Ask to send it again.</string>
     <string name="sync_open_link">Open link</string>
-    <string name="sync_send_failed">Could not send to the Mac</string>
+    <string name="sync_send_failed">Could not send to the computer</string>
     <string name="sync_working">Syncing the clipboard</string>
-    <string name="sync_not_paired">Tossling is not paired with a Mac yet</string>
+    <string name="sync_not_paired">Tossling is not paired with a computer yet</string>
     <string name="sync_too_large">Too large: up to 1 MB of text, 15 MB per image or 500 MB per file</string>
     <string name="sync_clipboard_empty">The clipboard is empty</string>
     <plurals name="sync_sending_files">
@@ -23,7 +23,7 @@
         <item quantity="one">Sending %1$d of %2$d files, the rest are too large or unreadable</item>
         <item quantity="other">Sending %1$d of %2$d files, the rest are too large or unreadable</item>
     </plurals>
-    <string name="sync_sending">Sending to the Mac</string>
+    <string name="sync_sending">Sending to the computer</string>
     <string name="sync_paused">Sending is paused</string>
     <string name="sync_images_off">Images are turned off in settings</string>
     <string name="sync_channel_projects">Projects</string>
@@ -54,7 +54,7 @@
     <string name="sync_widget_label">Tossling</string>
     <string name="sync_widget_description">Last clip and a button to send the clipboard</string>
     <string name="sync_widget_send">Send clipboard</string>
-    <string name="sync_widget_empty">Nothing yet: copy something on the Mac</string>
+    <string name="sync_widget_empty">Nothing yet: copy something on the computer</string>
     <string name="sync_widget_from">From %1$s</string>
     <string name="sync_widget_sent">Sent</string>
     <string name="sync_widget_to">To %1$s</string>

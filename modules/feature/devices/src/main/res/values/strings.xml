@@ -6,8 +6,8 @@
     <string name="devices_online">online</string>
     <string name="devices_self">this device</string>
     <string name="devices_self_title">This device</string>
-    <string name="devices_add_mac">Add a Mac</string>
-    <string name="devices_note">A device that is offline gets the clipboard when it is back. Another phone joins by scanning the QR of tossling pair on any Mac in the room.</string>
+    <string name="devices_add_mac">Add a computer</string>
+    <string name="devices_note">A device that is offline gets the clipboard when it is back. Another phone joins by scanning the QR of tossling pair on any Mac in the room, or of «Devices → Connect a Phone…» in the Tossling menu on Windows.</string>
     <string name="devices_name">Name</string>
     <string name="devices_own_name">Its own name</string>
     <string name="devices_system_name">Name in Android</string>
@@ -19,7 +19,7 @@
     <string name="devices_name_local">This name is shown on this phone only. Leave it empty to go back to the device\'s own name.</string>
     <string name="devices_leave">Leave the room</string>
     <string name="devices_unpair">Disconnect</string>
-    <string name="devices_remove_mac">Disconnect this Mac</string>
+    <string name="devices_remove_mac">Disconnect this computer</string>
     <string name="devices_remove_phone">Disconnect this device</string>
     <string name="devices_sheet_title">Disconnect %1$s?</string>
     <string name="devices_sheet_self">The phone removes the room key and stops getting the clipboard. Come back with tossling pair.</string>
@@ -29,19 +29,19 @@
     <string name="devices_sheet_other_confirm">Disconnect and revoke the key</string>
     <string name="devices_sheet_legacy_confirm">Disconnect and remove the key</string>
     <string name="devices_cancel">Cancel</string>
-    <string name="add_title">Add a Mac</string>
-    <string name="add_subtitle">The new Mac joins the room and sees the shared clipboard</string>
+    <string name="add_title">Add a computer</string>
+    <string name="add_subtitle">The new computer joins the room and sees the shared clipboard</string>
     <string name="add_step_invite">On a Mac that is already in the room, run</string>
-    <string name="add_step_join">On the new one, run the command it shows</string>
+    <string name="add_step_join">On the new one, run the command it shows. On Windows, paste the part after tossling join into the Tossling window</string>
     <string name="add_join_example">tossling join %1$s/ABCD-EFGH</string>
-    <string name="add_join_note">Example: the new Mac gets its own code</string>
+    <string name="add_join_note">Example: the new computer gets its own code</string>
     <string name="add_waiting">Waiting for the new device…</string>
     <string name="add_joined">%1$s is in the room</string>
-    <string name="add_scan">or scan the QR of the new Mac</string>
+    <string name="add_scan">or scan the QR of the new computer</string>
     <string name="add_done">Done</string>
     <string name="add_copy">Copy</string>
     <string name="devices_owner_title">Room creator</string>
-    <string name="devices_owner_note">The room was created on this Mac, so it can\'t be removed from the room. If you no longer want its clipboard, leave the room on the main screen.</string>
+    <string name="devices_owner_note">The room was created on this computer, so it can\'t be removed from the room. If you no longer want its clipboard, leave the room on the main screen.</string>
     <string name="devices_sheet_owner_title">Leave the room?</string>
-    <string name="devices_sheet_owner">This Mac created the room and can\'t be removed. The phone removes the room key and stops getting the clipboard from every device in it.</string>
+    <string name="devices_sheet_owner">This computer created the room and can\'t be removed. The phone removes the room key and stops getting the clipboard from every device in it.</string>
 </resources>

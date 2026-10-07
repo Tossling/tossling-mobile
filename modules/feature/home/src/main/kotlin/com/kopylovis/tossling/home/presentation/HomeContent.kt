@@ -377,7 +377,7 @@ private fun DevicesGroup(state: HomeScreenState, component: HomeComponent, modif
                     if (index > 0) Hairline(start = 74f.dp)
                     DeviceRow(
                         name = device.name,
-                        isMac = device.kind == DeviceKind.MAC,
+                        isComputer = device.kind == DeviceKind.COMPUTER,
                         isOnline = device.isOnline,
                         status = if (device.isOnline) stringResource(R.string.home_online) else seenAgo(time = device.seen),
                         ownName = device.shownOwnName,
@@ -441,7 +441,7 @@ private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss
             current.targets.forEach { device ->
                 Hairline(start = 68f.dp)
                 PickRow(
-                    icon = if (device.kind == DeviceKind.MAC) TosslingIcons.Laptop else TosslingIcons.Phone,
+                    icon = if (device.kind == DeviceKind.COMPUTER) TosslingIcons.Laptop else TosslingIcons.Phone,
                     label = device.name,
                     note = if (device.isOnline) stringResource(R.string.home_online) else stringResource(R.string.home_pick_later, seenAgo(time = device.seen)),
                     isPrimary = false,
