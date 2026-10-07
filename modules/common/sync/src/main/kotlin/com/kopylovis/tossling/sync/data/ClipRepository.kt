@@ -745,7 +745,7 @@ class ClipRepository internal constructor(
         private const val MESSAGE_EVENT = "message"
         private const val SOURCE_MAC = "mac"
         private const val LEGACY_PREFIX = "legacy-"
-        private const val TOKEN_LABEL = "tossy"
+        private const val TOKEN_LABEL = "tossling"
         private const val ROOM_BYTES = 12
         private const val FIRST_SINCE = "15m"
         private const val STALE_SECONDS = 15 * 60
