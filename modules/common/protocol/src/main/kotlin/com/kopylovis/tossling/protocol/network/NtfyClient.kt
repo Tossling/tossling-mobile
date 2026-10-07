@@ -94,11 +94,12 @@ class NtfyException(val code: Int, message: String) : Exception(message)
 
 class NtfyClient {
 
-    suspend fun publish(endpoint: Endpoint, topic: String, message: String, body: ByteArray?) = withContext(Dispatchers.IO) {
+    suspend fun publish(endpoint: Endpoint, topic: String, message: String, body: ByteArray?, headers: Map<String, String> = emptyMap()) = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/$topic")
         connection.requestMethod = if (body == null) "POST" else "PUT"
         connection.doOutput = true
         connection.setRequestProperty("X-Priority", "4")
+        headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
         val payload = if (body == null) {
             message.toByteArray()
         } else {
@@ -224,8 +225,9 @@ class NtfyClient {
         }
     }
 
-    suspend fun stream(endpoint: Endpoint, topics: List<String>, onOpen: () -> Unit, onEvent: (NtfyEvent) -> Unit) = coroutineScope {
-        val connection = open(endpoint = endpoint, url = "${endpoint.server}/${topics.joinToString(separator = ",")}/json")
+    suspend fun stream(endpoint: Endpoint, topics: List<String>, since: String? = null, onOpen: () -> Unit, onEvent: (NtfyEvent) -> Unit) = coroutineScope {
+        val query = since?.let { "?since=" + URLEncoder.encode(it, Charsets.UTF_8.name()) }.orEmpty()
+        val connection = open(endpoint = endpoint, url = "${endpoint.server}/${topics.joinToString(separator = ",")}/json$query")
         connection.readTimeout = LIVE_TIMEOUT_MS
         val closer = launch(Dispatchers.IO) {
             try {

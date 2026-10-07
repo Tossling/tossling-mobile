@@ -16,12 +16,15 @@ import kotlin.concurrent.thread
 
 class StreamTest {
 
+    private val requests = CopyOnWriteArrayList<String>()
+
     private fun server(lines: List<String>): ServerSocket {
         val socket = ServerSocket(0)
         thread(isDaemon = true) {
             runCatching {
                 socket.accept().use { client ->
                     val input = client.getInputStream().bufferedReader()
+                    requests.add(input.readLine().orEmpty())
                     while (input.readLine().orEmpty().isNotEmpty()) Unit
                     val out = client.getOutputStream()
                     out.write("HTTP/1.1 200 OK\r\nContent-Type: application/x-ndjson\r\n\r\n".toByteArray())
@@ -59,5 +62,18 @@ class StreamTest {
         withTimeout(3_000) { job.cancelAndJoin() }
         socket.close()
         assertTrue(System.currentTimeMillis() - started < 3_000)
+    }
+
+    @Test
+    fun asksForTheTopicsSinceTheLastEvent() = runBlocking {
+        val socket = server(lines = listOf("""{"id":"b","event":"message","topic":"t"}"""))
+        val events = CopyOnWriteArrayList<NtfyEvent>()
+        val job = launch(Dispatchers.IO) {
+            runCatching { NtfyClient().stream(endpoint = Endpoint(server = "http://127.0.0.1:${socket.localPort}"), topics = listOf("a", "b"), since = "Xy z", onOpen = {}, onEvent = { events.add(it) }) }
+        }
+        withTimeout(5_000) { while (events.isEmpty()) delay(20) }
+        job.cancelAndJoin()
+        socket.close()
+        assertEquals("GET /a,b/json?since=Xy+z HTTP/1.1", requests.single())
     }
 }
