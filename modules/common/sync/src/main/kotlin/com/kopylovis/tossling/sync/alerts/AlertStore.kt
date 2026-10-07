@@ -26,6 +26,15 @@ internal class AlertStore(context: Context) {
 
     fun setPendingRemovals(topics: Set<String>) = prefs.edit { putStringSet(KEY_REMOVED, topics) }
 
+    fun formerServers(): Set<String> = prefs.getStringSet(KEY_FORMER_SERVERS, null).orEmpty()
+
+    fun moveServer(from: String, to: String) {
+        prefs.edit { putStringSet(KEY_FORMER_SERVERS, formerServers() + from - to) }
+        if (_projects.value.none { it.endpoint.server == from }) return
+        _projects.update { list -> list.map { if (it.endpoint.server == from) it.copy(endpoint = it.endpoint.copy(server = to)) else it } }
+        writeProjects()
+    }
+
     fun lastId(topic: String): String = prefs.getString("$KEY_LAST_ID$topic", null).orEmpty()
 
     fun saveLastId(topic: String, id: String) = prefs.edit { putString("$KEY_LAST_ID$topic", id) }
@@ -88,6 +97,7 @@ internal class AlertStore(context: Context) {
         private const val FILE = "alerts.json"
         private const val KEY_PROJECTS = "projects"
         private const val KEY_LAST_ID = "last_id."
+        private const val KEY_FORMER_SERVERS = "former_servers"
         private const val KEY_REMOVED = "removed_topics"
         private const val CAPACITY = 500
         private val ProjectsSerializer = ListSerializer(Project.serializer())

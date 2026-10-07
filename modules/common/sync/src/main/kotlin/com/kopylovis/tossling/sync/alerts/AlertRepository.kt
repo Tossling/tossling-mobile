@@ -92,7 +92,7 @@ class AlertRepository internal constructor(
             removed.forEach { topic -> client.removeSubscription(endpoint = server, topic = topic) }
             if (removed.isNotEmpty()) store.setPendingRemovals(topics = emptySet())
             val remote = client.subscriptions(endpoint = server)
-                .filter { it.baseUrl.trimEnd('/') == server.server && TOPIC.matches(it.topic) && !isRoomTopic(topic = it.topic) }
+                .filter { (it.baseUrl.trimEnd('/') == server.server || it.baseUrl.trimEnd('/') in store.formerServers()) && TOPIC.matches(it.topic) && !isRoomTopic(topic = it.topic) }
             val remoteTopics = remote.map { it.topic }.toSet()
             val paired = pairings.pairings.value.map { it.server }.toSet() + server.server
             movedProjects(projects = store.projects.value, paired = paired, remoteTopics = remoteTopics).forEach { project ->
@@ -123,6 +123,11 @@ class AlertRepository internal constructor(
             }
             syncedAt = now
         }.onFailure { Log.w(TAG, "project sync failed", it) }
+    }
+
+    internal fun moveServer(from: String, to: String) {
+        store.moveServer(from = from, to = to)
+        syncedAt = 0
     }
 
     private suspend fun moveProject(project: Project, server: Endpoint) {

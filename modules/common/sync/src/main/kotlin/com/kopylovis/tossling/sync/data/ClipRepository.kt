@@ -113,6 +113,8 @@ class ClipRepository internal constructor(
         }
     }
 
+    internal fun moveServer(from: String, to: String) = store.moveServer(from = from, to = to)
+
     suspend fun savedRooms(): SavedRooms? = if (store.pairings.value.isNotEmpty()) null else backup.load()
 
     suspend fun restore(saved: SavedRooms): Pairing {

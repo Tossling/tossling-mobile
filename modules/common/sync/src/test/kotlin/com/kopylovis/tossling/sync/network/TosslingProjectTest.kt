@@ -47,4 +47,11 @@ class TosslingProjectTest {
     fun sendsOnlyTopicAndName() {
         assertEquals("""{"topic":"home-nas","name":"Home NAS"}""", SyncJson.encodeToString(TosslingProjectRequest.serializer(), TosslingProjectRequest(topic = "home-nas", name = "Home NAS")))
     }
+
+    @Test
+    fun readsTheMainAddressFromHealth() {
+        val health = SyncJson.decodeFromString(TosslingHealth.serializer(), """{"server":"tossling-server","version":"0.3.1","push":true,"url":"https://tossling.example.com"}""")
+        assertEquals("https://tossling.example.com", health.url)
+        assertEquals("", SyncJson.decodeFromString(TosslingHealth.serializer(), """{"server":"tossling-server"}""").url)
+    }
 }

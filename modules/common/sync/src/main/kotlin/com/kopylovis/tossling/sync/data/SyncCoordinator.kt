@@ -1,6 +1,7 @@
 package com.kopylovis.tossling.sync.data
 
 import android.content.Context
+import android.util.Log
 import com.kopylovis.tossling.sync.alerts.AlertRepository
 import com.kopylovis.tossling.sync.live.LiveConnectionService
 import com.kopylovis.tossling.sync.network.NtfyClient
@@ -57,6 +58,21 @@ class SyncCoordinator internal constructor(
             health != null -> settings.setServerPush(value = health.push)
             client.isReachable(endpoint = endpoint) -> settings.setServerPush(value = null)
         }
+        if (health != null) moveIfAsked(endpoint = endpoint, url = health.url)
+    }
+
+    private suspend fun moveIfAsked(endpoint: Endpoint, url: String) {
+        val target = serverMoveTarget(current = endpoint.server, url = url) ?: return
+        val next = endpoint.copy(server = target)
+        val isTossling = runCatching { client.tosslingHealth(endpoint = next) }.getOrNull()?.isTossling == true
+        val accountOk = isTossling && runCatching { client.subscriptions(endpoint = next) }.isSuccess
+        if (!acceptsServerMove(isTossling = isTossling, accountOk = accountOk)) {
+            Log.w(TAG, "the server asks to move to $target, but it does not answer there; staying on ${endpoint.server}")
+            return
+        }
+        clips.moveServer(from = endpoint.server, to = target)
+        alerts.moveServer(from = endpoint.server, to = target)
+        Log.i(TAG, "moved from ${endpoint.server} to $target")
     }
 
     fun restoreLive() {
@@ -95,5 +111,9 @@ class SyncCoordinator internal constructor(
         settings.setInstant(value = value)
         clips.subscribeAll(subscribe = value)
         alerts.subscribeAll(subscribe = value)
+    }
+
+    private companion object {
+        private const val TAG = "SyncCoordinator"
     }
 }

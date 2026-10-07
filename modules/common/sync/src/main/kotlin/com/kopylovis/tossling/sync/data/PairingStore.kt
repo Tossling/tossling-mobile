@@ -95,6 +95,12 @@ internal class PairingStore(context: Context) {
         return moved
     }
 
+    fun moveServer(from: String, to: String) {
+        if (_pairings.value.none { it.server == from }) return
+        _pairings.update { list -> list.map { if (it.server == from) it.copy(server = to) else it } }
+        writePairings()
+    }
+
     fun removePairing(id: String) {
         _pairings.update { list -> list.filterNot { it.id == id } }
         prefs.edit {

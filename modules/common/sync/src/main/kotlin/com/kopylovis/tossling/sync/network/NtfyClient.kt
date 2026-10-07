@@ -64,6 +64,7 @@ internal data class NtfyTokenRequest(
 internal data class TosslingHealth(
     val server: String = "",
     val push: Boolean? = null,
+    val url: String = "",
 ) {
     val isOurs: Boolean get() = server == TOSSLING_SERVER || server == TOSSY_SERVER
     val isTossling: Boolean get() = server == TOSSLING_SERVER
