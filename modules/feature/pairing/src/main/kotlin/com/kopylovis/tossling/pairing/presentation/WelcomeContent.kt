@@ -22,14 +22,14 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.kopylovis.tossling.core.presentation.glass.CapsuleButton
 import com.kopylovis.tossling.core.presentation.glass.CapsuleStyle
-import com.kopylovis.tossling.core.presentation.glass.GlassGroup
 import com.kopylovis.tossling.core.presentation.glass.FloatingBar
+import com.kopylovis.tossling.core.presentation.glass.GlassGroup
 import com.kopylovis.tossling.core.presentation.glass.GlassScreen
 import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.TosslingLogo
 import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.pairing.R
-import com.kopylovis.tossling.sync.data.PairingProblem
+import com.kopylovis.tossling.protocol.PairingProblem
 import com.kopylovis.tossling.sync.data.SavedRooms
 
 @Composable

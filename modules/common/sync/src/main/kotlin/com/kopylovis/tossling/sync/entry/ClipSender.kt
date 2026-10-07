@@ -6,14 +6,14 @@ import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.widget.Toast
+import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.sync.R
 import com.kopylovis.tossling.sync.clipboard.ClipboardBridge
 import com.kopylovis.tossling.sync.clipboard.Outgoing
 import com.kopylovis.tossling.sync.clipboard.TooLargeException
-import com.kopylovis.tossling.sync.data.ClipKind
 import com.kopylovis.tossling.sync.data.ClipRepository
 import com.kopylovis.tossling.sync.data.SyncSettings
-import com.kopylovis.tossling.sync.data.Transfer
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import com.kopylovis.tossling.sync.work.SendWorker
 

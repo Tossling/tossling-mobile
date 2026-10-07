@@ -5,13 +5,13 @@ import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.BaseComponent
 import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.navigation.GlobalNavigator
+import com.kopylovis.tossling.protocol.alerts.Project
+import com.kopylovis.tossling.protocol.alerts.ProjectException
+import com.kopylovis.tossling.protocol.alerts.ProjectProblem
 import com.kopylovis.tossling.sync.alerts.AlertRepository
 import com.kopylovis.tossling.sync.alerts.AppChoice
-import kotlinx.collections.immutable.toImmutableList
-import com.kopylovis.tossling.sync.alerts.Project
-import com.kopylovis.tossling.sync.alerts.ProjectException
-import com.kopylovis.tossling.sync.alerts.ProjectProblem
 import com.kopylovis.tossling.sync.data.ClipRepository
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.inject

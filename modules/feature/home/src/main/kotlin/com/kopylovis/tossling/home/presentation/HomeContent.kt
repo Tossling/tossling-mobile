@@ -32,12 +32,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -128,19 +128,19 @@ import com.kopylovis.tossling.core.presentation.relativeTime
 import com.kopylovis.tossling.core.presentation.seenAgo
 import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.home.R
-import com.kopylovis.tossling.sync.data.ClipItem
-import com.kopylovis.tossling.sync.data.ClipKind
-import com.kopylovis.tossling.sync.data.DeviceKind
-import com.kopylovis.tossling.sync.data.RoomDevice
-import com.kopylovis.tossling.sync.data.Transfer
+import com.kopylovis.tossling.protocol.ClipItem
+import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.DeviceKind
+import com.kopylovis.tossling.protocol.RoomDevice
+import com.kopylovis.tossling.protocol.Transfer
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
-import java.io.File
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

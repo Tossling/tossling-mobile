@@ -1,6 +1,6 @@
 package com.kopylovis.tossling.sync.live
 
-import com.kopylovis.tossling.sync.data.Endpoint
+import com.kopylovis.tossling.protocol.Endpoint
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

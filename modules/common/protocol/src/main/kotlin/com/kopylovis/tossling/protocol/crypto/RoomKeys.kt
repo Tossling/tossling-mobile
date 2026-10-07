@@ -1,6 +1,6 @@
-package com.kopylovis.tossling.sync.crypto
+package com.kopylovis.tossling.protocol.crypto
 
-import com.kopylovis.tossling.sync.data.SyncJson
+import com.kopylovis.tossling.protocol.SyncJson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.security.SecureRandom
@@ -10,7 +10,7 @@ import javax.crypto.Mac
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-internal class DeviceIdentity(val privateKey: ByteArray) {
+class DeviceIdentity(val privateKey: ByteArray) {
 
     val publicKey: ByteArray = X25519.publicKey(privateKey = privateKey)
 
@@ -22,18 +22,18 @@ internal class DeviceIdentity(val privateKey: ByteArray) {
 }
 
 @Serializable
-internal data class RoomSecret(
+data class RoomSecret(
     @SerialName("key") val key: String,
     @SerialName("r") val room: String,
     @SerialName("t") val token: String? = null,
 )
 
-internal data class SealedRoom(
+data class SealedRoom(
     val ephemeral: String,
     val keys: Map<String, String>,
 )
 
-internal object RoomKeys {
+object RoomKeys {
 
     private const val INFO = "tossy-rekey-v1"
     private const val NONCE_SIZE = 12

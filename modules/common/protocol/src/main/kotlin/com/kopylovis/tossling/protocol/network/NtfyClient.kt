@@ -1,7 +1,7 @@
-package com.kopylovis.tossling.sync.network
+package com.kopylovis.tossling.protocol.network
 
-import com.kopylovis.tossling.sync.data.Endpoint
-import com.kopylovis.tossling.sync.data.SyncJson
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.SyncJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
@@ -16,7 +16,7 @@ import java.net.URL
 import java.net.URLEncoder
 
 @Serializable
-internal data class NtfyEvent(
+data class NtfyEvent(
     val id: String = "",
     val time: Long = 0,
     val event: String = "",
@@ -32,36 +32,36 @@ internal data class NtfyEvent(
 )
 
 @Serializable
-internal data class NtfyAttachment(
+data class NtfyAttachment(
     val url: String = "",
     val type: String? = null,
     val size: Long? = null,
 )
 
 @Serializable
-internal data class NtfyToken(
+data class NtfyToken(
     val token: String = "",
 )
 
 @Serializable
-internal data class NtfySubscription(
+data class NtfySubscription(
     @SerialName("base_url") val baseUrl: String = "",
     val topic: String = "",
     @SerialName("display_name") val displayName: String? = null,
 )
 
 @Serializable
-internal data class NtfyAccount(
+data class NtfyAccount(
     val subscriptions: List<NtfySubscription> = emptyList(),
 )
 
 @Serializable
-internal data class NtfyTokenRequest(
+data class NtfyTokenRequest(
     val label: String,
 )
 
 @Serializable
-internal data class TosslingHealth(
+data class TosslingHealth(
     val server: String = "",
     val push: Boolean? = null,
     val url: String = "",
@@ -76,13 +76,13 @@ internal data class TosslingHealth(
 }
 
 @Serializable
-internal data class TosslingProjectRequest(
+data class TosslingProjectRequest(
     val topic: String,
     val name: String,
 )
 
 @Serializable
-internal data class TosslingProject(
+data class TosslingProject(
     val topic: String = "",
     val name: String = "",
     val publisher: String? = null,
@@ -92,7 +92,7 @@ internal data class TosslingProject(
 
 class NtfyException(val code: Int, message: String) : Exception(message)
 
-internal class NtfyClient {
+class NtfyClient {
 
     suspend fun publish(endpoint: Endpoint, topic: String, message: String, body: ByteArray?) = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/$topic")

@@ -12,11 +12,11 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.network.NtfyClient
 import com.kopylovis.tossling.sync.alerts.AlertRepository
 import com.kopylovis.tossling.sync.data.ClipRepository
-import com.kopylovis.tossling.sync.data.Endpoint
 import com.kopylovis.tossling.sync.data.SyncCoordinator
-import com.kopylovis.tossling.sync.network.NtfyClient
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import com.kopylovis.tossling.sync.work.FetchWorker
 import kotlinx.coroutines.CancellationException

@@ -2,9 +2,9 @@ package com.kopylovis.tossling.home.presentation
 
 import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.CommonComponent
-import com.kopylovis.tossling.sync.data.ClipItem
-import com.kopylovis.tossling.sync.data.RoomDevice
-import com.kopylovis.tossling.sync.data.Transfer
+import com.kopylovis.tossling.protocol.ClipItem
+import com.kopylovis.tossling.protocol.RoomDevice
+import com.kopylovis.tossling.protocol.Transfer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

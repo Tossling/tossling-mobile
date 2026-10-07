@@ -2,9 +2,13 @@ package com.kopylovis.tossling.sync.data
 
 import android.content.Context
 import android.util.Log
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.Transfer
+import com.kopylovis.tossling.protocol.acceptsServerMove
+import com.kopylovis.tossling.protocol.network.NtfyClient
+import com.kopylovis.tossling.protocol.serverMoveTarget
 import com.kopylovis.tossling.sync.alerts.AlertRepository
 import com.kopylovis.tossling.sync.live.LiveConnectionService
-import com.kopylovis.tossling.sync.network.NtfyClient
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import com.kopylovis.tossling.sync.push.PushRegistrar
 import com.kopylovis.tossling.sync.work.FetchWorker

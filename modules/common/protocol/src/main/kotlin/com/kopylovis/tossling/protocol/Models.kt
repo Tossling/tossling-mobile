@@ -1,10 +1,10 @@
-package com.kopylovis.tossling.sync.data
+package com.kopylovis.tossling.protocol
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-internal val SyncJson = Json {
+val SyncJson = Json {
     ignoreUnknownKeys = true
     explicitNulls = false
     encodeDefaults = true
@@ -108,7 +108,7 @@ data class MacDevice(
 )
 
 @Serializable
-internal data class ClipMeta(
+data class ClipMeta(
     @SerialName("k") val kind: String,
     @SerialName("m") val mime: String = TEXT_MIME,
     @SerialName("src") val source: String = "android",
@@ -125,6 +125,7 @@ internal data class ClipMeta(
     @SerialName("e") val ephemeral: String? = null,
     @SerialName("keys") val keys: Map<String, String>? = null,
     @SerialName("re") val renewed: Boolean? = null,
+    @SerialName("inv") val invite: String? = null,
 ) {
     companion object {
         const val TEXT = "text"

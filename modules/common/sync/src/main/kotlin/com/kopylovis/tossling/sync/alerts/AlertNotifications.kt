@@ -17,6 +17,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
+import com.kopylovis.tossling.protocol.alerts.Alert
+import com.kopylovis.tossling.protocol.alerts.Project
 import com.kopylovis.tossling.sync.R
 import com.kopylovis.tossling.sync.entry.AlertActionReceiver
 import com.kopylovis.tossling.sync.entry.AlertLinkActivity

@@ -39,11 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -68,7 +68,7 @@ import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.glass
 import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.pairing.R
-import com.kopylovis.tossling.sync.data.PairingProblem
+import com.kopylovis.tossling.protocol.PairingProblem
 import kotlin.math.PI
 import kotlin.math.sin
 

@@ -1,4 +1,4 @@
-package com.kopylovis.tossling.sync.crypto
+package com.kopylovis.tossling.protocol.crypto
 
 import java.security.KeyFactory
 import java.security.SecureRandom
@@ -6,7 +6,7 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import javax.crypto.KeyAgreement
 
-internal object X25519 {
+object X25519 {
 
     const val KEY_SIZE = 32
 

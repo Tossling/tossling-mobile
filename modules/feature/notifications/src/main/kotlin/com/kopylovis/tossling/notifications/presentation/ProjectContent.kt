@@ -61,7 +61,7 @@ import com.kopylovis.tossling.core.presentation.glass.pressable
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
 import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.notifications.R
-import com.kopylovis.tossling.sync.alerts.projectInitials
+import com.kopylovis.tossling.protocol.alerts.projectInitials
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher

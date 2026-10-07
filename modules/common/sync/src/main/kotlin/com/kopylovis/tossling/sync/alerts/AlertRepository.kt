@@ -1,13 +1,18 @@
 package com.kopylovis.tossling.sync.alerts
 
 import android.util.Log
-import com.kopylovis.tossling.sync.data.Endpoint
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.alerts.AddedProject
+import com.kopylovis.tossling.protocol.alerts.Alert
+import com.kopylovis.tossling.protocol.alerts.Project
+import com.kopylovis.tossling.protocol.alerts.ProjectException
+import com.kopylovis.tossling.protocol.alerts.ProjectProblem
+import com.kopylovis.tossling.protocol.isRoomTopic
+import com.kopylovis.tossling.protocol.network.NtfyClient
+import com.kopylovis.tossling.protocol.network.NtfyEvent
+import com.kopylovis.tossling.protocol.network.NtfyException
 import com.kopylovis.tossling.sync.data.PairingStore
 import com.kopylovis.tossling.sync.data.SyncSettings
-import com.kopylovis.tossling.sync.data.isRoomTopic
-import com.kopylovis.tossling.sync.network.NtfyClient
-import com.kopylovis.tossling.sync.network.NtfyEvent
-import com.kopylovis.tossling.sync.network.NtfyException
 import com.kopylovis.tossling.sync.push.PushRegistrar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

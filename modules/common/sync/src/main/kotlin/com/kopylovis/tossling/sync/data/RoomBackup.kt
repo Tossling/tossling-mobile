@@ -6,6 +6,8 @@ import com.google.android.gms.auth.blockstore.Blockstore
 import com.google.android.gms.auth.blockstore.DeleteBytesRequest
 import com.google.android.gms.auth.blockstore.RetrieveBytesRequest
 import com.google.android.gms.auth.blockstore.StoreBytesData
+import com.kopylovis.tossling.protocol.Pairing
+import com.kopylovis.tossling.protocol.SyncJson
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.Serializable
 

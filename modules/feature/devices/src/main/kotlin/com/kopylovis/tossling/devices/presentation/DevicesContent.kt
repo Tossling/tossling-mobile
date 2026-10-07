@@ -16,7 +16,7 @@ import com.kopylovis.tossling.core.presentation.glass.PageScaffold
 import com.kopylovis.tossling.core.presentation.glass.PageTitle
 import com.kopylovis.tossling.core.presentation.seenAgo
 import com.kopylovis.tossling.devices.R
-import com.kopylovis.tossling.sync.data.DeviceKind
+import com.kopylovis.tossling.protocol.DeviceKind
 
 @Composable
 internal fun DevicesContent(

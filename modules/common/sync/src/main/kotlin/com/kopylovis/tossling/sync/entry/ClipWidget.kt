@@ -13,9 +13,9 @@ import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.view.View
 import android.widget.RemoteViews
+import com.kopylovis.tossling.protocol.ClipItem
+import com.kopylovis.tossling.protocol.ClipKind
 import com.kopylovis.tossling.sync.R
-import com.kopylovis.tossling.sync.data.ClipItem
-import com.kopylovis.tossling.sync.data.ClipKind
 import com.kopylovis.tossling.sync.data.ClipRepository
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent

@@ -1,6 +1,7 @@
 package com.kopylovis.tossling.sync.alerts
 
-import com.kopylovis.tossling.sync.data.Endpoint
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.alerts.Project
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

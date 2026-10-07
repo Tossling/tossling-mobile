@@ -18,10 +18,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.ForegroundInfo
+import com.kopylovis.tossling.protocol.ClipItem
+import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.sync.R
-import com.kopylovis.tossling.sync.data.ClipItem
-import com.kopylovis.tossling.sync.data.ClipKind
-import com.kopylovis.tossling.sync.data.Transfer
 
 internal class SyncNotifications(private val context: Context) {
 

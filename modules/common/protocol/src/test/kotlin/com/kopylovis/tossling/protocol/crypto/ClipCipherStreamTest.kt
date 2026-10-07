@@ -1,4 +1,4 @@
-package com.kopylovis.tossling.sync.crypto
+package com.kopylovis.tossling.protocol.crypto
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals

@@ -2,7 +2,9 @@ package com.kopylovis.tossling.sync.alerts
 
 import android.content.Context
 import androidx.core.content.edit
-import com.kopylovis.tossling.sync.data.SyncJson
+import com.kopylovis.tossling.protocol.SyncJson
+import com.kopylovis.tossling.protocol.alerts.Alert
+import com.kopylovis.tossling.protocol.alerts.Project
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

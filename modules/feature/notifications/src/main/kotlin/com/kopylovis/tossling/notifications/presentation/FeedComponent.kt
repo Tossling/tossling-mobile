@@ -2,8 +2,8 @@ package com.kopylovis.tossling.notifications.presentation
 
 import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.CommonComponent
-import com.kopylovis.tossling.sync.alerts.Alert
-import com.kopylovis.tossling.sync.alerts.Project
+import com.kopylovis.tossling.protocol.alerts.Alert
+import com.kopylovis.tossling.protocol.alerts.Project
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

@@ -1,5 +1,7 @@
 package com.kopylovis.tossling.sync.data
 
+import com.kopylovis.tossling.protocol.Member
+import com.kopylovis.tossling.protocol.Pairing
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

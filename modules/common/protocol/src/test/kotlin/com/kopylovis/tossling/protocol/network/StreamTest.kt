@@ -1,6 +1,6 @@
-package com.kopylovis.tossling.sync.network
+package com.kopylovis.tossling.protocol.network
 
-import com.kopylovis.tossling.sync.data.Endpoint
+import com.kopylovis.tossling.protocol.Endpoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay

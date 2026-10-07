@@ -25,7 +25,7 @@ kotlin {
 
 dependencies {
     api(projects.modules.common.core)
-    api(libs.kotlinx.serialization.json)
+    api(projects.modules.common.protocol)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)

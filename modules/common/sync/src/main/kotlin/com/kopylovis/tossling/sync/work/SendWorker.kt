@@ -13,14 +13,14 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.sync.clipboard.Outgoing
-import com.kopylovis.tossling.sync.data.ClipKind
 import com.kopylovis.tossling.sync.data.ClipRepository
-import com.kopylovis.tossling.sync.data.Transfer
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
+import kotlinx.coroutines.CancellationException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlinx.coroutines.CancellationException
 import java.io.File
 
 internal class SendWorker(

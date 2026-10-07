@@ -1,4 +1,4 @@
-package com.kopylovis.tossling.sync.crypto
+package com.kopylovis.tossling.protocol.crypto
 
 import java.io.IOException
 import java.io.InputStream
@@ -10,13 +10,13 @@ import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-internal class ClipCipher(key: ByteArray) {
+class ClipCipher(key: ByteArray) {
 
     private val secret = SecretKeySpec(key, ALGORITHM)
     private val random = SecureRandom()
 
-    fun seal(plain: ByteArray): ByteArray {
-        val nonce = ByteArray(NONCE_SIZE).also(random::nextBytes)
+    fun seal(plain: ByteArray, nonce: ByteArray = ByteArray(NONCE_SIZE).also(random::nextBytes)): ByteArray {
+        require(nonce.size == NONCE_SIZE) { "nonce must be $NONCE_SIZE bytes" }
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, secret, GCMParameterSpec(TAG_BITS, nonce))
         return nonce + cipher.doFinal(plain)

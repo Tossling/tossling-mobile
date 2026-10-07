@@ -1,9 +1,9 @@
 package com.kopylovis.tossling.sync.clipboard
 
 import android.content.ClipData
-import android.content.ContentValues
 import android.content.ClipDescription
 import android.content.ClipboardManager
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
@@ -11,7 +11,7 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
-import com.kopylovis.tossling.sync.data.ClipKind
+import com.kopylovis.tossling.protocol.ClipKind
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream

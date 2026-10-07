@@ -1,6 +1,6 @@
-package com.kopylovis.tossling.sync.network
+package com.kopylovis.tossling.protocol.network
 
-import com.kopylovis.tossling.sync.data.SyncJson
+import com.kopylovis.tossling.protocol.SyncJson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

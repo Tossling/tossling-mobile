@@ -4,16 +4,33 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.kopylovis.tossling.core.presentation.tr
+import com.kopylovis.tossling.protocol.ClipItem
+import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.ClipMeta
+import com.kopylovis.tossling.protocol.DeviceKind
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.LinkStatus
+import com.kopylovis.tossling.protocol.MacDevice
+import com.kopylovis.tossling.protocol.Member
+import com.kopylovis.tossling.protocol.OLD_ROOM_PREFIX
+import com.kopylovis.tossling.protocol.Pairing
+import com.kopylovis.tossling.protocol.PairingException
+import com.kopylovis.tossling.protocol.PairingProblem
+import com.kopylovis.tossling.protocol.ROOM_PREFIX
+import com.kopylovis.tossling.protocol.RoomDevice
+import com.kopylovis.tossling.protocol.RoomSwitch
+import com.kopylovis.tossling.protocol.SyncJson
+import com.kopylovis.tossling.protocol.Transfer
+import com.kopylovis.tossling.protocol.crypto.ClipCipher
+import com.kopylovis.tossling.protocol.crypto.DeviceIdentity
+import com.kopylovis.tossling.protocol.crypto.RoomKeys
+import com.kopylovis.tossling.protocol.crypto.RoomSecret
+import com.kopylovis.tossling.protocol.network.NtfyClient
+import com.kopylovis.tossling.protocol.network.NtfyEvent
+import com.kopylovis.tossling.protocol.network.NtfyException
 import com.kopylovis.tossling.sync.clipboard.ClipboardBridge
 import com.kopylovis.tossling.sync.clipboard.Outgoing
-import com.kopylovis.tossling.sync.crypto.ClipCipher
-import com.kopylovis.tossling.sync.crypto.DeviceIdentity
-import com.kopylovis.tossling.sync.crypto.RoomKeys
-import com.kopylovis.tossling.sync.crypto.RoomSecret
 import com.kopylovis.tossling.sync.entry.ClipWidget
-import com.kopylovis.tossling.sync.network.NtfyClient
-import com.kopylovis.tossling.sync.network.NtfyEvent
-import com.kopylovis.tossling.sync.network.NtfyException
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import com.kopylovis.tossling.sync.push.PushRegistrar
 import com.kopylovis.tossling.sync.work.RetireTokenWorker
@@ -446,7 +463,7 @@ class ClipRepository internal constructor(
         val sealedMeta = event.message ?: return Outcome.SKIPPED
         val meta = SyncJson.decodeFromString(ClipMeta.serializer(), cipher.openText(text = sealedMeta).decodeToString())
         if (meta.sender.isNotEmpty() && meta.sender == settings.deviceId) return Outcome.SKIPPED
-        if (meta.to != null && settings.deviceId !in meta.to) return Outcome.SKIPPED
+        if (meta.to?.contains(settings.deviceId) == false) return Outcome.SKIPPED
         if (pairing.isRoom) {
             val memberId = meta.sender.ifEmpty { "$LEGACY_PREFIX${meta.source}-${meta.device}" }
             when (meta.kind) {
@@ -463,7 +480,8 @@ class ClipRepository internal constructor(
 
                 ClipMeta.REKEY -> {
                     val box = meta.keys?.get(settings.deviceId)
-                    val opened = if (box != null && meta.ephemeral != null) RoomKeys.open(identity = settings.identity, id = settings.deviceId, ephemeral = meta.ephemeral, box = box) else null
+                    val ephemeral = meta.ephemeral
+                    val opened = if (box != null && ephemeral != null) RoomKeys.open(identity = settings.identity, id = settings.deviceId, ephemeral = ephemeral, box = box) else null
                     val room = opened?.room ?: meta.room ?: return Outcome.SKIPPED
                     val key = opened?.key ?: meta.key ?: return Outcome.SKIPPED
                     switchRoom(pairing = pairing, room = room, key = key, token = opened?.token, keep = meta.to.orEmpty() + memberId, without = null)

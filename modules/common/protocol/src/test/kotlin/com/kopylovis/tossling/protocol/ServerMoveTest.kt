@@ -1,4 +1,4 @@
-package com.kopylovis.tossling.sync.data
+package com.kopylovis.tossling.protocol
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

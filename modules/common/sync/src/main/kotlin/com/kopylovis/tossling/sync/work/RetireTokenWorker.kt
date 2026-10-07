@@ -9,9 +9,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.kopylovis.tossling.sync.data.Endpoint
-import com.kopylovis.tossling.sync.network.NtfyClient
-import com.kopylovis.tossling.sync.network.NtfyException
+import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.network.NtfyClient
+import com.kopylovis.tossling.protocol.network.NtfyException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit

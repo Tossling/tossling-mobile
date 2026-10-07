@@ -91,8 +91,12 @@ and pull request; the APKs are attached to the run. It needs no secrets.
 
 ## Protocol compatibility
 
-The crypto test vectors in `modules/common/sync/src/test/resources/vectors.json` must stay identical to
-`mac/Tossling/vectors.json` in the Mac repository: both sides test against them.
+What the apps send to each other is described in
+[PROTOCOL.md](https://github.com/tossling/tossling-server/blob/main/docs/PROTOCOL.md) in the server repository.
+`modules/common/protocol` implements it: messages, encryption, rooms, invites and the server API, in plain Kotlin
+for the JVM with no Android code, so the desktop apps for Windows and Linux use the same module. Its test vectors
+in `modules/common/protocol/src/test/resources/vectors.json` are a copy of the server's `docs/vectors.json`, the same
+file the Mac app tests against.
 
 ## Reporting a vulnerability
 

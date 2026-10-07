@@ -1,6 +1,6 @@
-package com.kopylovis.tossling.sync.alerts
+package com.kopylovis.tossling.protocol.alerts
 
-import com.kopylovis.tossling.sync.data.Endpoint
+import com.kopylovis.tossling.protocol.Endpoint
 import kotlinx.serialization.Serializable
 
 @Serializable

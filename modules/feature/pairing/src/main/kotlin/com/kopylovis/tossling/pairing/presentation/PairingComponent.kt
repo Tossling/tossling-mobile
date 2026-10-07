@@ -2,7 +2,7 @@ package com.kopylovis.tossling.pairing.presentation
 
 import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.CommonComponent
-import com.kopylovis.tossling.sync.data.PairingProblem
+import com.kopylovis.tossling.protocol.PairingProblem
 
 internal sealed interface PairingStage {
     data object Idle : PairingStage

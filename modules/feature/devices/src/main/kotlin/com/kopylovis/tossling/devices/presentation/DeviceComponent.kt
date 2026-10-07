@@ -2,7 +2,7 @@ package com.kopylovis.tossling.devices.presentation
 
 import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.CommonComponent
-import com.kopylovis.tossling.sync.data.RoomDevice
+import com.kopylovis.tossling.protocol.RoomDevice
 
 internal data class DeviceScreenState(
     val device: RoomDevice? = null,

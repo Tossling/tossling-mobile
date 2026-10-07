@@ -12,8 +12,8 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.sync.data.SyncCoordinator
-import com.kopylovis.tossling.sync.data.Transfer
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

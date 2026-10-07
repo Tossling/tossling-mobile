@@ -73,7 +73,7 @@ import com.kopylovis.tossling.core.presentation.glass.rememberTitleCollapse
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
 import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.notifications.R
-import com.kopylovis.tossling.sync.alerts.projectInitials
+import com.kopylovis.tossling.protocol.alerts.projectInitials
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

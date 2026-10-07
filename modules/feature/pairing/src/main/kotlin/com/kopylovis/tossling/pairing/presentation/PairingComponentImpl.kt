@@ -8,10 +8,10 @@ import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.BaseComponent
 import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.navigation.GlobalNavigator
+import com.kopylovis.tossling.protocol.PairingException
+import com.kopylovis.tossling.protocol.PairingProblem
+import com.kopylovis.tossling.protocol.pairingHost
 import com.kopylovis.tossling.sync.data.ClipRepository
-import com.kopylovis.tossling.sync.data.PairingException
-import com.kopylovis.tossling.sync.data.PairingProblem
-import com.kopylovis.tossling.sync.data.pairingHost
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.inject

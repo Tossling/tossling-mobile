@@ -42,8 +42,8 @@ import com.kopylovis.tossling.core.presentation.longDate
 import com.kopylovis.tossling.core.presentation.seenAgo
 import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.devices.R
-import com.kopylovis.tossling.sync.data.DeviceKind
-import com.kopylovis.tossling.sync.data.RoomDevice
+import com.kopylovis.tossling.protocol.DeviceKind
+import com.kopylovis.tossling.protocol.RoomDevice
 
 @Composable
 internal fun DeviceContent(

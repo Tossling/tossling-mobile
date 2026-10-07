@@ -2,7 +2,7 @@ package com.kopylovis.tossling.sync.data
 
 import android.content.Context
 import androidx.core.content.edit
-import com.kopylovis.tossling.sync.crypto.DeviceIdentity
+import com.kopylovis.tossling.protocol.crypto.DeviceIdentity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -5,8 +5,8 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnResume
 import com.kopylovis.tossling.core.decompose.base.BaseComponent
 import com.kopylovis.tossling.navigation.GlobalNavigator
+import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.sync.data.ClipRepository
-import com.kopylovis.tossling.sync.data.RoomDevice
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.component.inject
 
