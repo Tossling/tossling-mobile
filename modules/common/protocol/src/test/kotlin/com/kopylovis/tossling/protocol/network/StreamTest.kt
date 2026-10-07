@@ -76,4 +76,17 @@ class StreamTest {
         socket.close()
         assertEquals("GET /a,b/json?since=Xy+z HTTP/1.1", requests.single())
     }
+
+    @Test
+    fun givesUpOnAServerThatNeverAnswers() = runBlocking {
+        val socket = ServerSocket(0)
+        thread(isDaemon = true) { runCatching { socket.accept().use { Thread.sleep(120_000) } } }
+        val started = System.currentTimeMillis()
+        val failure = withTimeout(30_000) {
+            runCatching { NtfyClient().stream(endpoint = Endpoint(server = "http://127.0.0.1:${socket.localPort}"), topics = listOf("t"), onOpen = {}, onEvent = {}) }.exceptionOrNull()
+        }
+        socket.close()
+        assertTrue(failure != null)
+        assertTrue(System.currentTimeMillis() - started < 25_000)
+    }
 }

@@ -2,9 +2,11 @@ package com.kopylovis.tossling.protocol.network
 
 import com.kopylovis.tossling.protocol.Endpoint
 import com.kopylovis.tossling.protocol.SyncJson
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -236,15 +238,23 @@ class NtfyClient {
                 connection.disconnect()
             }
         }
+        val opened = CompletableDeferred<Unit>()
+        val answer = launch(Dispatchers.IO) {
+            delay(ANSWER_TIMEOUT_MS)
+            if (!opened.isCompleted) connection.disconnect()
+        }
         try {
             withContext(Dispatchers.IO) {
                 connection.ensureOk()
+                opened.complete(Unit)
+                answer.cancel()
                 onOpen()
                 connection.inputStream.bufferedReader().useLines { lines ->
                     lines.filter { it.isNotBlank() }.forEach { line -> onEvent(SyncJson.decodeFromString(NtfyEvent.serializer(), line)) }
                 }
             }
         } finally {
+            answer.cancel()
             closer.cancel()
             connection.disconnect()
         }
@@ -336,6 +346,7 @@ class NtfyClient {
         private const val DOWNLOAD_TIMEOUT_MS = 120_000
         private const val STREAM_TIMEOUT_MS = 300_000
         private const val LIVE_TIMEOUT_MS = 90_000
+        private const val ANSWER_TIMEOUT_MS = 15_000L
         private val API_PREFIXES = listOf("/v1/tossling", "/v1/tossy")
         private const val STREAM_BUFFER = 1 shl 16
     }
