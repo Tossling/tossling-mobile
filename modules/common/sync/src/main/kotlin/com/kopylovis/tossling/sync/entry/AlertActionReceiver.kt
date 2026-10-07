@@ -12,7 +12,7 @@ internal class AlertActionReceiver : BroadcastReceiver(), KoinComponent {
     private val alerts: AlertRepository by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != TossyIntents.ACTION_MARK_READ) return
-        intent.getStringExtra(TossyIntents.EXTRA_ALERT)?.let(alerts::markRead)
+        if (intent.action != TosslingIntents.ACTION_MARK_READ) return
+        intent.getStringExtra(TosslingIntents.EXTRA_ALERT)?.let(alerts::markRead)
     }
 }

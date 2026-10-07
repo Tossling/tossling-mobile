@@ -23,7 +23,7 @@ import com.kopylovis.tossling.core.presentation.glass.Island
 import com.kopylovis.tossling.core.presentation.messages.AppMessage
 import com.kopylovis.tossling.core.presentation.messages.AppMessageKind
 import com.kopylovis.tossling.core.presentation.messages.AppMessenger
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.mediators.MediatorManager
 import com.kopylovis.tossling.presentation.main.MainContent
 import com.kopylovis.tossling.sync.data.ClipRepository
@@ -60,7 +60,7 @@ internal fun AppContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Tossy.palette.background),
+            .background(Tossling.palette.background),
     ) {
         ChildStack(
             stack = component.stack,

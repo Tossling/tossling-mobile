@@ -4,6 +4,7 @@ import android.util.Log
 import com.kopylovis.tossling.sync.data.Endpoint
 import com.kopylovis.tossling.sync.data.PairingStore
 import com.kopylovis.tossling.sync.data.SyncSettings
+import com.kopylovis.tossling.sync.data.isRoomTopic
 import com.kopylovis.tossling.sync.network.NtfyClient
 import com.kopylovis.tossling.sync.network.NtfyEvent
 import com.kopylovis.tossling.sync.network.NtfyException
@@ -91,7 +92,7 @@ class AlertRepository internal constructor(
             removed.forEach { topic -> client.removeSubscription(endpoint = server, topic = topic) }
             if (removed.isNotEmpty()) store.setPendingRemovals(topics = emptySet())
             val remote = client.subscriptions(endpoint = server)
-                .filter { it.baseUrl.trimEnd('/') == server.server && TOPIC.matches(it.topic) && !it.topic.startsWith(ROOM_PREFIX) }
+                .filter { it.baseUrl.trimEnd('/') == server.server && TOPIC.matches(it.topic) && !isRoomTopic(topic = it.topic) }
             val remoteTopics = remote.map { it.topic }.toSet()
             val paired = pairings.pairings.value.map { it.server }.toSet() + server.server
             movedProjects(projects = store.projects.value, paired = paired, remoteTopics = remoteTopics).forEach { project ->
@@ -137,7 +138,7 @@ class AlertRepository internal constructor(
         if (!TOPIC.matches(cleanTopic)) throw ProjectException(ProjectProblem.INVALID_TOPIC)
         if (owns(cleanTopic)) throw ProjectException(ProjectProblem.DUPLICATE)
         val server = endpoint ?: throw ProjectException(ProjectProblem.NO_SERVER)
-        if (client.isTossyServer(endpoint = server)) {
+        if (client.isTosslingServer(endpoint = server)) {
             val created = try {
                 client.createProject(endpoint = server, topic = cleanTopic, name = name.trim().ifEmpty { cleanTopic })
             } catch (error: NtfyException) {
@@ -201,7 +202,7 @@ class AlertRepository internal constructor(
     suspend fun removeProject(topic: String) {
         store.projects.value.firstOrNull { it.topic == topic }?.let { project ->
             val server = endpointOf(project = project)
-            val revoked = client.isTossyServer(endpoint = server) && runCatching { client.deleteProject(endpoint = server, topic = topic) }.isSuccess
+            val revoked = client.isTosslingServer(endpoint = server) && runCatching { client.deleteProject(endpoint = server, topic = topic) }.isSuccess
             val removed = revoked || runCatching { client.removeSubscription(endpoint = server, topic = topic) }.isSuccess
             if (!removed && project.isSynced) store.setPendingRemovals(topics = store.pendingRemovals() + topic)
         }
@@ -304,7 +305,6 @@ class AlertRepository internal constructor(
         private const val MARKDOWN = "text/markdown"
         private const val BACKLOG = "24h"
         private val TOPIC = Regex("^[A-Za-z0-9_-]{1,64}$")
-        private const val ROOM_PREFIX = "tossy-"
         private const val SYNC_INTERVAL_MS = 5 * 60_000L
     }
 }

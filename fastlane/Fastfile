@@ -33,7 +33,7 @@ lane :upload do |options|
   #
   # The notes go through a file, not a variable: `shellescape` puts a backslash before every
   # non-ASCII letter, and the log turns into a picket fence instead of text.
-  notes = Tempfile.new("tossy-release-notes")
+  notes = Tempfile.new("tossling-release-notes")
   begin
     notes.write(release_notes(options))
     notes.close

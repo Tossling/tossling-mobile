@@ -26,7 +26,7 @@ class RoomKeysTest {
         val phone = DeviceIdentity.generate()
         val mac = DeviceIdentity.generate()
         val removed = DeviceIdentity.generate()
-        val secret = RoomSecret(room = "tossy-abc", key = "c2VjcmV0")
+        val secret = RoomSecret(room = "tossling-abc", key = "c2VjcmV0")
         val sealed = RoomKeys.seal(secret = secret, recipients = mapOf("phone" to phone.publicText, "mac" to mac.publicText))
         assertEquals(secret, RoomKeys.open(identity = phone, id = "phone", ephemeral = sealed.ephemeral, box = sealed.keys.getValue("phone")))
         assertEquals(secret, RoomKeys.open(identity = mac, id = "mac", ephemeral = sealed.ephemeral, box = sealed.keys.getValue("mac")))

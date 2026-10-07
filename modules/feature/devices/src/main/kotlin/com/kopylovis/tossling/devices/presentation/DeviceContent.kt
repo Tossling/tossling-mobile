@@ -35,12 +35,12 @@ import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.PageScaffold
 import com.kopylovis.tossling.core.presentation.glass.StatusDot
 import com.kopylovis.tossling.core.presentation.glass.StatusText
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.ValueRow
 import com.kopylovis.tossling.core.presentation.glass.animateStatusColor
 import com.kopylovis.tossling.core.presentation.longDate
 import com.kopylovis.tossling.core.presentation.seenAgo
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.devices.R
 import com.kopylovis.tossling.sync.data.DeviceKind
 import com.kopylovis.tossling.sync.data.RoomDevice
@@ -60,7 +60,7 @@ internal fun DeviceContent(
             if (device != null) {
                 ConfirmSheet(
                     visible = state.isSheetVisible,
-                    icon = TossyIcons.KeyOff,
+                    icon = TosslingIcons.KeyOff,
                     title = if (device.isOwner && !device.isSelf) stringResource(R.string.devices_sheet_owner_title) else stringResource(R.string.devices_sheet_title, device.name),
                     text = stringResource(
                         when {
@@ -123,7 +123,7 @@ internal fun DeviceContent(
             ),
             onClick = component::onDisconnectClicked,
             style = CapsuleStyle.PLAIN,
-            textColor = Tossy.palette.dangerInk,
+            textColor = Tossling.palette.dangerInk,
             modifier = Modifier
                 .padding(top = 24f.dp)
                 .fillMaxWidth(),
@@ -133,7 +133,7 @@ internal fun DeviceContent(
 
 @Composable
 private fun DeviceHeader(device: RoomDevice) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,20 +142,20 @@ private fun DeviceHeader(device: RoomDevice) {
         verticalArrangement = Arrangement.spacedBy(10f.dp),
     ) {
         CircleBadge(
-            icon = if (device.kind == DeviceKind.MAC) TossyIcons.Laptop else TossyIcons.Phone,
+            icon = if (device.kind == DeviceKind.MAC) TosslingIcons.Laptop else TosslingIcons.Phone,
             tint = if (device.isOnline) palette.onAccent else palette.ink2,
             background = if (device.isOnline) palette.accent else palette.glassWeak,
             size = 80f.dp,
             iconSize = 36f.dp,
         )
-        Text(text = device.name, style = Tossy.type.title, color = palette.ink, textAlign = TextAlign.Center)
+        Text(text = device.name, style = Tossling.type.title, color = palette.ink, textAlign = TextAlign.Center)
         if (device.hasAlias) {
-            Text(text = device.ownName, style = Tossy.type.hint, color = palette.ink2, textAlign = TextAlign.Center)
+            Text(text = device.ownName, style = Tossling.type.hint, color = palette.ink2, textAlign = TextAlign.Center)
         }
         if (device.isSelf) {
-            Text(text = stringResource(R.string.devices_self_title), style = Tossy.type.hint, color = palette.ink2)
+            Text(text = stringResource(R.string.devices_self_title), style = Tossling.type.hint, color = palette.ink2)
         } else if (device.isOwner) {
-            Text(text = stringResource(R.string.devices_owner_title), style = Tossy.type.hint, color = palette.ink2)
+            Text(text = stringResource(R.string.devices_owner_title), style = Tossling.type.hint, color = palette.ink2)
         }
         val ink = animateStatusColor(target = if (device.isOnline) palette.accentInk else palette.ink2)
         val fill = animateStatusColor(target = if (device.isOnline) palette.accentSoft else palette.glassWeak)
@@ -171,7 +171,7 @@ private fun DeviceHeader(device: RoomDevice) {
             StatusDot(isOnline = device.isOnline, ring = ink)
             StatusText(
                 text = if (device.isOnline) stringResource(R.string.devices_online) else seenAgo(time = device.seen),
-                style = Tossy.type.hint.copy(fontWeight = FontWeight.Medium),
+                style = Tossling.type.hint.copy(fontWeight = FontWeight.Medium),
                 color = ink,
             )
         }

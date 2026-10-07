@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="tossy_background">#FFFBFBFF</color>
-    <color name="tossy_icon_background">#FF3D5AFE</color>
+    <color name="tossling_background">#FFFBFBFF</color>
+    <color name="tossling_icon_background">#FF3D5AFE</color>
 </resources>

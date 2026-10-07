@@ -30,7 +30,7 @@
         </provider>
 
         <service
-            android:name=".push.TossyMessagingService"
+            android:name=".push.TosslingMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -54,7 +54,7 @@
         <service
             android:name=".entry.ClipTileService"
             android:exported="true"
-            android:icon="@drawable/ic_stat_tossy"
+            android:icon="@drawable/ic_stat_tossling"
             android:label="@string/sync_tile_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
@@ -70,7 +70,7 @@
             android:label="@string/sync_share_label"
             android:noHistory="true"
             android:taskAffinity=""
-            android:theme="@style/Theme.Tossy.Invisible">
+            android:theme="@style/Theme.Tossling.Invisible">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -106,7 +106,7 @@
             android:exported="false"
             android:noHistory="true"
             android:taskAffinity=""
-            android:theme="@style/Theme.Tossy.Invisible" />
+            android:theme="@style/Theme.Tossling.Invisible" />
 
         <receiver
             android:name=".entry.AlertActionReceiver"
@@ -118,7 +118,7 @@
             android:exported="false"
             android:noHistory="true"
             android:taskAffinity=""
-            android:theme="@style/Theme.Tossy.Invisible" />
+            android:theme="@style/Theme.Tossling.Invisible" />
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"

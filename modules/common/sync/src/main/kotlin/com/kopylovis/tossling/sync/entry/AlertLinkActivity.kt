@@ -14,7 +14,7 @@ internal class AlertLinkActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        intent.getStringExtra(TossyIntents.EXTRA_ALERT)?.let(alerts::markRead)
+        intent.getStringExtra(TosslingIntents.EXTRA_ALERT)?.let(alerts::markRead)
         intent.data?.let { url ->
             runCatching { startActivity(Intent(Intent.ACTION_VIEW, url).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
         }
@@ -25,7 +25,7 @@ internal class AlertLinkActivity : Activity() {
         fun intent(context: Context, alertId: String, url: String): Intent =
             Intent(context, AlertLinkActivity::class.java)
                 .setData(Uri.parse(url))
-                .putExtra(TossyIntents.EXTRA_ALERT, alertId)
+                .putExtra(TosslingIntents.EXTRA_ALERT, alertId)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 }

@@ -52,7 +52,7 @@ class SyncCoordinator internal constructor(
             settings.setServerPush(value = null)
             return
         }
-        val health = runCatching { client.tossyHealth(endpoint = endpoint) }.getOrNull()
+        val health = runCatching { client.tosslingHealth(endpoint = endpoint) }.getOrNull()
         when {
             health != null -> settings.setServerPush(value = health.push)
             client.isReachable(endpoint = endpoint) -> settings.setServerPush(value = null)

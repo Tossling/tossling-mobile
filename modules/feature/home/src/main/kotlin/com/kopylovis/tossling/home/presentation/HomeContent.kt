@@ -117,7 +117,7 @@ import com.kopylovis.tossling.core.presentation.glass.StatusText
 import com.kopylovis.tossling.core.presentation.glass.SwipeAction
 import com.kopylovis.tossling.core.presentation.glass.SwipeRow
 import com.kopylovis.tossling.core.presentation.glass.TopBarHeight
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.TrackOverlay
 import com.kopylovis.tossling.core.presentation.glass.animateStatusColor
 import com.kopylovis.tossling.core.presentation.glass.glass
@@ -126,7 +126,7 @@ import com.kopylovis.tossling.core.presentation.glass.rememberTitleCollapse
 import com.kopylovis.tossling.core.presentation.glass.rowPress
 import com.kopylovis.tossling.core.presentation.relativeTime
 import com.kopylovis.tossling.core.presentation.seenAgo
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.home.R
 import com.kopylovis.tossling.sync.data.ClipItem
 import com.kopylovis.tossling.sync.data.ClipKind
@@ -149,7 +149,7 @@ internal fun HomeContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.subscribeAsState()
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val density = LocalDensity.current
     val listState = rememberLazyListState()
     val pullState = rememberPullToRefreshState()
@@ -175,7 +175,7 @@ internal fun HomeContent(
         topBar = {
             GlassTopBar(
                 trailing = {
-                    GlassIconButton(icon = TossyIcons.Sliders, contentDescription = stringResource(R.string.home_settings), onClick = component::onSettingsClicked, iconSize = 22f.dp)
+                    GlassIconButton(icon = TosslingIcons.Sliders, contentDescription = stringResource(R.string.home_settings), onClick = component::onSettingsClicked, iconSize = 22f.dp)
                 },
             )
             FlowingTitle(
@@ -191,7 +191,7 @@ internal fun HomeContent(
             ImagePreview(item = state.preview, onCopy = component::onPreviewCopied, onShare = component::onPreviewShared, onDismiss = component::onPreviewDismissed)
             ConfirmSheet(
                 visible = state.leaving != null,
-                icon = TossyIcons.KeyOff,
+                icon = TosslingIcons.KeyOff,
                 title = stringResource(R.string.home_leave_title),
                 text = stringResource(R.string.home_leave_text),
                 confirm = stringResource(R.string.home_leave_confirm),
@@ -220,14 +220,14 @@ internal fun HomeContent(
                             .padding(start = 4f.dp, end = 4f.dp, bottom = 4f.dp),
                         verticalArrangement = Arrangement.spacedBy(2f.dp),
                     ) {
-                        Text(text = title, style = Tossy.type.largeTitle, color = palette.ink, maxLines = 1, modifier = Modifier.alpha(0f))
+                        Text(text = title, style = Tossling.type.largeTitle, color = palette.ink, maxLines = 1, modifier = Modifier.alpha(0f))
                         Text(
                             text = if (state.isRoom) {
                                 stringResource(R.string.home_room, pluralStringResource(R.plurals.home_devices, state.devices.count { !it.isSelf } + 1, state.devices.count { !it.isSelf } + 1))
                             } else {
                                 stringResource(R.string.home_subtitle)
                             },
-                            style = Tossy.type.body,
+                            style = Tossling.type.body,
                             color = palette.ink2,
                         )
                     }
@@ -256,9 +256,9 @@ internal fun HomeContent(
                             .padding(start = 6f.dp, end = 6f.dp, top = 28f.dp, bottom = 10f.dp),
                         verticalAlignment = Alignment.Bottom,
                     ) {
-                        Text(text = stringResource(R.string.home_history), style = Tossy.type.title2, color = palette.ink, modifier = Modifier.weight(1f))
+                        Text(text = stringResource(R.string.home_history), style = Tossling.type.title2, color = palette.ink, modifier = Modifier.weight(1f))
                         if (state.history.isNotEmpty()) {
-                            Text(text = stringResource(R.string.home_history_count, state.history.size), style = Tossy.type.footnote, color = palette.ink2)
+                            Text(text = stringResource(R.string.home_history_count, state.history.size), style = Tossling.type.footnote, color = palette.ink2)
                         }
                     }
                 }
@@ -291,7 +291,7 @@ internal fun HomeContent(
                     item(key = "nothing") {
                         Text(
                             text = stringResource(R.string.home_nothing_found),
-                            style = Tossy.type.body,
+                            style = Tossling.type.body,
                             color = palette.ink2,
                             modifier = Modifier.padding(horizontal = 6f.dp, vertical = 12f.dp),
                         )
@@ -306,7 +306,7 @@ internal fun HomeContent(
                                         onOpenChange = { open -> openSwipe = if (open) item.id else openSwipe.takeIf { it != item.id } },
                                         actions = listOf(
                                             SwipeAction(
-                                                icon = TossyIcons.Pin,
+                                                icon = TosslingIcons.Pin,
                                                 label = stringResource(if (item.isPinned) R.string.home_unpin else R.string.home_pin),
                                                 background = palette.accentSoft,
                                                 tint = palette.accentInk,
@@ -316,7 +316,7 @@ internal fun HomeContent(
                                                 },
                                             ),
                                             SwipeAction(
-                                                icon = TossyIcons.Trash,
+                                                icon = TosslingIcons.Trash,
                                                 label = stringResource(R.string.home_delete),
                                                 background = palette.danger,
                                                 tint = palette.onDanger,
@@ -359,14 +359,14 @@ private fun DevicesGroup(state: HomeScreenState, component: HomeComponent, modif
             ) {
                 Text(
                     text = if (rooms.size > 1) stringResource(R.string.home_room_number, roomIndex + 1) else stringResource(R.string.home_devices_title),
-                    style = Tossy.type.body.copy(fontWeight = FontWeight.SemiBold),
-                    color = Tossy.palette.ink2,
+                    style = Tossling.type.body.copy(fontWeight = FontWeight.SemiBold),
+                    color = Tossling.palette.ink2,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
                     text = stringResource(R.string.home_leave),
-                    style = Tossy.type.footnote.copy(fontWeight = FontWeight.SemiBold),
-                    color = Tossy.palette.dangerInk,
+                    style = Tossling.type.footnote.copy(fontWeight = FontWeight.SemiBold),
+                    color = Tossling.palette.dangerInk,
                     modifier = Modifier
                         .pressable(onClick = { component.onLeaveRoomClicked(pairingId = devices.first().pairingId) }, pressedScale = 0.94f)
                         .padding(horizontal = 10f.dp, vertical = 10f.dp),
@@ -400,7 +400,7 @@ private fun DevicesGroup(state: HomeScreenState, component: HomeComponent, modif
 
 @Composable
 private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shown = remember { mutableStateOf<PickState?>(null) }
     if (pick != null) shown.value = pick
     GlassSheet(
@@ -412,13 +412,13 @@ private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss
         val current = shown.value ?: return@GlassSheet
         Text(
             text = stringResource(R.string.home_pick_title),
-            style = Tossy.type.title2,
+            style = Tossling.type.title2,
             color = palette.ink,
             modifier = Modifier.padding(start = 6f.dp, end = 6f.dp, top = 18f.dp),
         )
         Text(
             text = stringResource(R.string.home_pick_preview, current.preview),
-            style = Tossy.type.body,
+            style = Tossling.type.body,
             color = palette.ink2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -432,7 +432,7 @@ private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss
                 .border(width = 1f.dp, color = palette.hairline, shape = RoundedCornerShape(24f.dp)),
         ) {
             PickRow(
-                icon = TossyIcons.Devices,
+                icon = TosslingIcons.Devices,
                 label = stringResource(R.string.home_pick_all),
                 note = stringResource(R.string.home_pick_all_note, pluralStringResource(R.plurals.home_devices, current.targets.size, current.targets.size)),
                 isPrimary = true,
@@ -441,7 +441,7 @@ private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss
             current.targets.forEach { device ->
                 Hairline(start = 68f.dp)
                 PickRow(
-                    icon = if (device.kind == DeviceKind.MAC) TossyIcons.Laptop else TossyIcons.Phone,
+                    icon = if (device.kind == DeviceKind.MAC) TosslingIcons.Laptop else TosslingIcons.Phone,
                     label = device.name,
                     note = if (device.isOnline) stringResource(R.string.home_online) else stringResource(R.string.home_pick_later, seenAgo(time = device.seen)),
                     isPrimary = false,
@@ -451,7 +451,7 @@ private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss
         }
         Text(
             text = stringResource(R.string.home_pick_note),
-            style = Tossy.type.footnote,
+            style = Tossling.type.footnote,
             color = palette.ink2,
             modifier = Modifier.padding(start = 8f.dp, end = 8f.dp, top = 10f.dp),
         )
@@ -468,7 +468,7 @@ private fun PickSheet(pick: PickState?, onPick: (RoomDevice?) -> Unit, onDismiss
 
 @Composable
 private fun PickRow(icon: ImageVector, label: String, note: String, isPrimary: Boolean, onClick: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -486,10 +486,10 @@ private fun PickRow(icon: ImageVector, label: String, note: String, isPrimary: B
             iconSize = 20f.dp,
         )
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1f.dp)) {
-            Text(text = label, style = Tossy.type.row.copy(fontWeight = FontWeight.SemiBold), color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(text = note, style = Tossy.type.footnote, color = palette.ink2)
+            Text(text = label, style = Tossling.type.row.copy(fontWeight = FontWeight.SemiBold), color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = note, style = Tossling.type.footnote, color = palette.ink2)
         }
-        Icon(imageVector = TossyIcons.ArrowUp, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(18f.dp))
+        Icon(imageVector = TosslingIcons.ArrowUp, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(18f.dp))
     }
 }
 
@@ -513,20 +513,20 @@ private fun PullSpinner(fraction: Float, isRefreshing: Boolean, top: Dp) {
 
 @Composable
 private fun StatusCard(state: HomeScreenState, modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     GlassCard(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(18f.dp), verticalArrangement = Arrangement.spacedBy(14f.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(14f.dp), verticalAlignment = Alignment.CenterVertically) {
                 CircleBadge(
-                    icon = TossyIcons.Laptop,
+                    icon = TosslingIcons.Laptop,
                     tint = if (state.isOnline) palette.onAccent else palette.ink2,
                     background = if (state.isOnline) palette.accent else palette.glassWeak,
                     size = 48f.dp,
                     iconSize = 24f.dp,
                 )
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2f.dp)) {
-                    Text(text = state.macName, style = Tossy.type.headline, color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(text = state.server, style = Tossy.type.monoSmall.copy(fontWeight = FontWeight.Normal), color = palette.ink2, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = state.macName, style = Tossling.type.headline, color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = state.server, style = Tossling.type.monoSmall.copy(fontWeight = FontWeight.Normal), color = palette.ink2, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 LinkPill(isOnline = state.isOnline)
             }
@@ -554,7 +554,7 @@ private fun StatusCard(state: HomeScreenState, modifier: Modifier = Modifier) {
 
 @Composable
 private fun LinkPill(isOnline: Boolean) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val ink = animateStatusColor(target = if (isOnline) palette.accentInk else palette.dangerInk)
     val fill = animateStatusColor(target = if (isOnline) palette.glassStrong else palette.dangerSoft)
     Row(
@@ -569,7 +569,7 @@ private fun LinkPill(isOnline: Boolean) {
         StatusDot(isOnline = isOnline, ring = ink)
         StatusText(
             text = stringResource(if (isOnline) R.string.home_online else R.string.home_offline),
-            style = Tossy.type.footnote.copy(fontWeight = FontWeight.Medium),
+            style = Tossling.type.footnote.copy(fontWeight = FontWeight.Medium),
             color = ink,
         )
     }
@@ -578,11 +578,11 @@ private fun LinkPill(isOnline: Boolean) {
 @Composable
 private fun InfoRow(label: String, value: String, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12f.dp)) {
-        Text(text = label, style = Tossy.type.body, color = Tossy.palette.ink2)
+        Text(text = label, style = Tossling.type.body, color = Tossling.palette.ink2)
         Text(
             text = value,
-            style = Tossy.type.body.copy(fontWeight = FontWeight.Medium),
-            color = Tossy.palette.ink,
+            style = Tossling.type.body.copy(fontWeight = FontWeight.Medium),
+            color = Tossling.palette.ink,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f),
         )
@@ -591,7 +591,7 @@ private fun InfoRow(label: String, value: String, modifier: Modifier = Modifier)
 
 @Composable
 private fun TileHint(onClick: () -> Unit, onClose: () -> Unit, modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -601,22 +601,22 @@ private fun TileHint(onClick: () -> Unit, onClose: () -> Unit, modifier: Modifie
         horizontalArrangement = Arrangement.spacedBy(12f.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(imageVector = TossyIcons.Tile, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(20f.dp))
+        Icon(imageVector = TosslingIcons.Tile, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(20f.dp))
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(fontWeight = FontWeight.Medium, color = palette.accentInk)) { append(stringResource(R.string.home_tile_action)) }
                 withStyle(SpanStyle(color = palette.ink2)) { append(stringResource(R.string.home_tile_rest)) }
             },
-            style = Tossy.type.hint,
+            style = Tossling.type.hint,
             modifier = Modifier.weight(1f),
         )
-        GlassIconButton(icon = TossyIcons.Close, contentDescription = stringResource(R.string.home_tile_close), onClick = onClose, iconSize = 14f.dp, bare = true, tint = palette.ink2)
+        GlassIconButton(icon = TosslingIcons.Close, contentDescription = stringResource(R.string.home_tile_close), onClick = onClose, iconSize = 14f.dp, bare = true, tint = palette.ink2)
     }
 }
 
 @Composable
 private fun TransferCard(transfer: Transfer, onCancel: () -> Unit, modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val context = LocalContext.current
     val progress by animateFloatAsState(targetValue = transfer.percent / 100f, label = "transfer")
     Row(
@@ -628,7 +628,7 @@ private fun TransferCard(transfer: Transfer, onCancel: () -> Unit, modifier: Mod
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = if (transfer.incoming) TossyIcons.ArrowDown else TossyIcons.ArrowUp,
+            imageVector = if (transfer.incoming) TosslingIcons.ArrowDown else TosslingIcons.ArrowUp,
             contentDescription = null,
             tint = palette.accentInk,
             modifier = Modifier.size(20f.dp),
@@ -636,7 +636,7 @@ private fun TransferCard(transfer: Transfer, onCancel: () -> Unit, modifier: Mod
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6f.dp)) {
             Text(
                 text = stringResource(if (transfer.incoming) R.string.home_transfer_receive else R.string.home_transfer_send, transfer.name),
-                style = Tossy.type.body.copy(fontWeight = FontWeight.Medium),
+                style = Tossling.type.body.copy(fontWeight = FontWeight.Medium),
                 color = palette.ink,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -663,19 +663,19 @@ private fun TransferCard(transfer: Transfer, onCancel: () -> Unit, modifier: Mod
                     Formatter.formatShortFileSize(context, transfer.done),
                     Formatter.formatShortFileSize(context, transfer.total),
                 ),
-                style = Tossy.type.footnote,
+                style = Tossling.type.footnote,
                 color = palette.ink2,
             )
         }
         if (!transfer.incoming) {
-            GlassIconButton(icon = TossyIcons.Close, contentDescription = stringResource(R.string.home_transfer_cancel), onClick = onCancel, iconSize = 14f.dp, bare = true, tint = palette.ink2)
+            GlassIconButton(icon = TosslingIcons.Close, contentDescription = stringResource(R.string.home_transfer_cancel), onClick = onCancel, iconSize = 14f.dp, bare = true, tint = palette.ink2)
         }
     }
 }
 
 @Composable
 private fun EmptyHistory() {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     GlassCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -684,11 +684,11 @@ private fun EmptyHistory() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8f.dp),
         ) {
-            CircleBadge(icon = TossyIcons.Clipboard, tint = palette.accentInk, background = palette.accentSoft, iconSize = 24f.dp, modifier = Modifier.padding(bottom = 8f.dp))
-            Text(text = stringResource(R.string.home_history_empty_title), style = Tossy.type.headline, color = palette.ink)
+            CircleBadge(icon = TosslingIcons.Clipboard, tint = palette.accentInk, background = palette.accentSoft, iconSize = 24f.dp, modifier = Modifier.padding(bottom = 8f.dp))
+            Text(text = stringResource(R.string.home_history_empty_title), style = Tossling.type.headline, color = palette.ink)
             Text(
                 text = stringResource(R.string.home_history_empty),
-                style = Tossy.type.body,
+                style = Tossling.type.body,
                 color = palette.ink2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 280f.dp),
@@ -721,7 +721,7 @@ private fun HistoryRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val entrance = remember { Animatable(if (isFresh) 0f else 1f) }
     LaunchedEffect(Unit) {
         if (entrance.value < 1f) entrance.animateTo(1f, animationSpec = spring(dampingRatio = 0.55f, stiffness = 300f))
@@ -753,7 +753,7 @@ private fun HistoryRow(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = if (item.incoming) TossyIcons.ArrowDown else TossyIcons.ArrowUp,
+                    imageVector = if (item.incoming) TosslingIcons.ArrowDown else TosslingIcons.ArrowUp,
                     contentDescription = null,
                     tint = palette.accentInk,
                     modifier = Modifier.size(14f.dp),
@@ -769,19 +769,19 @@ private fun HistoryRow(
                             item.device.isNotEmpty() -> stringResource(R.string.home_to, item.device)
                             else -> stringResource(R.string.home_to_mac)
                         },
-                        style = Tossy.type.footnote,
+                        style = Tossling.type.footnote,
                         color = palette.ink2,
                         modifier = Modifier.weight(1f),
                     )
                     if (item.isPinned) {
-                        Icon(imageVector = TossyIcons.Pin, contentDescription = null, tint = palette.accentInk, modifier = Modifier.padding(end = 6f.dp).size(14f.dp))
+                        Icon(imageVector = TosslingIcons.Pin, contentDescription = null, tint = palette.accentInk, modifier = Modifier.padding(end = 6f.dp).size(14f.dp))
                     }
-                    Text(text = relativeTime(time = item.time), style = Tossy.type.footnote, color = palette.ink2)
+                    Text(text = relativeTime(time = item.time), style = Tossling.type.footnote, color = palette.ink2)
                 }
                 when (item.kind) {
                     ClipKind.TEXT -> Text(
                         text = item.text.orEmpty(),
-                        style = Tossy.type.body,
+                        style = Tossling.type.body,
                         color = palette.ink,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
@@ -797,7 +797,7 @@ private fun HistoryRow(
 
 @Composable
 private fun FileChip(name: String, size: Long) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -809,17 +809,17 @@ private fun FileChip(name: String, size: Long) {
         horizontalArrangement = Arrangement.spacedBy(10f.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(imageVector = TossyIcons.Document, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(22f.dp))
+        Icon(imageVector = TosslingIcons.Document, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(22f.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = name, style = Tossy.type.body.copy(fontWeight = FontWeight.Medium), color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (size > 0) Text(text = Formatter.formatShortFileSize(context, size), style = Tossy.type.footnote, color = palette.ink2)
+            Text(text = name, style = Tossling.type.body.copy(fontWeight = FontWeight.Medium), color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (size > 0) Text(text = Formatter.formatShortFileSize(context, size), style = Tossling.type.footnote, color = palette.ink2)
         }
     }
 }
 
 @Composable
 private fun Thumbnail(path: String?) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val context = LocalContext.current
     val density = LocalDensity.current
     val bounds = remember(path) { path?.let(::imageBounds) }
@@ -847,7 +847,7 @@ private fun Thumbnail(path: String?) {
             if (label.isNotEmpty()) {
                 Text(
                     text = label,
-                    style = Tossy.type.monoSmall.copy(fontSize = Tossy.type.footnote.fontSize * 0.85f),
+                    style = Tossling.type.monoSmall.copy(fontSize = Tossling.type.footnote.fontSize * 0.85f),
                     color = palette.ink,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -863,7 +863,7 @@ private fun Thumbnail(path: String?) {
 
 @Composable
 private fun ImagePreview(item: ClipItem?, onCopy: () -> Unit, onShare: () -> Unit, onDismiss: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shown = remember { mutableStateOf<ClipItem?>(null) }
     if (item != null) shown.value = item
     val visible = item != null
@@ -899,7 +899,7 @@ private fun ImagePreview(item: ClipItem?, onCopy: () -> Unit, onShare: () -> Uni
             ) {
                 ZoomableImage(path = current.file, modifier = Modifier.fillMaxSize())
                 GlassIconButton(
-                    icon = TossyIcons.Close,
+                    icon = TosslingIcons.Close,
                     contentDescription = stringResource(R.string.home_preview_close),
                     onClick = onDismiss,
                     modifier = Modifier
@@ -919,13 +919,13 @@ private fun ImagePreview(item: ClipItem?, onCopy: () -> Unit, onShare: () -> Uni
                         text = stringResource(R.string.home_preview_share),
                         onClick = onShare,
                         style = CapsuleStyle.PLAIN,
-                        icon = TossyIcons.External,
+                        icon = TosslingIcons.External,
                         modifier = Modifier.weight(1f),
                     )
                     CapsuleButton(
                         text = stringResource(R.string.home_preview_copy),
                         onClick = onCopy,
-                        icon = TossyIcons.Copy,
+                        icon = TosslingIcons.Copy,
                         modifier = Modifier.weight(1f),
                     )
                 }

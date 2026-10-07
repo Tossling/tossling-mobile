@@ -59,7 +59,7 @@ internal class ClipCipher(key: ByteArray) {
 
     fun openStream(input: InputStream, output: OutputStream, onChunk: (Long) -> Unit): Long {
         val header = input.readNBytes(HEADER_SIZE)
-        if (header.size != HEADER_SIZE || !header.copyOf(MAGIC.size).contentEquals(MAGIC)) throw IOException("not a Tossy stream")
+        if (header.size != HEADER_SIZE || !header.copyOf(MAGIC.size).contentEquals(MAGIC)) throw IOException("not a Tossling stream")
         val chunkSize = ByteBuffer.wrap(header, MAGIC.size, Int.SIZE_BYTES).int
         if (chunkSize <= 0 || chunkSize > MAX_CHUNK_SIZE) throw IOException("bad chunk size")
         var done = 0L

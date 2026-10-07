@@ -22,7 +22,7 @@ val JetBrainsMono = FontFamily(
 )
 
 @Immutable
-data class TossyType(
+data class TosslingType(
     val largeTitle: TextStyle = style(size = 40, line = 44, weight = FontWeight.Bold, spacing = -0.025),
     val title: TextStyle = style(size = 34, line = 40, weight = FontWeight.Bold, spacing = -0.025),
     val title2: TextStyle = style(size = 22, line = 28, weight = FontWeight.Bold, spacing = -0.015),
@@ -47,4 +47,4 @@ private fun style(size: Int, line: Int, weight: FontWeight, spacing: Double = 0.
         letterSpacing = spacing.em,
     )
 
-val LocalTossyType = staticCompositionLocalOf { TossyType() }
+val LocalTosslingType = staticCompositionLocalOf { TosslingType() }

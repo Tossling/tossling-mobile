@@ -38,8 +38,8 @@ import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.PageScaffold
 import com.kopylovis.tossling.core.presentation.glass.PageTitle
 import com.kopylovis.tossling.core.presentation.glass.Spinner
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.devices.R
 
 @Composable
@@ -48,7 +48,7 @@ internal fun AddMacContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.subscribeAsState()
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     PageScaffold(
         onBack = component::onBackClicked,
         backLabel = stringResource(R.string.devices_back),
@@ -60,7 +60,7 @@ internal fun AddMacContent(
                 if (joined == null) {
                     CapsuleButton(
                         text = stringResource(R.string.add_scan),
-                        icon = TossyIcons.Qr,
+                        icon = TosslingIcons.Qr,
                         onClick = component::onScanClicked,
                         style = CapsuleStyle.GLASS,
                         modifier = Modifier.weight(1f),
@@ -79,7 +79,7 @@ internal fun AddMacContent(
             Hairline(start = 58f.dp)
             Step(number = "2", text = stringResource(R.string.add_step_join)) {
                 CommandBox(command = stringResource(R.string.add_join_example, state.host), onCopy = component::onCopyJoin)
-                Text(text = stringResource(R.string.add_join_note), style = Tossy.type.footnote, color = palette.ink2)
+                Text(text = stringResource(R.string.add_join_note), style = Tossling.type.footnote, color = palette.ink2)
             }
             Hairline(start = 58f.dp)
             AnimatedContent(
@@ -96,10 +96,10 @@ internal fun AddMacContent(
                 ) {
                     if (joined == null) {
                         Box(modifier = Modifier.size(28f.dp), contentAlignment = Alignment.Center) { Spinner(size = 20f.dp, stroke = 2.5f.dp) }
-                        Text(text = stringResource(R.string.add_waiting), style = Tossy.type.row.copy(fontWeight = FontWeight.Normal), color = palette.ink2)
+                        Text(text = stringResource(R.string.add_waiting), style = Tossling.type.row.copy(fontWeight = FontWeight.Normal), color = palette.ink2)
                     } else {
-                        CircleBadge(icon = TossyIcons.Check, tint = palette.onAccent, background = palette.accent, size = 28f.dp, iconSize = 14f.dp)
-                        Text(text = stringResource(R.string.add_joined, joined), style = Tossy.type.row.copy(fontWeight = FontWeight.SemiBold), color = palette.ink)
+                        CircleBadge(icon = TosslingIcons.Check, tint = palette.onAccent, background = palette.accent, size = 28f.dp, iconSize = 14f.dp)
+                        Text(text = stringResource(R.string.add_joined, joined), style = Tossling.type.row.copy(fontWeight = FontWeight.SemiBold), color = palette.ink)
                     }
                 }
             }
@@ -109,7 +109,7 @@ internal fun AddMacContent(
 
 @Composable
 private fun Step(number: String, text: String, content: @Composable () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,10 +122,10 @@ private fun Step(number: String, text: String, content: @Composable () -> Unit) 
                 .background(color = palette.accentSoft, shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = number, style = Tossy.type.hint.copy(fontWeight = FontWeight.SemiBold), color = palette.accentInk)
+            Text(text = number, style = Tossling.type.hint.copy(fontWeight = FontWeight.SemiBold), color = palette.accentInk)
         }
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10f.dp)) {
-            Text(text = text, style = Tossy.type.row, color = palette.ink, modifier = Modifier.padding(top = 3f.dp))
+            Text(text = text, style = Tossling.type.row, color = palette.ink, modifier = Modifier.padding(top = 3f.dp))
             content()
         }
     }
@@ -133,7 +133,7 @@ private fun Step(number: String, text: String, content: @Composable () -> Unit) 
 
 @Composable
 private fun CommandBox(command: String, onCopy: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shape = RoundedCornerShape(16f.dp)
     Row(
         modifier = Modifier
@@ -146,12 +146,12 @@ private fun CommandBox(command: String, onCopy: () -> Unit) {
     ) {
         Text(
             text = command,
-            style = Tossy.type.monoSmall.copy(fontSize = 13.sp, lineHeight = 19.sp),
+            style = Tossling.type.monoSmall.copy(fontSize = 13.sp, lineHeight = 19.sp),
             color = palette.ink,
             modifier = Modifier
                 .weight(1f)
                 .padding(vertical = 6f.dp),
         )
-        GlassIconButton(icon = TossyIcons.Copy, contentDescription = stringResource(R.string.add_copy), onClick = onCopy, iconSize = 18f.dp, bare = true, tint = palette.ink2)
+        GlassIconButton(icon = TosslingIcons.Copy, contentDescription = stringResource(R.string.add_copy), onClick = onCopy, iconSize = 18f.dp, bare = true, tint = palette.ink2)
     }
 }

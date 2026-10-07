@@ -117,9 +117,9 @@ class ClipRepository internal constructor(
 
     suspend fun restore(saved: SavedRooms): Pairing {
         val identity = runCatching { DeviceIdentity(privateKey = Base64.getDecoder().decode(saved.identity)) }.getOrNull()
-            ?: throw PairingException(problem = PairingProblem.NOT_TOSSY)
+            ?: throw PairingException(problem = PairingProblem.NOT_TOSSLING)
         val rooms = saved.rooms.filter { it.isRoom }
-        if (rooms.isEmpty()) throw PairingException(problem = PairingProblem.NOT_TOSSY)
+        if (rooms.isEmpty()) throw PairingException(problem = PairingProblem.NOT_TOSSLING)
         rooms.forEach { room ->
             try {
                 client.check(endpoint = room.endpoint, topic = room.inTopic)
@@ -213,7 +213,7 @@ class ClipRepository internal constructor(
         }
         if (deviceId == pairing.ownerId) throw IllegalStateException(tr("The room creator can't be removed", "Создателя комнаты нельзя отключить"))
         val remaining = pairing.members.filter { it.id != deviceId && it.id != settings.deviceId && !it.id.startsWith(LEGACY_PREFIX) }
-        val room = "$ROOM_PREFIX${hex(bytes = ROOM_BYTES)}"
+        val room = "${roomPrefix(endpoint = pairing.endpoint)}${hex(bytes = ROOM_BYTES)}"
         val key = Base64.getEncoder().encodeToString(ByteArray(ClipCipher.KEY_SIZE).also(random::nextBytes))
         val isLegacy = remaining.any { RoomKeys.decodeKey(it.pk) == null }
         if (isLegacy) Log.w(TAG, "some devices have no key yet, the new room key goes out under the old one")
@@ -235,6 +235,9 @@ class ClipRepository internal constructor(
         switchRoom(pairing = pairing, room = room, key = key, token = token, keep = null, without = deviceId)
         if (token != null) RetireTokenWorker.enqueue(context = context, server = pairing.server, token = token, old = pairing.token)
     }
+
+    private suspend fun roomPrefix(endpoint: Endpoint): String =
+        if (runCatching { client.tosslingHealth(endpoint = endpoint) }.getOrNull()?.isTossling == true) ROOM_PREFIX else OLD_ROOM_PREFIX
 
     fun renameLater(name: String) {
         scope.launch { rename(name = name) }
@@ -312,7 +315,7 @@ class ClipRepository internal constructor(
                 else -> pairing to null
             }
         }
-        if (routes.isEmpty()) throw IllegalStateException(tr("Tossy is not paired", "Tossy не подключён"))
+        if (routes.isEmpty()) throw IllegalStateException(tr("Tossling is not paired", "Tossling не подключён"))
         val isStream = outgoing.kind == ClipKind.FILE
         val size = outgoing.file.length()
         val bytes = if (isStream) null else outgoing.file.readBytes()
@@ -702,12 +705,12 @@ class ClipRepository internal constructor(
 
     private fun parse(raw: String): Pairing {
         val pairing = runCatching { SyncJson.decodeFromString(Pairing.serializer(), raw.trim()) }.getOrNull()
-            ?: throw PairingException(problem = PairingProblem.NOT_TOSSY)
+            ?: throw PairingException(problem = PairingProblem.NOT_TOSSLING)
         val server = pairing.server.trim().trimEnd('/')
         val valid = server.startsWith("https://") || server.startsWith("http://")
         val normalized = if (pairing.room.isNotBlank()) pairing.copy(inTopic = pairing.room, outTopic = pairing.room) else pairing
         if (!valid || normalized.inTopic.isBlank() || normalized.outTopic.isBlank() || runCatching { ClipCipher.fromBase64(pairing.key) }.isFailure) {
-            throw PairingException(problem = PairingProblem.NOT_TOSSY)
+            throw PairingException(problem = PairingProblem.NOT_TOSSLING)
         }
         return normalized.copy(server = server, members = emptyList())
     }
@@ -742,7 +745,6 @@ class ClipRepository internal constructor(
         private const val MESSAGE_EVENT = "message"
         private const val SOURCE_MAC = "mac"
         private const val LEGACY_PREFIX = "legacy-"
-        private const val ROOM_PREFIX = "tossy-"
         private const val TOKEN_LABEL = "tossy"
         private const val ROOM_BYTES = 12
         private const val FIRST_SINCE = "15m"

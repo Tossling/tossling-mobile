@@ -33,8 +33,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.kopylovis.tossling.core.presentation.theme.Tossy
-import com.kopylovis.tossling.core.presentation.theme.TossyPalette
+import com.kopylovis.tossling.core.presentation.theme.Tossling
+import com.kopylovis.tossling.core.presentation.theme.TosslingPalette
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
@@ -49,7 +49,7 @@ fun GlassScreen(
     content: @Composable BoxScope.() -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        TossyBackground()
+        TosslingBackground()
         CompositionLocalProvider(LocalHazeState provides null) {
             content()
         }
@@ -57,8 +57,8 @@ fun GlassScreen(
 }
 
 @Composable
-fun TossyBackground(modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+fun TosslingBackground(modifier: Modifier = Modifier) {
+    val palette = Tossling.palette
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -107,7 +107,7 @@ fun Modifier.glass(
     withShadow: Boolean = true,
     withStroke: Boolean = true,
 ): Modifier {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val state = LocalHazeState.current
     val fill = palette.fillFor(level = level)
     val shadowed = if (withShadow) shadow(elevation = GLASS_ELEVATION, shape = shape, ambientColor = palette.shadow, spotColor = palette.shadow) else this
@@ -141,7 +141,7 @@ fun Modifier.glass(
 
 @Composable
 fun Modifier.glassLite(shape: Shape, withShadow: Boolean = true): Modifier {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shadowed = if (withShadow) shadow(elevation = 6f.dp, shape = shape, ambientColor = palette.shadow, spotColor = palette.shadow) else this
     return shadowed
         .background(color = palette.glassLite, shape = shape)
@@ -157,7 +157,7 @@ fun Modifier.glassLite(shape: Shape, withShadow: Boolean = true): Modifier {
         }
 }
 
-fun TossyPalette.fillFor(level: GlassLevel): Color = when (level) {
+fun TosslingPalette.fillFor(level: GlassLevel): Color = when (level) {
     GlassLevel.FILL -> glassFill
     GlassLevel.STRONG -> glassStrong
     GlassLevel.WEAK -> glassWeak

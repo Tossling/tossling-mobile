@@ -6,7 +6,7 @@ set -euo pipefail
 # Via the Firebase CLI rather than their Gradle plugin: the plugin still needs `AppExtension`,
 # which AGP 9 removed, and fails as soon as it is applied.
 #
-# Signing uses the same keystore as every other build (tossy.jks + keystore_* in local.properties).
+# Signing uses the same keystore as every other build (tossling.jks + keystore_* in local.properties).
 # Firebase access: either `firebase login` once in this terminal, or a service-account key in
 # GOOGLE_APPLICATION_CREDENTIALS.
 #
@@ -68,7 +68,7 @@ fi
 APKSIGNER="$(ls "$HOME"/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | tail -1)"
 if [ -n "$APKSIGNER" ]; then
     if ! "$APKSIGNER" verify "$APK_PATH" >/dev/null 2>&1; then
-        echo "ERROR: APK is not signed — check tossy.jks + keystore_* in local.properties" >&2
+        echo "ERROR: APK is not signed — check tossling.jks + keystore_* in local.properties" >&2
         exit 1
     fi
     echo "Signature: $("$APKSIGNER" verify --print-certs "$APK_PATH" | grep -m1 "certificate DN")"

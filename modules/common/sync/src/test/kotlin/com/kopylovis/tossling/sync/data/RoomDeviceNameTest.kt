@@ -1,14 +1,16 @@
 package com.kopylovis.tossling.sync.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RoomDeviceNameTest {
 
     private fun device(name: String, ownName: String, hasAlias: Boolean) = RoomDevice(
         id = "a", pairingId = "p", name = name, kind = DeviceKind.PHONE, isSelf = false, isOnline = true,
-        seen = 0, since = 0, host = "tossy.example.com", isRoom = true, ownName = ownName, hasAlias = hasAlias,
+        seen = 0, since = 0, host = "tossling.example.com", isRoom = true, ownName = ownName, hasAlias = hasAlias,
     )
 
     @Test
@@ -31,9 +33,17 @@ class RoomDeviceNameTest {
 
     @Test
     fun pairingHostReadsEscapedSlashes() {
-        val raw = """{"s":"https:\/\/tossy.example.com","t":"tk_x","r":"tossy-abc","k":"a2V5","v":2}"""
-        assertEquals("tossy.example.com", pairingHost(raw = raw))
-        assertEquals("tossy.example.com", pairingHost(raw = """{"s":"https://tossy.example.com/","k":"a2V5"}"""))
+        val raw = """{"s":"https:\/\/tossling.example.com","t":"tk_x","r":"tossling-abc","k":"a2V5","v":2}"""
+        assertEquals("tossling.example.com", pairingHost(raw = raw))
+        assertEquals("tossling.example.com", pairingHost(raw = """{"s":"https://tossling.example.com/","k":"a2V5"}"""))
         assertEquals("", pairingHost(raw = "not a code"))
+    }
+
+    @Test
+    fun roomsUseEitherPrefix() {
+        assertTrue(isRoomTopic(topic = "tossling-0123"))
+        assertTrue(isRoomTopic(topic = "tossy-0123"))
+        assertFalse(isRoomTopic(topic = "axrock"))
+        assertFalse(isRoomTopic(topic = "tossling"))
     }
 }

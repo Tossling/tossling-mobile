@@ -47,14 +47,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kopylovis.tossling.core.presentation.messages.AppMessage
 import com.kopylovis.tossling.core.presentation.messages.AppMessageKind
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 
 @Composable
 fun Island(
     message: AppMessage?,
     modifier: Modifier = Modifier,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     AnimatedVisibility(
         visible = message != null,
         modifier = modifier
@@ -78,9 +78,9 @@ fun Island(
         ) {
             when (shown.kind) {
                 AppMessageKind.BUSY -> Spinner(size = 14f.dp, stroke = 2f.dp, color = Color.White, track = Color.White.copy(alpha = 0.25f))
-                AppMessageKind.DONE -> Icon(imageVector = TossyIcons.Check, contentDescription = null, tint = Color(0xFF96C0FE), modifier = Modifier.size(14f.dp))
-                AppMessageKind.ERROR -> Icon(imageVector = TossyIcons.Alert, contentDescription = null, tint = Color(0xFFFF9E96), modifier = Modifier.size(16f.dp))
-                AppMessageKind.DEVICE -> Icon(imageVector = TossyIcons.Laptop, contentDescription = null, tint = Color.White, modifier = Modifier.size(18f.dp))
+                AppMessageKind.DONE -> Icon(imageVector = TosslingIcons.Check, contentDescription = null, tint = Color(0xFF96C0FE), modifier = Modifier.size(14f.dp))
+                AppMessageKind.ERROR -> Icon(imageVector = TosslingIcons.Alert, contentDescription = null, tint = Color(0xFFFF9E96), modifier = Modifier.size(16f.dp))
+                AppMessageKind.DEVICE -> Icon(imageVector = TosslingIcons.Laptop, contentDescription = null, tint = Color.White, modifier = Modifier.size(18f.dp))
                 AppMessageKind.INFO -> Box(
                     modifier = Modifier
                         .size(8f.dp)
@@ -88,7 +88,7 @@ fun Island(
                         .background(Color.White.copy(alpha = 0.7f)),
                 )
             }
-            Text(text = shown.text, style = Tossy.type.hint.copy(fontWeight = FontWeight.Medium), color = Color.White, maxLines = 1)
+            Text(text = shown.text, style = Tossling.type.hint.copy(fontWeight = FontWeight.Medium), color = Color.White, maxLines = 1)
         }
     }
 }
@@ -101,7 +101,7 @@ fun GlassSheet(
     contentPadding: PaddingValues = PaddingValues(start = 20f.dp, end = 20f.dp, top = 12f.dp, bottom = 20f.dp),
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     if (visible) BackHandler(onBack = onDismiss)
     TrackOverlay(visible = visible)
     AnimatedVisibility(visible = visible, enter = fadeIn(tween(durationMillis = 250)), exit = fadeOut(tween(durationMillis = 200))) {
@@ -152,15 +152,15 @@ fun ConfirmSheet(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     GlassSheet(visible = visible, onDismiss = onDismiss) {
         Spacer(modifier = Modifier.height(20f.dp))
         CircleBadge(icon = icon, tint = palette.dangerInk, background = palette.dangerSoft)
         Spacer(modifier = Modifier.height(14f.dp))
-        Text(text = title, style = Tossy.type.title2, color = palette.ink, textAlign = TextAlign.Center)
+        Text(text = title, style = Tossling.type.title2, color = palette.ink, textAlign = TextAlign.Center)
         Text(
             text = text,
-            style = Tossy.type.body,
+            style = Tossling.type.body,
             color = palette.ink2,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -187,7 +187,7 @@ fun GlassMenu(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     if (visible) {
         BackHandler(onBack = onDismiss)
         Box(
@@ -231,7 +231,7 @@ fun GlassMenu(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(imageVector = action.icon, contentDescription = null, tint = color, modifier = Modifier.size(20f.dp))
-                    Text(text = action.label, style = Tossy.type.row.copy(fontWeight = FontWeight.Normal), color = color)
+                    Text(text = action.label, style = Tossling.type.row.copy(fontWeight = FontWeight.Normal), color = color)
                 }
             }
         }
@@ -264,6 +264,6 @@ fun Hairline(
             .padding(start = start)
             .fillMaxWidth()
             .height(1f.dp)
-            .background(Tossy.palette.hairline),
+            .background(Tossling.palette.hairline),
     )
 }

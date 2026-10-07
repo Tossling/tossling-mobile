@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeProgressive
 import dev.chrisbanes.haze.HazeState
@@ -77,7 +77,7 @@ fun GlassPage(
     overlay: @Composable BoxScope.() -> Unit = {},
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val hazeState = rememberHazeState()
     val statusTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -87,7 +87,7 @@ fun GlassPage(
                 .fillMaxSize()
                 .hazeSource(state = hazeState),
         ) {
-            TossyBackground()
+            TosslingBackground()
             CompositionLocalProvider(LocalHazeState provides null) {
                 content()
             }
@@ -124,7 +124,7 @@ fun EdgeBlur(
     tint: Color,
     modifier: Modifier = Modifier,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Box(
         modifier = modifier
             .hazeEffect(
@@ -185,10 +185,10 @@ fun BoxScope.FlowingTitle(
     expandedTop: Dp,
     pull: () -> Float = { 0f },
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val density = LocalDensity.current
     val statusTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    val style = Tossy.type.largeTitle
+    val style = Tossling.type.largeTitle
     val collapsedScale = COLLAPSED_SIZE / style.fontSize.value
     val expandedX = with(density) { expandedStart.toPx() }
     val expandedY = with(density) { expandedTop.toPx() }

@@ -8,11 +8,11 @@ class LiveTargetsTest {
 
     @Test
     fun groupsTopicsByServerWithoutRepeats() {
-        val home = Endpoint(server = "https://tossy.example.com", token = "tk_a")
+        val home = Endpoint(server = "https://tossling.example.com", token = "tk_a")
         val other = Endpoint(server = "https://ntfy.example.org", token = "tk_b")
         val targets = liveTargets(
             topics = listOf(
-                home to "tossy-room",
+                home to "tossling-room",
                 home to "router",
                 other to "backups",
                 home to "axrock",
@@ -20,13 +20,13 @@ class LiveTargetsTest {
                 home to "",
             ),
         )
-        assertEquals(mapOf(home to listOf("axrock", "router", "tossy-room"), other to listOf("backups")), targets)
+        assertEquals(mapOf(home to listOf("axrock", "router", "tossling-room"), other to listOf("backups")), targets)
     }
 
     @Test
     fun sameServerWithAnotherTokenIsAnotherConnection() {
-        val old = Endpoint(server = "https://tossy.example.com", token = "tk_old")
-        val new = Endpoint(server = "https://tossy.example.com", token = "tk_new")
+        val old = Endpoint(server = "https://tossling.example.com", token = "tk_old")
+        val new = Endpoint(server = "https://tossling.example.com", token = "tk_new")
         assertEquals(2, liveTargets(topics = listOf(old to "a", new to "b")).size)
     }
 

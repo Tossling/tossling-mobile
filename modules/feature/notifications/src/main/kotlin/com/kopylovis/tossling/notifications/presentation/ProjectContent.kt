@@ -54,12 +54,12 @@ import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.PageScaffold
 import com.kopylovis.tossling.core.presentation.glass.ProjectAvatar
 import com.kopylovis.tossling.core.presentation.glass.SectionLabel
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.ValueRow
 import com.kopylovis.tossling.core.presentation.glass.glassLite
 import com.kopylovis.tossling.core.presentation.glass.pressable
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.notifications.R
 import com.kopylovis.tossling.sync.alerts.projectInitials
 import io.github.vinceglb.filekit.dialogs.FileKitMode
@@ -74,7 +74,7 @@ internal fun ProjectContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.subscribeAsState()
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val isCreated = state.token.isNotEmpty()
     val title = when {
         isCreated -> stringResource(R.string.project_created)
@@ -122,7 +122,7 @@ internal fun ProjectContent(
             AppPicker(state = state, component = component)
             ConfirmSheet(
                 visible = state.isSheetVisible,
-                icon = TossyIcons.Trash,
+                icon = TosslingIcons.Trash,
                 title = stringResource(R.string.project_delete_title, state.name),
                 text = stringResource(R.string.project_delete_text, state.channel),
                 confirm = stringResource(R.string.project_delete),
@@ -144,7 +144,7 @@ internal fun ProjectContent(
             } else {
                 ProjectAvatar(initials = initials, color = ProjectColors[state.color], size = 48f.dp, iconPath = state.iconPath)
             }
-            Text(text = title, style = Tossy.type.title, color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = title, style = Tossling.type.title, color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         if (isCreated) {
             GlassGroup(modifier = Modifier.padding(top = 22f.dp)) {
@@ -179,7 +179,7 @@ internal fun ProjectContent(
                         .padding(start = 16f.dp, end = 10f.dp, top = 8f.dp, bottom = 8f.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(text = stringResource(R.string.project_color), style = Tossy.type.row, color = palette.ink, modifier = Modifier.weight(1f))
+                    Text(text = stringResource(R.string.project_color), style = Tossling.type.row, color = palette.ink, modifier = Modifier.weight(1f))
                     ProjectColors.forEachIndexed { index, color ->
                         Swatch(color = color, isSelected = index == state.color, onClick = { component.onColorClicked(index = index) })
                     }
@@ -219,7 +219,7 @@ private fun AppIcon(packageName: String, size: Dp) {
         runCatching { context.packageManager.getApplicationIcon(packageName).toBitmap(width = 144, height = 144).asImageBitmap() }.getOrNull()
     }
     if (icon == null) {
-        Box(modifier = Modifier.size(size).background(color = Tossy.palette.glassWeak, shape = CircleShape))
+        Box(modifier = Modifier.size(size).background(color = Tossling.palette.glassWeak, shape = CircleShape))
     } else {
         Image(bitmap = icon, contentDescription = null, modifier = Modifier.size(size).clip(CircleShape))
     }
@@ -227,7 +227,7 @@ private fun AppIcon(packageName: String, size: Dp) {
 
 @Composable
 private fun AppPicker(state: ProjectScreenState, component: ProjectComponent) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shown = remember(state.apps, state.appQuery) {
         val query = state.appQuery.trim().lowercase()
         if (query.isEmpty()) state.apps else state.apps.filter { query in it.label.lowercase() || query in it.packageName.lowercase() }
@@ -239,7 +239,7 @@ private fun AppPicker(state: ProjectScreenState, component: ProjectComponent) {
     GlassSheet(visible = state.isPickerVisible, onDismiss = component::onPickerDismissed, horizontalAlignment = Alignment.Start) {
         Text(
             text = stringResource(R.string.project_icon_pick),
-            style = Tossy.type.headline,
+            style = Tossling.type.headline,
             color = palette.ink,
             modifier = Modifier.padding(top = 14f.dp, bottom = 8f.dp),
         )
@@ -256,22 +256,22 @@ private fun AppPicker(state: ProjectScreenState, component: ProjectComponent) {
                         ProjectAvatar(initials = "", color = ProjectColors[state.color], size = 36f.dp, iconPath = state.iconPath)
                     } else {
                         Box(modifier = Modifier.size(36f.dp).background(color = palette.accentSoft, shape = CircleShape), contentAlignment = Alignment.Center) {
-                            Icon(imageVector = TossyIcons.Plus, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(18f.dp))
+                            Icon(imageVector = TosslingIcons.Plus, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(18f.dp))
                         }
                     }
-                    Text(text = stringResource(R.string.project_icon_file), style = Tossy.type.row, color = palette.ink)
+                    Text(text = stringResource(R.string.project_icon_file), style = Tossling.type.row, color = palette.ink)
                 }
             }
             item(key = "none") {
                 PickerRow(selected = state.app == null && !state.isCustomIcon, onClick = { component.onAppPicked(app = null) }) {
                     ProjectAvatar(initials = projectInitials(name = state.name.ifBlank { "?" }), color = ProjectColors[state.color], size = 36f.dp)
-                    Text(text = stringResource(R.string.project_icon_none), style = Tossy.type.row, color = palette.ink)
+                    Text(text = stringResource(R.string.project_icon_none), style = Tossling.type.row, color = palette.ink)
                 }
             }
             items(items = shown, key = { it.packageName }) { app ->
                 PickerRow(selected = state.app == app.packageName, onClick = { component.onAppPicked(app = app) }) {
                     AppIcon(packageName = app.packageName, size = 36f.dp)
-                    Text(text = app.label, style = Tossy.type.row, color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = app.label, style = Tossling.type.row, color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
@@ -290,7 +290,7 @@ private fun PickerRow(selected: Boolean, onClick: () -> Unit, content: @Composab
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12f.dp), verticalAlignment = Alignment.CenterVertically, content = content)
-        if (selected) Icon(imageVector = TossyIcons.Check, contentDescription = null, tint = Tossy.palette.accentInk, modifier = Modifier.size(18f.dp))
+        if (selected) Icon(imageVector = TosslingIcons.Check, contentDescription = null, tint = Tossling.palette.accentInk, modifier = Modifier.size(18f.dp))
     }
 }
 
@@ -315,7 +315,7 @@ private fun Swatch(color: Color, isSelected: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun CopyBlock(label: String, text: String, onCopy: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -328,7 +328,7 @@ private fun CopyBlock(label: String, text: String, onCopy: () -> Unit) {
                 .padding(start = 14f.dp, end = 4f.dp, top = 2f.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = label, style = Tossy.type.monoSmall.copy(fontSize = 12.sp), color = palette.ink2, modifier = Modifier.weight(1f))
+            Text(text = label, style = Tossling.type.monoSmall.copy(fontSize = 12.sp), color = palette.ink2, modifier = Modifier.weight(1f))
             Row(
                 modifier = Modifier
                     .heightIn(min = 44f.dp)
@@ -337,13 +337,13 @@ private fun CopyBlock(label: String, text: String, onCopy: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(6f.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(imageVector = TossyIcons.Copy, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(16f.dp))
-                Text(text = stringResource(R.string.project_copy), style = Tossy.type.hint.copy(fontWeight = FontWeight.SemiBold), color = palette.accentInk)
+                Icon(imageVector = TosslingIcons.Copy, contentDescription = null, tint = palette.accentInk, modifier = Modifier.size(16f.dp))
+                Text(text = stringResource(R.string.project_copy), style = Tossling.type.hint.copy(fontWeight = FontWeight.SemiBold), color = palette.accentInk)
             }
         }
         Text(
             text = text,
-            style = Tossy.type.monoSmall.copy(fontSize = 12.sp, lineHeight = 19.sp, fontWeight = FontWeight.Normal),
+            style = Tossling.type.monoSmall.copy(fontSize = 12.sp, lineHeight = 19.sp, fontWeight = FontWeight.Normal),
             color = palette.ink,
             softWrap = false,
             modifier = Modifier

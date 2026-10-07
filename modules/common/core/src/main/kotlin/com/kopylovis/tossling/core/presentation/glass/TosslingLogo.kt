@@ -23,7 +23,7 @@ private val LogoPeach = Color(0xFFFFD4B0)
 private val LogoBall = Color(0xFF3067B8)
 
 @Composable
-fun TossyLogo(
+fun TosslingLogo(
     modifier: Modifier = Modifier,
     size: Dp = 112f.dp,
 ) {

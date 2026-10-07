@@ -23,10 +23,10 @@ import com.kopylovis.tossling.core.presentation.glass.GlassIconButton
 import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.PageScaffold
 import com.kopylovis.tossling.core.presentation.glass.ProjectAvatar
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.ValueRow
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.notifications.R
 import com.kopylovis.tossling.sync.alerts.projectInitials
 
@@ -36,7 +36,7 @@ internal fun AlertContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.subscribeAsState()
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val uriHandler = LocalUriHandler.current
     val alert = state.alert
     val project = state.project
@@ -46,7 +46,7 @@ internal fun AlertContent(
         modifier = modifier,
         bottomPadding = 140f.dp,
         trailing = {
-            GlassIconButton(icon = TossyIcons.Trash, contentDescription = stringResource(R.string.notif_delete), onClick = component::onDeleteClicked)
+            GlassIconButton(icon = TosslingIcons.Trash, contentDescription = stringResource(R.string.notif_delete), onClick = component::onDeleteClicked)
         },
         overlay = {
             if (alert != null) {
@@ -56,7 +56,7 @@ internal fun AlertContent(
                         CapsuleButton(text = stringResource(R.string.notif_copy_text), onClick = component::onCopyClicked, style = CapsuleStyle.GLASS, modifier = Modifier.weight(1f))
                         CapsuleButton(
                             text = stringResource(R.string.notif_open_link),
-                            icon = TossyIcons.External,
+                            icon = TosslingIcons.External,
                             iconSize = 14f.dp,
                             onClick = { runCatching { uriHandler.openUri(link) } },
                             modifier = Modifier.weight(1f),
@@ -76,12 +76,12 @@ internal fun AlertContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ProjectAvatar(initials = project?.initials ?: projectInitials(name = name), color = ProjectColors[project?.colorIndex ?: 0], size = 28f.dp, iconPath = project?.iconFile)
-            Text(text = name, style = Tossy.type.body.copy(fontWeight = FontWeight.Medium), color = palette.ink2)
+            Text(text = name, style = Tossling.type.body.copy(fontWeight = FontWeight.Medium), color = palette.ink2)
             PriorityChip(priority = alert.priority, large = true)
         }
         Text(
             text = alert.titleFor(project = name).ifBlank { name },
-            style = Tossy.type.title,
+            style = Tossling.type.title,
             color = palette.ink,
             modifier = Modifier.padding(start = 4f.dp, end = 4f.dp, top = 8f.dp),
         )

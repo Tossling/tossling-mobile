@@ -14,7 +14,7 @@ val localProperties = Properties().apply {
     if (file.exists()) file.inputStream().use { load(it) }
 }
 
-val keystore = rootProject.file("tossy.jks")
+val keystore = rootProject.file("tossling.jks")
 
 val buildNumber: Int = file("version-code.txt")
     .takeIf { it.exists() }

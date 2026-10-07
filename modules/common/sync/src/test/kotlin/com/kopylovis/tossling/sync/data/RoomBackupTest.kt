@@ -9,7 +9,7 @@ import org.junit.Test
 class RoomBackupTest {
 
     private fun room(n: Int) = Pairing(
-        server = "https://tossy.example.com", token = "tk_" + "a".repeat(29), key = "k".repeat(44), room = "tossy-${"%024d".format(n)}",
+        server = "https://tossling.example.com", token = "tk_" + "a".repeat(29), key = "k".repeat(44), room = "tossling-${"%024d".format(n)}",
         macName = "MacBook $n", macId = "mac$n", macKey = "p".repeat(44), owner = "mac$n",
         members = listOf(Member(id = "x", name = "Pixel", source = "android", seen = 1)),
     )
@@ -21,7 +21,7 @@ class RoomBackupTest {
         assertNotNull(back)
         assertEquals("d1", back!!.deviceId)
         assertEquals("MacBook 1", back.title)
-        assertEquals("tossy.example.com", back.host)
+        assertEquals("tossling.example.com", back.host)
         assertTrue(back.rooms.single().members.isEmpty())
     }
 

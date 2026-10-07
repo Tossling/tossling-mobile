@@ -66,12 +66,12 @@ import com.kopylovis.tossling.core.presentation.glass.Spinner
 import com.kopylovis.tossling.core.presentation.glass.SwipeAction
 import com.kopylovis.tossling.core.presentation.glass.SwipeRow
 import com.kopylovis.tossling.core.presentation.glass.TopBarHeight
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.glass
 import com.kopylovis.tossling.core.presentation.glass.pressable
 import com.kopylovis.tossling.core.presentation.glass.rememberTitleCollapse
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.notifications.R
 import com.kopylovis.tossling.sync.alerts.projectInitials
 
@@ -82,7 +82,7 @@ internal fun FeedContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.subscribeAsState()
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val density = LocalDensity.current
     val listState = rememberLazyListState()
     val pullState = rememberPullToRefreshState()
@@ -98,7 +98,7 @@ internal fun FeedContent(
         topBar = {
             GlassTopBar(
                 trailing = {
-                    GlassIconButton(icon = TossyIcons.More, contentDescription = stringResource(R.string.notif_menu), onClick = { isMenuOpen = true })
+                    GlassIconButton(icon = TosslingIcons.More, contentDescription = stringResource(R.string.notif_menu), onClick = { isMenuOpen = true })
                 },
             )
             FlowingTitle(
@@ -114,9 +114,9 @@ internal fun FeedContent(
                 visible = isMenuOpen,
                 onDismiss = { isMenuOpen = false },
                 actions = listOf(
-                    MenuAction(icon = TossyIcons.DoneAll, label = stringResource(R.string.notif_read_all), onClick = component::onReadAllClicked),
-                    MenuAction(icon = TossyIcons.Projects, label = stringResource(R.string.notif_projects), onClick = component::onProjectsClicked),
-                    MenuAction(icon = TossyIcons.Trash, label = stringResource(R.string.notif_clear), danger = true, onClick = component::onClearClicked),
+                    MenuAction(icon = TosslingIcons.DoneAll, label = stringResource(R.string.notif_read_all), onClick = component::onReadAllClicked),
+                    MenuAction(icon = TosslingIcons.Projects, label = stringResource(R.string.notif_projects), onClick = component::onProjectsClicked),
+                    MenuAction(icon = TosslingIcons.Trash, label = stringResource(R.string.notif_clear), danger = true, onClick = component::onClearClicked),
                 ),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -124,7 +124,7 @@ internal fun FeedContent(
             )
             ConfirmSheet(
                 visible = state.isClearSheetVisible,
-                icon = TossyIcons.Trash,
+                icon = TosslingIcons.Trash,
                 title = stringResource(R.string.notif_clear_title),
                 text = stringResource(R.string.notif_clear_text),
                 confirm = stringResource(R.string.notif_clear),
@@ -153,10 +153,10 @@ internal fun FeedContent(
                             .padding(start = 20f.dp, end = 20f.dp, bottom = 4f.dp),
                         verticalArrangement = Arrangement.spacedBy(2f.dp),
                     ) {
-                        Text(text = title, style = Tossy.type.largeTitle, color = palette.ink, maxLines = 1, modifier = Modifier.alpha(0f))
+                        Text(text = title, style = Tossling.type.largeTitle, color = palette.ink, maxLines = 1, modifier = Modifier.alpha(0f))
                         Text(
                             text = if (state.unread > 0) pluralStringResource(R.plurals.notif_unread_count, state.unread, state.unread) else stringResource(R.string.notif_all_read),
-                            style = Tossy.type.body,
+                            style = Tossling.type.body,
                             color = palette.ink2,
                         )
                     }
@@ -205,7 +205,7 @@ internal fun FeedContent(
                                         onOpenChange = { open -> openSwipe = if (open) item.alert.id else openSwipe.takeIf { it != item.alert.id } },
                                         actions = listOf(
                                             SwipeAction(
-                                                icon = TossyIcons.Done,
+                                                icon = TosslingIcons.Done,
                                                 label = stringResource(if (item.alert.isRead) R.string.notif_unread else R.string.notif_read),
                                                 background = palette.accentSoft,
                                                 tint = palette.accentInk,
@@ -215,7 +215,7 @@ internal fun FeedContent(
                                                 },
                                             ),
                                             SwipeAction(
-                                                icon = TossyIcons.Trash,
+                                                icon = TosslingIcons.Trash,
                                                 label = stringResource(R.string.notif_delete),
                                                 background = palette.danger,
                                                 tint = palette.onDanger,
@@ -246,7 +246,7 @@ internal fun FeedContent(
 
 @Composable
 private fun AlertRow(item: FeedItem, onClick: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val alert = item.alert
     val project = item.project
     Row(
@@ -267,14 +267,14 @@ private fun AlertRow(item: FeedItem, onClick: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(8f.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = project?.name ?: alert.topic,
-                    style = Tossy.type.footnote,
+                    style = Tossling.type.footnote,
                     color = palette.ink2,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
                 PriorityChip(priority = alert.priority)
-                Text(text = clockTime(time = alert.time), style = Tossy.type.footnote, color = palette.ink2)
+                Text(text = clockTime(time = alert.time), style = Tossling.type.footnote, color = palette.ink2)
                 if (!alert.isRead) {
                     Box(
                         modifier = Modifier
@@ -287,13 +287,13 @@ private fun AlertRow(item: FeedItem, onClick: () -> Unit) {
             if (title.isNotBlank()) {
                 Text(
                     text = title,
-                    style = Tossy.type.row.copy(lineHeight = 21.sp, fontWeight = FontWeight.SemiBold),
+                    style = Tossling.type.row.copy(lineHeight = 21.sp, fontWeight = FontWeight.SemiBold),
                     color = if (alert.priority <= 2) palette.ink2 else palette.ink,
                 )
             }
             Text(
                 text = plainText(markdown = alert.message),
-                style = Tossy.type.body,
+                style = Tossling.type.body,
                 color = palette.ink2,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
@@ -304,7 +304,7 @@ private fun AlertRow(item: FeedItem, onClick: () -> Unit) {
 
 @Composable
 internal fun PriorityChip(priority: Int, modifier: Modifier = Modifier, large: Boolean = false) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val (text, background, ink) = when {
         priority >= 5 -> Triple(stringResource(R.string.notif_urgent), palette.danger, palette.onDanger)
         priority == 4 -> Triple(stringResource(R.string.notif_important), palette.importantSoft, palette.importantInk)
@@ -314,7 +314,7 @@ internal fun PriorityChip(priority: Int, modifier: Modifier = Modifier, large: B
     }
     Text(
         text = text,
-        style = Tossy.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+        style = Tossling.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
         color = ink,
         maxLines = 1,
         modifier = modifier
@@ -326,7 +326,7 @@ internal fun PriorityChip(priority: Int, modifier: Modifier = Modifier, large: B
 
 @Composable
 private fun EmptyFeed(title: String, text: String, onProjects: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     GlassCard(
         modifier = Modifier
             .padding(start = 16f.dp, end = 16f.dp, top = 24f.dp)
@@ -339,12 +339,12 @@ private fun EmptyFeed(title: String, text: String, onProjects: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8f.dp),
         ) {
-            CircleBadge(icon = TossyIcons.Bell, tint = palette.accentInk, background = palette.accentSoft, iconSize = 24f.dp, modifier = Modifier.padding(bottom = 8f.dp))
-            Text(text = title, style = Tossy.type.headline, color = palette.ink, textAlign = TextAlign.Center)
-            Text(text = text, style = Tossy.type.body, color = palette.ink2, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 290f.dp))
+            CircleBadge(icon = TosslingIcons.Bell, tint = palette.accentInk, background = palette.accentSoft, iconSize = 24f.dp, modifier = Modifier.padding(bottom = 8f.dp))
+            Text(text = title, style = Tossling.type.headline, color = palette.ink, textAlign = TextAlign.Center)
+            Text(text = text, style = Tossling.type.body, color = palette.ink2, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 290f.dp))
             Text(
                 text = stringResource(R.string.notif_projects),
-                style = Tossy.type.body.copy(fontWeight = FontWeight.SemiBold),
+                style = Tossling.type.body.copy(fontWeight = FontWeight.SemiBold),
                 color = palette.accentInk,
                 modifier = Modifier
                     .padding(top = 10f.dp)

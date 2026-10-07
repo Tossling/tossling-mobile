@@ -7,7 +7,7 @@ import org.junit.Test
 class MovedProjectsTest {
 
     private val old = Endpoint(server = "https://ntfy.example.com", token = "tk_old")
-    private val new = Endpoint(server = "https://tossy.example.com", token = "tk_new")
+    private val new = Endpoint(server = "https://tossling.example.com", token = "tk_new")
     private val other = Endpoint(server = "https://other.example.org", token = "tk_other")
 
     @Test

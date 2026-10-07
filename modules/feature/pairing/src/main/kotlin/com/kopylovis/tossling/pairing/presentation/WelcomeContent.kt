@@ -25,9 +25,9 @@ import com.kopylovis.tossling.core.presentation.glass.CapsuleStyle
 import com.kopylovis.tossling.core.presentation.glass.GlassGroup
 import com.kopylovis.tossling.core.presentation.glass.FloatingBar
 import com.kopylovis.tossling.core.presentation.glass.GlassScreen
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
-import com.kopylovis.tossling.core.presentation.glass.TossyLogo
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingLogo
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.pairing.R
 import com.kopylovis.tossling.sync.data.PairingProblem
 import com.kopylovis.tossling.sync.data.SavedRooms
@@ -47,26 +47,26 @@ internal fun WelcomeContent(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            TossyLogo(
+            TosslingLogo(
                 modifier = Modifier
-                    .shadow(elevation = 18f.dp, shape = RoundedCornerShape(34f.dp), ambientColor = Tossy.palette.shadow, spotColor = Tossy.palette.shadow)
+                    .shadow(elevation = 18f.dp, shape = RoundedCornerShape(34f.dp), ambientColor = Tossling.palette.shadow, spotColor = Tossling.palette.shadow)
                     .clip(RoundedCornerShape(34f.dp)),
             )
             Spacer(modifier = Modifier.height(26f.dp))
-            Text(text = stringResource(R.string.app_title), style = Tossy.type.largeTitle, color = Tossy.palette.ink)
+            Text(text = stringResource(R.string.app_title), style = Tossling.type.largeTitle, color = Tossling.palette.ink)
             Spacer(modifier = Modifier.height(14f.dp))
             Text(
                 text = stringResource(R.string.welcome_lead),
-                style = Tossy.type.lead,
-                color = Tossy.palette.ink,
+                style = Tossling.type.lead,
+                color = Tossling.palette.ink,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 320f.dp),
             )
             Spacer(modifier = Modifier.height(14f.dp))
             Text(
                 text = stringResource(R.string.welcome_note),
-                style = Tossy.type.body,
-                color = Tossy.palette.ink2,
+                style = Tossling.type.body,
+                color = Tossling.palette.ink2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 300f.dp),
             )
@@ -85,7 +85,7 @@ internal fun WelcomeContent(
             if (saved != null) {
                 CapsuleButton(
                     text = stringResource(R.string.welcome_restore),
-                    icon = TossyIcons.Laptop,
+                    icon = TosslingIcons.Laptop,
                     onClick = component::onRestoreClicked,
                     enabled = !state.isRestoring,
                     modifier = Modifier.weight(1f),
@@ -93,7 +93,7 @@ internal fun WelcomeContent(
             } else {
                 CapsuleButton(
                     text = stringResource(R.string.welcome_pair),
-                    icon = TossyIcons.Laptop,
+                    icon = TosslingIcons.Laptop,
                     onClick = component::onPairClicked,
                     modifier = Modifier.weight(1f),
                 )
@@ -104,24 +104,24 @@ internal fun WelcomeContent(
 
 @Composable
 private fun SavedRoomCard(saved: SavedRooms, problem: PairingProblem?) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     GlassGroup(modifier = Modifier.widthIn(max = 360f.dp)) {
         Column(
             modifier = Modifier.padding(horizontal = 20f.dp, vertical = 18f.dp),
             verticalArrangement = Arrangement.spacedBy(6f.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = stringResource(R.string.welcome_saved_title), style = Tossy.type.footnote, color = palette.ink2, textAlign = TextAlign.Center)
-            Text(text = stringResource(R.string.welcome_saved_room, saved.title), style = Tossy.type.lead.copy(fontWeight = FontWeight.SemiBold), color = palette.ink, textAlign = TextAlign.Center)
-            Text(text = saved.host, style = Tossy.type.footnote, color = palette.ink2, textAlign = TextAlign.Center)
+            Text(text = stringResource(R.string.welcome_saved_title), style = Tossling.type.footnote, color = palette.ink2, textAlign = TextAlign.Center)
+            Text(text = stringResource(R.string.welcome_saved_room, saved.title), style = Tossling.type.lead.copy(fontWeight = FontWeight.SemiBold), color = palette.ink, textAlign = TextAlign.Center)
+            Text(text = saved.host, style = Tossling.type.footnote, color = palette.ink2, textAlign = TextAlign.Center)
             Text(
                 text = when (problem) {
                     null -> stringResource(R.string.welcome_saved_note)
                     PairingProblem.TOKEN -> stringResource(R.string.welcome_restore_token)
                     PairingProblem.NETWORK -> stringResource(R.string.welcome_restore_network, saved.host)
-                    PairingProblem.NOT_TOSSY -> stringResource(R.string.welcome_restore_broken)
+                    PairingProblem.NOT_TOSSLING -> stringResource(R.string.welcome_restore_broken)
                 },
-                style = Tossy.type.body,
+                style = Tossling.type.body,
                 color = if (problem == null) palette.ink2 else palette.dangerInk,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4f.dp),

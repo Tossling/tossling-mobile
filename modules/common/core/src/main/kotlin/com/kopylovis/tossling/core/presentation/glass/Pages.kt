@@ -50,7 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 
 @Composable
 fun PageScaffold(
@@ -68,7 +68,7 @@ fun PageScaffold(
         modifier = modifier,
         topBar = {
             GlassTopBar(
-                leading = { GlassIconButton(icon = TossyIcons.Back, contentDescription = backLabel, onClick = onBack) },
+                leading = { GlassIconButton(icon = TosslingIcons.Back, contentDescription = backLabel, onClick = onBack) },
                 trailing = { trailing?.invoke() },
             )
         },
@@ -88,8 +88,8 @@ fun PageScaffold(
 @Composable
 fun PageTitle(title: String, modifier: Modifier = Modifier, subtitle: String? = null, large: Boolean = true) {
     Column(modifier = modifier.padding(start = 4f.dp, end = 4f.dp, top = 20f.dp), verticalArrangement = Arrangement.spacedBy(4f.dp)) {
-        Text(text = title, style = if (large) Tossy.type.largeTitle else Tossy.type.title, color = Tossy.palette.ink)
-        subtitle?.let { Text(text = it, style = Tossy.type.body, color = Tossy.palette.ink2) }
+        Text(text = title, style = if (large) Tossling.type.largeTitle else Tossling.type.title, color = Tossling.palette.ink)
+        subtitle?.let { Text(text = it, style = Tossling.type.body, color = Tossling.palette.ink2) }
     }
 }
 
@@ -104,7 +104,7 @@ fun DeviceRow(
     modifier: Modifier = Modifier,
     ownName: String? = null,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -115,7 +115,7 @@ fun DeviceRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CircleBadge(
-            icon = if (isMac) TossyIcons.Laptop else TossyIcons.Phone,
+            icon = if (isMac) TosslingIcons.Laptop else TosslingIcons.Phone,
             tint = if (isOnline) palette.onAccent else palette.ink2,
             background = if (isOnline) palette.accent else palette.glassWeak,
             size = 44f.dp,
@@ -125,7 +125,7 @@ fun DeviceRow(
             Row(horizontalArrangement = Arrangement.spacedBy(8f.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = name,
-                    style = Tossy.type.row.copy(fontSize = 17.sp, fontWeight = FontWeight.SemiBold),
+                    style = Tossling.type.row.copy(fontSize = 17.sp, fontWeight = FontWeight.SemiBold),
                     color = palette.ink,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -136,7 +136,7 @@ fun DeviceRow(
             ownName?.let {
                 Text(
                     text = it,
-                    style = Tossy.type.footnote.copy(fontSize = 12.sp),
+                    style = Tossling.type.footnote.copy(fontSize = 12.sp),
                     color = palette.ink2,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -144,17 +144,17 @@ fun DeviceRow(
             }
             StatusLine(isOnline = isOnline, text = status)
         }
-        Icon(imageVector = TossyIcons.ChevronRight, contentDescription = null, tint = palette.ink2, modifier = Modifier.size(16f.dp))
+        Icon(imageVector = TosslingIcons.ChevronRight, contentDescription = null, tint = palette.ink2, modifier = Modifier.size(16f.dp))
     }
 }
 
 @Composable
 fun SelfChip(text: String) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shape = RoundedCornerShape(9f.dp)
     Text(
         text = text,
-        style = Tossy.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+        style = Tossling.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
         color = palette.ink2,
         maxLines = 1,
         modifier = Modifier
@@ -167,17 +167,17 @@ fun SelfChip(text: String) {
 
 @Composable
 fun StatusLine(isOnline: Boolean, text: String, modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val color = animateStatusColor(target = if (isOnline) palette.accentInk else palette.ink2)
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(6f.dp), verticalAlignment = Alignment.CenterVertically) {
         StatusDot(isOnline = isOnline, ring = color)
-        StatusText(text = text, style = Tossy.type.footnote.copy(fontWeight = FontWeight.Medium), color = color)
+        StatusText(text = text, style = Tossling.type.footnote.copy(fontWeight = FontWeight.Medium), color = color)
     }
 }
 
 @Composable
 fun StatusDot(isOnline: Boolean, ring: Color, modifier: Modifier = Modifier) {
-    val fill = Tossy.palette.accent
+    val fill = Tossling.palette.accent
     val ringColor = animateStatusColor(target = ring)
     val progress by animateFloatAsState(
         targetValue = if (isOnline) 1f else 0f,

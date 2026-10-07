@@ -32,7 +32,7 @@ import com.kopylovis.tossling.core.presentation.glass.SectionLabel
 import com.kopylovis.tossling.core.presentation.glass.pressable
 import com.kopylovis.tossling.core.presentation.relativeTime
 import com.kopylovis.tossling.core.presentation.theme.ProjectColors
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.notifications.R
 
 @Composable
@@ -41,7 +41,7 @@ internal fun ProjectsContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.subscribeAsState()
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     PageScaffold(onBack = component::onBackClicked, backLabel = stringResource(R.string.notif_back), modifier = modifier) {
         PageTitle(title = stringResource(R.string.projects_title), subtitle = stringResource(R.string.projects_subtitle))
         SectionLabel(
@@ -70,12 +70,12 @@ internal fun ProjectsContent(
                     ) {
                         ProjectAvatar(initials = project.initials, color = ProjectColors[project.colorIndex], size = 40f.dp, iconPath = project.iconFile)
                         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1f.dp)) {
-                            Text(text = project.name, style = Tossy.type.row.copy(fontWeight = FontWeight.SemiBold), color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(text = project.topic, style = Tossy.type.monoSmall.copy(fontSize = 12.sp, lineHeight = 17.sp, fontWeight = FontWeight.Normal), color = palette.ink2, maxLines = 1)
+                            Text(text = project.name, style = Tossling.type.row.copy(fontWeight = FontWeight.SemiBold), color = palette.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = project.topic, style = Tossling.type.monoSmall.copy(fontSize = 12.sp, lineHeight = 17.sp, fontWeight = FontWeight.Normal), color = palette.ink2, maxLines = 1)
                             Text(
                                 text = row.last?.let { last -> "${last.titleFor(project = project.name).ifBlank { plainText(markdown = last.message) }} · ${relativeTime(time = last.time)}" }
                                     ?: stringResource(R.string.projects_no_events),
-                                style = Tossy.type.footnote,
+                                style = Tossling.type.footnote,
                                 color = palette.ink2,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,

@@ -18,8 +18,8 @@
     <string name="pairing_connecting">Сопрягаю…</string>
     <string name="pairing_connecting_note">Проверяю токен и обмениваюсь ключами</string>
     <string name="pairing_server">Сервер</string>
-    <string name="pairing_error_not_tossy">Это не код Tossling</string>
-    <string name="pairing_error_not_tossy_text">QR-код не похож на код подключения. Запусти на Mac команду ниже и отсканируй код из терминала.</string>
+    <string name="pairing_error_not_tossling">Это не код Tossling</string>
+    <string name="pairing_error_not_tossling_text">QR-код не похож на код подключения. Запусти на Mac команду ниже и отсканируй код из терминала.</string>
     <string name="pairing_error_token">Сервер не принял токен</string>
     <string name="pairing_error_token_text">Код устарел или уже использован. Получи новый на Mac — и отсканируй ещё раз.</string>
     <string name="pairing_error_network">Нет связи с сервером</string>

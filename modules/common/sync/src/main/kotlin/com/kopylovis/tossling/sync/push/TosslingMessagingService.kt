@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.kopylovis.tossling.sync.work.FetchWorker
 
-internal class TossyMessagingService : FirebaseMessagingService() {
+internal class TosslingMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         if (message.data["event"] in WAKE_EVENTS) FetchWorker.enqueue(context = applicationContext, topic = message.data["topic"])

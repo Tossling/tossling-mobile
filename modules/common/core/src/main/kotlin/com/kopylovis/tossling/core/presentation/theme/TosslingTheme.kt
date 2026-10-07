@@ -11,18 +11,18 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 
-object Tossy {
+object Tossling {
 
-    val palette: TossyPalette
-        @Composable @ReadOnlyComposable get() = LocalTossyPalette.current
+    val palette: TosslingPalette
+        @Composable @ReadOnlyComposable get() = LocalTosslingPalette.current
 
-    val type: TossyType
-        @Composable @ReadOnlyComposable get() = LocalTossyType.current
+    val type: TosslingType
+        @Composable @ReadOnlyComposable get() = LocalTosslingType.current
 }
 
 @Composable
-fun TossyTheme(content: @Composable () -> Unit) {
-    val palette = if (isSystemInDarkTheme()) TossyPalette.Dark else TossyPalette.Light
+fun TosslingTheme(content: @Composable () -> Unit) {
+    val palette = if (isSystemInDarkTheme()) TosslingPalette.Dark else TosslingPalette.Light
     val scheme = if (palette.isDark) {
         darkColorScheme(primary = palette.accent, background = palette.background, surface = palette.background, onSurface = palette.ink)
     } else {
@@ -30,8 +30,8 @@ fun TossyTheme(content: @Composable () -> Unit) {
     }
     MaterialTheme(colorScheme = scheme) {
         CompositionLocalProvider(
-            LocalTossyPalette provides palette,
-            LocalTossyType provides TossyType(),
+            LocalTosslingPalette provides palette,
+            LocalTosslingType provides TosslingType(),
             LocalContentColor provides palette.ink,
             LocalTextSelectionColors provides TextSelectionColors(handleColor = palette.accent, backgroundColor = palette.accentSoft),
             content = content,

@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.unit.dp
 
-object TossyIcons {
+object TosslingIcons {
 
     val Back: ImageVector by lazy { stroked(name = "back", viewport = 20f, width = 2f, "M12.5 4l-6 6 6 6") }
 

@@ -28,7 +28,7 @@ echo "=== Building Tossling $VERSION ($CODE) ==="
 
 APKSIGNER="$(ls "$HOME"/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | tail -1)"
 if [ -z "$APKSIGNER" ] || ! "$APKSIGNER" verify "$APK" >/dev/null 2>&1; then
-    echo "ERROR: the APK is not signed; check tossy.jks and keystore_* in local.properties" >&2
+    echo "ERROR: the APK is not signed; check tossling.jks and keystore_* in local.properties" >&2
     exit 1
 fi
 CERT=$("$APKSIGNER" verify --print-certs "$APK" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1)

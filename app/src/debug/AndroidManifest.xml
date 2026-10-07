@@ -5,7 +5,7 @@
         <activity
             android:name=".debug.DebugPairActivity"
             android:exported="true"
-            android:theme="@style/Theme.Tossy.Invisible" />
+            android:theme="@style/Theme.Tossling.Invisible" />
     </application>
 
 </manifest>

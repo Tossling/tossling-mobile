@@ -20,7 +20,7 @@ import com.kopylovis.tossling.core.presentation.theme.ProjectColors
 import com.kopylovis.tossling.sync.R
 import com.kopylovis.tossling.sync.entry.AlertActionReceiver
 import com.kopylovis.tossling.sync.entry.AlertLinkActivity
-import com.kopylovis.tossling.sync.entry.TossyIntents
+import com.kopylovis.tossling.sync.entry.TosslingIntents
 
 internal class AlertNotifications(private val context: Context) {
 
@@ -56,7 +56,7 @@ internal class AlertNotifications(private val context: Context) {
         val title = alert.titleFor(project = project.name).ifBlank { project.name }
         val text = plain(alert.message)
         val builder = NotificationCompat.Builder(context, channel)
-            .setSmallIcon(R.drawable.ic_stat_tossy)
+            .setSmallIcon(R.drawable.ic_stat_tossling)
             .setLargeIcon(project.iconFile.takeIf { it.isNotEmpty() }?.let(BitmapFactory::decodeFile) ?: avatar(project = project))
             .setSubText(project.name)
             .setContentTitle(title)
@@ -95,7 +95,7 @@ internal class AlertNotifications(private val context: Context) {
     private fun openDetail(alert: Alert): PendingIntent? {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra(TossyIntents.EXTRA_ALERT, alert.id)
+            putExtra(TosslingIntents.EXTRA_ALERT, alert.id)
         } ?: return null
         return PendingIntent.getActivity(context, alert.id.hashCode(), intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     }
@@ -110,8 +110,8 @@ internal class AlertNotifications(private val context: Context) {
 
     private fun markRead(alert: Alert): PendingIntent {
         val intent = Intent(context, AlertActionReceiver::class.java)
-            .setAction(TossyIntents.ACTION_MARK_READ)
-            .putExtra(TossyIntents.EXTRA_ALERT, alert.id)
+            .setAction(TosslingIntents.ACTION_MARK_READ)
+            .putExtra(TosslingIntents.EXTRA_ALERT, alert.id)
         return PendingIntent.getBroadcast(context, alert.id.hashCode(), intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     }
 

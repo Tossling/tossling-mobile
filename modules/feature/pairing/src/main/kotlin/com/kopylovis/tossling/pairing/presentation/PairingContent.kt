@@ -64,9 +64,9 @@ import com.kopylovis.tossling.core.presentation.glass.GlassIconButton
 import com.kopylovis.tossling.core.presentation.glass.GlassScreen
 import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.Spinner
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.glass
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import com.kopylovis.tossling.pairing.R
 import com.kopylovis.tossling.sync.data.PairingProblem
 import kotlin.math.PI
@@ -101,10 +101,10 @@ internal fun PairingContent(
                     .statusBarsPadding()
                     .padding(start = 16f.dp, end = 16f.dp, top = 16f.dp),
             ) {
-                GlassIconButton(icon = TossyIcons.Back, contentDescription = stringResource(R.string.pairing_back), onClick = component::onBackClicked)
+                GlassIconButton(icon = TosslingIcons.Back, contentDescription = stringResource(R.string.pairing_back), onClick = component::onBackClicked)
                 Column(modifier = Modifier.padding(start = 4f.dp, end = 4f.dp, top = 20f.dp), verticalArrangement = Arrangement.spacedBy(4f.dp)) {
-                    Text(text = stringResource(R.string.pairing_title), style = Tossy.type.title, color = Tossy.palette.ink)
-                    Text(text = stringResource(R.string.pairing_subtitle), style = Tossy.type.body, color = Tossy.palette.ink2)
+                    Text(text = stringResource(R.string.pairing_title), style = Tossling.type.title, color = Tossling.palette.ink)
+                    Text(text = stringResource(R.string.pairing_subtitle), style = Tossling.type.body, color = Tossling.palette.ink2)
                 }
                 Spacer(modifier = Modifier.height(24f.dp))
                 AnimatedContent(
@@ -128,20 +128,20 @@ internal fun PairingContent(
         }
         FloatingBar(modifier = Modifier.align(Alignment.BottomCenter)) {
             when (stage) {
-                is PairingStage.Idle -> CapsuleButton(text = stringResource(R.string.pairing_scan), icon = TossyIcons.Qr, onClick = scan, modifier = Modifier.weight(1f))
+                is PairingStage.Idle -> CapsuleButton(text = stringResource(R.string.pairing_scan), icon = TosslingIcons.Qr, onClick = scan, modifier = Modifier.weight(1f))
                 is PairingStage.Connecting, is PairingStage.Switching -> CapsuleButton(text = stringResource(R.string.pairing_cancel), style = CapsuleStyle.GLASS, onClick = component::onCancelClicked, modifier = Modifier.weight(1f))
                 is PairingStage.Failed -> {
                     CapsuleButton(text = stringResource(R.string.pairing_cancel), style = CapsuleStyle.GLASS, onClick = component::onBackClicked)
                     CapsuleButton(text = stringResource(R.string.pairing_scan_again), onClick = scan, modifier = Modifier.weight(1f))
                 }
 
-                is PairingStage.Paired -> CapsuleButton(text = stringResource(R.string.pairing_done), onClick = component::onDoneClicked, style = CapsuleStyle.SUCCESS, icon = TossyIcons.Check, modifier = Modifier.weight(1f))
+                is PairingStage.Paired -> CapsuleButton(text = stringResource(R.string.pairing_done), onClick = component::onDoneClicked, style = CapsuleStyle.SUCCESS, icon = TosslingIcons.Check, modifier = Modifier.weight(1f))
             }
         }
         val switching = stage as? PairingStage.Switching
         ConfirmSheet(
             visible = switching != null,
-            icon = TossyIcons.Devices,
+            icon = TosslingIcons.Devices,
             title = stringResource(R.string.pairing_switch_title, switching?.to.orEmpty()),
             text = stringResource(R.string.pairing_switch_text, switching?.from?.ifEmpty { null } ?: stringResource(R.string.pairing_switch_nobody)),
             confirm = stringResource(R.string.pairing_switch_confirm),
@@ -154,13 +154,13 @@ internal fun PairingContent(
 
 @Composable
 private fun Steps(onCopyClicked: () -> Unit) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     GlassCard(modifier = Modifier.fillMaxWidth()) {
         Column {
             Row(modifier = Modifier.padding(start = 16f.dp, end = 16f.dp, top = 18f.dp, bottom = 16f.dp), horizontalArrangement = Arrangement.spacedBy(14f.dp)) {
                 StepNumber(number = 1)
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10f.dp)) {
-                    Text(text = stringResource(R.string.pairing_step_mac), style = Tossy.type.row, color = palette.ink, modifier = Modifier.padding(top = 3f.dp))
+                    Text(text = stringResource(R.string.pairing_step_mac), style = Tossling.type.row, color = palette.ink, modifier = Modifier.padding(top = 3f.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -170,9 +170,9 @@ private fun Steps(onCopyClicked: () -> Unit) {
                             .padding(start = 14f.dp, end = 4f.dp, top = 4f.dp, bottom = 4f.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(text = PairingComponentImpl.COMMAND, style = Tossy.type.mono, color = palette.ink, modifier = Modifier.weight(1f))
+                        Text(text = PairingComponentImpl.COMMAND, style = Tossling.type.mono, color = palette.ink, modifier = Modifier.weight(1f))
                         GlassIconButton(
-                            icon = TossyIcons.Copy,
+                            icon = TosslingIcons.Copy,
                             contentDescription = stringResource(R.string.pairing_copy),
                             onClick = onCopyClicked,
                             iconSize = 18f.dp,
@@ -194,7 +194,7 @@ private fun Steps(onCopyClicked: () -> Unit) {
 private fun StepRow(number: Int, text: String) {
     Row(modifier = Modifier.padding(16f.dp), horizontalArrangement = Arrangement.spacedBy(14f.dp), verticalAlignment = Alignment.CenterVertically) {
         StepNumber(number = number)
-        Text(text = text, style = Tossy.type.row, color = Tossy.palette.ink)
+        Text(text = text, style = Tossling.type.row, color = Tossling.palette.ink)
     }
 }
 
@@ -203,18 +203,18 @@ private fun StepNumber(number: Int) {
     Box(
         modifier = Modifier
             .size(28f.dp)
-            .background(color = Tossy.palette.accentSoft, shape = CircleShape),
+            .background(color = Tossling.palette.accentSoft, shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = number.toString(), style = Tossy.type.hint.copy(fontWeight = FontWeight.SemiBold), color = Tossy.palette.accentInk)
+        Text(text = number.toString(), style = Tossling.type.hint.copy(fontWeight = FontWeight.SemiBold), color = Tossling.palette.accentInk)
     }
 }
 
 @Composable
 private fun Failed(stage: PairingStage.Failed) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val (title, body) = when (stage.problem) {
-        PairingProblem.NOT_TOSSY -> stringResource(R.string.pairing_error_not_tossy) to stringResource(R.string.pairing_error_not_tossy_text)
+        PairingProblem.NOT_TOSSLING -> stringResource(R.string.pairing_error_not_tossling) to stringResource(R.string.pairing_error_not_tossling_text)
         PairingProblem.TOKEN -> stringResource(R.string.pairing_error_token) to stringResource(R.string.pairing_error_token_text)
         PairingProblem.NETWORK -> stringResource(R.string.pairing_error_network) to
             stringResource(R.string.pairing_error_network_text, stage.server.ifEmpty { stringResource(R.string.pairing_server) })
@@ -227,13 +227,13 @@ private fun Failed(stage: PairingStage.Failed) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10f.dp),
         ) {
-            CircleBadge(icon = TossyIcons.Alert, tint = palette.dangerInk, background = palette.dangerSoft, modifier = Modifier.padding(bottom = 6f.dp))
-            Text(text = title, style = Tossy.type.headline, color = palette.ink, textAlign = TextAlign.Center)
-            Text(text = body, style = Tossy.type.body, color = palette.ink2, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 300f.dp))
+            CircleBadge(icon = TosslingIcons.Alert, tint = palette.dangerInk, background = palette.dangerSoft, modifier = Modifier.padding(bottom = 6f.dp))
+            Text(text = title, style = Tossling.type.headline, color = palette.ink, textAlign = TextAlign.Center)
+            Text(text = body, style = Tossling.type.body, color = palette.ink2, textAlign = TextAlign.Center, modifier = Modifier.widthIn(max = 300f.dp))
             if (stage.problem != PairingProblem.NETWORK) {
                 Text(
                     text = PairingComponentImpl.COMMAND,
-                    style = Tossy.type.mono.copy(fontSize = Tossy.type.monoSmall.fontSize),
+                    style = Tossling.type.mono.copy(fontSize = Tossling.type.monoSmall.fontSize),
                     color = palette.ink,
                     modifier = Modifier
                         .padding(top = 6f.dp)
@@ -249,7 +249,7 @@ private fun Failed(stage: PairingStage.Failed) {
 
 @Composable
 private fun TossScene(stage: PairingStage) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val toss = remember { Animatable(0f) }
     val landed = remember { Animatable(0f) }
     val isDone = stage is PairingStage.Paired
@@ -280,9 +280,9 @@ private fun TossScene(stage: PairingStage) {
                 }
                 drawPath(path = path, color = arcColor, style = Stroke(width = 2.5f.dp.toPx(), cap = StrokeCap.Round, pathEffect = PathEffect.dashPathEffect(floatArrayOf(0.1f, 9f.dp.toPx()))))
             }
-            Device(icon = TossyIcons.Phone, modifier = Modifier.offset(x = 0f.dp, y = 50f.dp))
+            Device(icon = TosslingIcons.Phone, modifier = Modifier.offset(x = 0f.dp, y = 50f.dp))
             Device(
-                icon = TossyIcons.Laptop,
+                icon = TosslingIcons.Laptop,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .offset(y = 50f.dp)
@@ -315,7 +315,7 @@ private fun TossScene(stage: PairingStage) {
                     .background(color = palette.success, shape = CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(imageVector = TossyIcons.Check, contentDescription = null, tint = palette.onSuccess, modifier = Modifier.size(20f.dp))
+                Icon(imageVector = TosslingIcons.Check, contentDescription = null, tint = palette.onSuccess, modifier = Modifier.size(20f.dp))
             }
         }
         Spacer(modifier = Modifier.height(30f.dp))
@@ -328,13 +328,13 @@ private fun TossScene(stage: PairingStage) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(if (paired != null) R.string.pairing_paired_title else R.string.pairing_connecting),
-                    style = Tossy.type.title,
+                    style = Tossling.type.title,
                     color = palette.ink,
                 )
                 Spacer(modifier = Modifier.height(12f.dp))
                 Text(
                     text = if (paired != null) stringResource(R.string.pairing_paired_text, paired.macName) else stringResource(R.string.pairing_connecting_note),
-                    style = Tossy.type.row.copy(fontWeight = FontWeight.Normal),
+                    style = Tossling.type.row.copy(fontWeight = FontWeight.Normal),
                     color = palette.ink2,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.widthIn(max = 300f.dp),
@@ -344,7 +344,7 @@ private fun TossScene(stage: PairingStage) {
                     Spacer(modifier = Modifier.height(18f.dp))
                     Text(
                         text = if (paired != null) stringResource(R.string.pairing_paired_key, server) else server,
-                        style = Tossy.type.monoSmall,
+                        style = Tossling.type.monoSmall,
                         color = palette.ink2,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14f.dp))
@@ -366,7 +366,7 @@ private fun Device(icon: ImageVector, modifier: Modifier = Modifier) {
             .glass(shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(imageVector = icon, contentDescription = null, tint = Tossy.palette.ink, modifier = Modifier.size(30f.dp))
+        Icon(imageVector = icon, contentDescription = null, tint = Tossling.palette.ink, modifier = Modifier.size(30f.dp))
     }
 }
 

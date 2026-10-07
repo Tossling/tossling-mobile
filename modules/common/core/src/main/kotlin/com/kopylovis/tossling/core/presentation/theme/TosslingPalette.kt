@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Immutable
-data class TossyPalette(
+data class TosslingPalette(
     val isDark: Boolean,
     val background: Color,
     val blob1: Color,
@@ -52,7 +52,7 @@ data class TossyPalette(
     val tabIndicator: Color,
 ) {
     companion object {
-        val Light = TossyPalette(
+        val Light = TosslingPalette(
             isDark = false,
             background = Color(0xFFEEF0F5),
             blob1 = Color(0xFFD0CAFD),
@@ -97,7 +97,7 @@ data class TossyPalette(
             tabIndicator = Color.Black.copy(alpha = 0.08f),
         )
 
-        val Dark = TossyPalette(
+        val Dark = TosslingPalette(
             isDark = true,
             background = Color(0xFF0E1016),
             blob1 = Color(0xFF3D3368),
@@ -153,4 +153,4 @@ val ProjectColors: List<Color> = listOf(
     Color(0xFFAD3A55),
 )
 
-val LocalTossyPalette = staticCompositionLocalOf { TossyPalette.Light }
+val LocalTosslingPalette = staticCompositionLocalOf { TosslingPalette.Light }

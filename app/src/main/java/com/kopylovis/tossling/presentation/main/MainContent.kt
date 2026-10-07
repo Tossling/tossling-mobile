@@ -26,7 +26,7 @@ import com.kopylovis.tossling.core.presentation.glass.OverlayTracker
 import com.kopylovis.tossling.core.presentation.glass.TabAction
 import com.kopylovis.tossling.core.presentation.glass.TabBar
 import com.kopylovis.tossling.core.presentation.glass.TabSpec
-import com.kopylovis.tossling.core.presentation.glass.TossyIcons
+import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.mediators.MediatorManager
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -67,13 +67,13 @@ internal fun MainContent(
             }
             TabBar(
                 tabs = listOf(
-                    TabSpec(icon = TossyIcons.Clipboard, label = stringResource(R.string.tab_buffer)),
-                    TabSpec(icon = TossyIcons.Bell, label = stringResource(R.string.tab_notifications), badge = unread),
+                    TabSpec(icon = TosslingIcons.Clipboard, label = stringResource(R.string.tab_buffer)),
+                    TabSpec(icon = TosslingIcons.Bell, label = stringResource(R.string.tab_notifications), badge = unread),
                 ),
                 selected = selectedIndex,
                 onSelect = { index -> component.onTabClicked(tab = MainTab.entries[index]) },
                 hazeState = hazeState,
-                action = TabAction(icon = TossyIcons.ArrowUp, label = stringResource(R.string.tab_send), onClick = component::onSendClicked),
+                action = TabAction(icon = TosslingIcons.ArrowUp, label = stringResource(R.string.tab_send), onClick = component::onSendClicked),
                 hidden = overlays.open > 0,
                 modifier = Modifier.align(Alignment.BottomCenter),
             )

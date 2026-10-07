@@ -61,19 +61,27 @@ internal data class NtfyTokenRequest(
 )
 
 @Serializable
-internal data class TossyHealth(
+internal data class TosslingHealth(
     val server: String = "",
     val push: Boolean? = null,
-)
+) {
+    val isOurs: Boolean get() = server == TOSSLING_SERVER || server == TOSSY_SERVER
+    val isTossling: Boolean get() = server == TOSSLING_SERVER
+
+    companion object {
+        const val TOSSLING_SERVER = "tossling-server"
+        const val TOSSY_SERVER = "tossy-server"
+    }
+}
 
 @Serializable
-internal data class TossyProjectRequest(
+internal data class TosslingProjectRequest(
     val topic: String,
     val name: String,
 )
 
 @Serializable
-internal data class TossyProject(
+internal data class TosslingProject(
     val topic: String = "",
     val name: String = "",
     val publisher: String? = null,
@@ -239,12 +247,12 @@ internal class NtfyClient {
         }
     }
 
-    suspend fun tossyHealth(endpoint: Endpoint): TossyHealth? = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/tossy/health")
+    suspend fun tosslingHealth(endpoint: Endpoint): TosslingHealth? = withContext(Dispatchers.IO) {
+        val connection = runCatching { openApi(endpoint = endpoint, path = "health") }.getOrNull() ?: return@withContext null
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) return@withContext null
-            SyncJson.decodeFromString(TossyHealth.serializer(), connection.inputStream.bufferedReader().use { it.readText() })
-                .takeIf { it.server == TOSSY_SERVER }
+            SyncJson.decodeFromString(TosslingHealth.serializer(), connection.inputStream.bufferedReader().use { it.readText() })
+                .takeIf { it.isOurs }
         } catch (error: Exception) {
             null
         } finally {
@@ -252,7 +260,7 @@ internal class NtfyClient {
         }
     }
 
-    suspend fun isTossyServer(endpoint: Endpoint): Boolean = tossyHealth(endpoint = endpoint) != null
+    suspend fun isTosslingServer(endpoint: Endpoint): Boolean = tosslingHealth(endpoint = endpoint) != null
 
     suspend fun isReachable(endpoint: Endpoint): Boolean = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/health")
@@ -265,25 +273,25 @@ internal class NtfyClient {
         }
     }
 
-    suspend fun createProject(endpoint: Endpoint, topic: String, name: String): TossyProject = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/tossy/projects")
-        connection.requestMethod = "POST"
-        connection.doOutput = true
-        connection.setRequestProperty("Content-Type", "application/json")
-        val body = SyncJson.encodeToString(TossyProjectRequest.serializer(), TossyProjectRequest(topic = topic, name = name)).toByteArray()
-        connection.setFixedLengthStreamingMode(body.size)
+    suspend fun createProject(endpoint: Endpoint, topic: String, name: String): TosslingProject = withContext(Dispatchers.IO) {
+        val body = SyncJson.encodeToString(TosslingProjectRequest.serializer(), TosslingProjectRequest(topic = topic, name = name)).toByteArray()
+        val connection = openApi(endpoint = endpoint, path = "projects") {
+            requestMethod = "POST"
+            doOutput = true
+            setRequestProperty("Content-Type", "application/json")
+            setFixedLengthStreamingMode(body.size)
+            outputStream.use { it.write(body) }
+        }
         try {
-            connection.outputStream.use { it.write(body) }
             connection.ensureOk()
-            SyncJson.decodeFromString(TossyProject.serializer(), connection.inputStream.bufferedReader().use { it.readText() })
+            SyncJson.decodeFromString(TosslingProject.serializer(), connection.inputStream.bufferedReader().use { it.readText() })
         } finally {
             connection.disconnect()
         }
     }
 
     suspend fun deleteProject(endpoint: Endpoint, topic: String) = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/tossy/projects/$topic")
-        connection.requestMethod = "DELETE"
+        val connection = openApi(endpoint = endpoint, path = "projects/$topic") { requestMethod = "DELETE" }
         try {
             connection.ensureOk()
         } finally {
@@ -293,6 +301,15 @@ internal class NtfyClient {
 
     suspend fun check(endpoint: Endpoint, topic: String) {
         poll(endpoint = endpoint, topic = topic, since = "1s")
+    }
+
+    private fun openApi(endpoint: Endpoint, path: String, prepare: HttpURLConnection.() -> Unit = {}): HttpURLConnection {
+        API_PREFIXES.forEachIndexed { index, prefix ->
+            val connection = open(endpoint = endpoint, url = "${endpoint.server}$prefix/$path").apply(prepare)
+            if (connection.responseCode != HttpURLConnection.HTTP_NOT_FOUND || index == API_PREFIXES.lastIndex) return connection
+            connection.disconnect()
+        }
+        error("no API prefixes")
     }
 
     private fun open(endpoint: Endpoint, url: String): HttpURLConnection =
@@ -316,7 +333,7 @@ internal class NtfyClient {
         private const val DOWNLOAD_TIMEOUT_MS = 120_000
         private const val STREAM_TIMEOUT_MS = 300_000
         private const val LIVE_TIMEOUT_MS = 90_000
-        private const val TOSSY_SERVER = "tossy-server"
+        private val API_PREFIXES = listOf("/v1/tossling", "/v1/tossy")
         private const val STREAM_BUFFER = 1 shl 16
     }
 }

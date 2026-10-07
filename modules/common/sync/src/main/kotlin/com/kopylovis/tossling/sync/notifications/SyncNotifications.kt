@@ -210,7 +210,7 @@ internal class SyncNotifications(private val context: Context) {
 
     private fun base(channel: String): NotificationCompat.Builder =
         NotificationCompat.Builder(context, channel)
-            .setSmallIcon(R.drawable.ic_stat_tossy)
+            .setSmallIcon(R.drawable.ic_stat_tossling)
             .setAutoCancel(true)
             .setContentIntent(openApp())
 

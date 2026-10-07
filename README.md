@@ -61,7 +61,7 @@ Optional local files, all ignored by git:
 | File | What for |
 | --- | --- |
 | `app/google-services.json` | «Instant delivery»: Firebase Cloud Messaging wakes the app when something arrives. Without it new items arrive when the app opens. |
-| `tossy.jks` + `keystore_password`, `keystore_alias` in `local.properties` | Signing release builds. Without it the release APK is unsigned. |
+| `tossling.jks` + `keystore_password`, `keystore_alias` in `local.properties` | Signing release builds. Without it the release APK is unsigned. |
 | `firebase_app_id`, `firebase_project`, `firebase_groups` in `local.properties` | Firebase App Distribution, see below. The same values can come from `FIREBASE_APP_ID`, `FIREBASE_PROJECT`, `FIREBASE_GROUPS`. |
 
 ## Distribution to testers
@@ -80,7 +80,7 @@ Firebase App Distribution (`firebase login` once, or a service account in `GOOGL
 deploy/release-github.sh
 ```
 
-Builds a release APK signed with the local `tossy.jks`, checks the signature and publishes `Tossling-<version>.apk`
+Builds a release APK signed with the local `tossling.jks`, checks the signature and publishes `Tossling-<version>.apk`
 with its SHA-256 as the GitHub release `v<version>`. The key never leaves the machine; raise `appversion` in
 `gradle/libs.versions.toml` for the next release.
 

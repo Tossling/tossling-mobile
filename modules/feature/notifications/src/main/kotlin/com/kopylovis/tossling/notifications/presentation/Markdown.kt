@@ -27,8 +27,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kopylovis.tossling.core.presentation.theme.JetBrainsMono
-import com.kopylovis.tossling.core.presentation.theme.Tossy
-import com.kopylovis.tossling.core.presentation.theme.TossyPalette
+import com.kopylovis.tossling.core.presentation.theme.Tossling
+import com.kopylovis.tossling.core.presentation.theme.TosslingPalette
 
 private sealed interface Block {
     data class Paragraph(val text: String) : Block
@@ -39,17 +39,17 @@ private sealed interface Block {
 
 @Composable
 internal fun MarkdownBody(markdown: String, isMarkdown: Boolean, modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val blocks = remember(markdown, isMarkdown) { if (isMarkdown || looksLikeMarkdown(markdown)) parseBlocks(markdown) else listOf(Block.Paragraph(markdown.trim())) }
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12f.dp)) {
         blocks.forEach { block ->
             when (block) {
-                is Block.Paragraph -> Text(text = inline(block.text, palette), style = Tossy.type.body.copy(fontSize = 16.sp, lineHeight = 23.sp), color = palette.ink)
-                is Block.Heading -> Text(text = inline(block.text, palette), style = Tossy.type.headline, color = palette.ink)
-                is Block.Bullet -> Text(text = inline("•  " + block.text, palette), style = Tossy.type.body.copy(fontSize = 16.sp, lineHeight = 23.sp), color = palette.ink)
+                is Block.Paragraph -> Text(text = inline(block.text, palette), style = Tossling.type.body.copy(fontSize = 16.sp, lineHeight = 23.sp), color = palette.ink)
+                is Block.Heading -> Text(text = inline(block.text, palette), style = Tossling.type.headline, color = palette.ink)
+                is Block.Bullet -> Text(text = inline("•  " + block.text, palette), style = Tossling.type.body.copy(fontSize = 16.sp, lineHeight = 23.sp), color = palette.ink)
                 is Block.Code -> Text(
                     text = block.text,
-                    style = Tossy.type.monoSmall.copy(fontSize = 13.sp, lineHeight = 20.sp),
+                    style = Tossling.type.monoSmall.copy(fontSize = 13.sp, lineHeight = 20.sp),
                     color = palette.ink,
                     softWrap = false,
                     modifier = Modifier
@@ -123,7 +123,7 @@ private fun parseBlocks(markdown: String): List<Block> {
 
 private val InlineToken = Regex("\\*\\*(.+?)\\*\\*|__(.+?)__|`([^`]+)`|\\[([^]]+)]\\(([^)\\s]+)\\)|(?<![*\\w])\\*(?!\\s)(.+?)(?<!\\s)\\*(?!\\*)|(?<!\\w)_(?!\\s)(.+?)(?<!\\s)_(?!\\w)")
 
-private fun inline(text: String, palette: TossyPalette): AnnotatedString = buildAnnotatedString {
+private fun inline(text: String, palette: TosslingPalette): AnnotatedString = buildAnnotatedString {
     var cursor = 0
     InlineToken.findAll(text).forEach { match ->
         append(text.substring(cursor, match.range.first))

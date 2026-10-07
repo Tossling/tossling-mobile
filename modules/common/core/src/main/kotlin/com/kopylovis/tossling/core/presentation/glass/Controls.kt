@@ -44,7 +44,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 
 enum class CapsuleStyle { PRIMARY, SUCCESS, GLASS, DANGER, QUIET, PLAIN }
 
@@ -60,7 +60,7 @@ fun CapsuleButton(
     height: Dp = 56f.dp,
     textColor: Color? = null,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shape = RoundedCornerShape(percent = 50)
     val (background, tint) = when (style) {
         CapsuleStyle.PRIMARY -> palette.accent to palette.onAccent
@@ -89,7 +89,7 @@ fun CapsuleButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         icon?.let { Icon(imageVector = it, contentDescription = null, tint = content, modifier = Modifier.size(iconSize)) }
-        Text(text = text, style = Tossy.type.button, color = content, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text = text, style = Tossling.type.button, color = content, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -103,7 +103,7 @@ fun GlassIconButton(
     iconSize: Dp = 20f.dp,
     inPanel: Boolean = false,
     bare: Boolean = false,
-    tint: Color = Tossy.palette.ink,
+    tint: Color = Tossling.palette.ink,
 ) {
     val shape = CircleShape
     Box(
@@ -113,7 +113,7 @@ fun GlassIconButton(
             .then(
                 when {
                     bare -> Modifier
-                    inPanel -> Modifier.clip(shape).background(Tossy.palette.glassWeak)
+                    inPanel -> Modifier.clip(shape).background(Tossling.palette.glassWeak)
                     else -> Modifier.glass(shape = shape)
                 },
             ),
@@ -147,7 +147,7 @@ fun GlassToggle(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val track by animateColorAsState(targetValue = if (checked) palette.accent else palette.track, animationSpec = tween(durationMillis = 250), label = "track")
     val knob by animateDpAsState(
         targetValue = if (checked) 20f.dp else 0f.dp,
@@ -176,8 +176,8 @@ fun Spinner(
     modifier: Modifier = Modifier,
     size: Dp = 40f.dp,
     stroke: Dp = 3f.dp,
-    color: Color = Tossy.palette.accent,
-    track: Color = Tossy.palette.hairline,
+    color: Color = Tossling.palette.accent,
+    track: Color = Tossling.palette.hairline,
 ) {
     val transition = rememberInfiniteTransition(label = "spinner")
     val angle by transition.animateFloat(

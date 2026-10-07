@@ -62,7 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.lerp
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
@@ -139,7 +139,7 @@ fun TabBar(
 
 @Composable
 private fun TabItem(tab: TabSpec, index: Int) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val highlight = LocalTabHighlight.current
     val color = lerpColor(palette.ink, palette.accentInk, highlight(index))
     Box(modifier = Modifier.size(22f.dp)) {
@@ -153,7 +153,7 @@ private fun TabItem(tab: TabSpec, index: Int) {
             )
         }
     }
-    Text(text = tab.label, style = Tossy.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold), color = color, maxLines = 1)
+    Text(text = tab.label, style = Tossling.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold), color = color, maxLines = 1)
 }
 
 @Composable
@@ -165,7 +165,7 @@ private fun LiquidTabs(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val capsuleShape = RoundedCornerShape(percent = 50)
 
     BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.CenterStart) {
@@ -310,7 +310,7 @@ private fun RowScope.LiquidTab(
 
 @Composable
 fun CountBadge(count: Int, modifier: Modifier = Modifier) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Box(
         modifier = modifier
             .background(color = palette.badgeRing, shape = RoundedCornerShape(11f.dp))
@@ -323,7 +323,7 @@ fun CountBadge(count: Int, modifier: Modifier = Modifier) {
     ) {
         Text(
             text = if (count > MAX_BADGE) "$MAX_BADGE+" else count.toString(),
-            style = Tossy.type.footnote.copy(
+            style = Tossling.type.footnote.copy(
                 fontSize = 11.sp,
                 lineHeight = 11.sp,
                 fontWeight = FontWeight.Bold,
@@ -339,7 +339,7 @@ fun CountBadge(count: Int, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ActionCapsule(action: TabAction, hazeState: HazeState) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val capsuleShape = RoundedCornerShape(percent = 50)
     Row(
         modifier = Modifier
@@ -360,7 +360,7 @@ private fun ActionCapsule(action: TabAction, hazeState: HazeState) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(imageVector = action.icon, contentDescription = null, tint = palette.onAccent, modifier = Modifier.size(18f.dp))
-        Text(text = action.label, style = Tossy.type.button, color = palette.onAccent, maxLines = 1)
+        Text(text = action.label, style = Tossling.type.button, color = palette.onAccent, maxLines = 1)
     }
 }
 

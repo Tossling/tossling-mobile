@@ -18,8 +18,8 @@
     <string name="pairing_connecting">Pairing…</string>
     <string name="pairing_connecting_note">Checking the token and exchanging keys</string>
     <string name="pairing_server">The server</string>
-    <string name="pairing_error_not_tossy">This is not a Tossling code</string>
-    <string name="pairing_error_not_tossy_text">The QR code does not look like a pairing code. Run the command below on the Mac and scan the code from the terminal.</string>
+    <string name="pairing_error_not_tossling">This is not a Tossling code</string>
+    <string name="pairing_error_not_tossling_text">The QR code does not look like a pairing code. Run the command below on the Mac and scan the code from the terminal.</string>
     <string name="pairing_error_token">The server did not accept the token</string>
     <string name="pairing_error_token_text">The code is outdated or already used. Get a new one on the Mac and scan it again.</string>
     <string name="pairing_error_network">No connection to the server</string>

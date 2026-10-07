@@ -89,7 +89,7 @@ class ClipSender internal constructor(
         context.getSystemService(StatusBarManager::class.java).requestAddTileService(
             ComponentName(context, ClipTileService::class.java),
             context.getString(R.string.sync_tile_label),
-            Icon.createWithResource(context, R.drawable.ic_stat_tossy),
+            Icon.createWithResource(context, R.drawable.ic_stat_tossling),
             context.mainExecutor,
         ) { }
     }

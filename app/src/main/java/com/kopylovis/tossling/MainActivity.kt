@@ -13,10 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.arkivanov.decompose.defaultComponentContext
 import com.kopylovis.tossling.core.presentation.modifiers.dismissKeyboardOnTap
-import com.kopylovis.tossling.core.presentation.theme.TossyTheme
+import com.kopylovis.tossling.core.presentation.theme.TosslingTheme
 import com.kopylovis.tossling.presentation.app.AppComponentImpl
 import com.kopylovis.tossling.presentation.app.AppContent
-import com.kopylovis.tossling.sync.entry.TossyIntents
+import com.kopylovis.tossling.sync.entry.TosslingIntents
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) openAlert(intent = intent)
 
         setContent {
-            TossyTheme {
+            TosslingTheme {
                 AppContent(component = appComponent, modifier = Modifier.dismissKeyboardOnTap())
             }
         }
@@ -49,8 +49,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openAlert(intent: Intent?) {
-        val id = intent?.getStringExtra(TossyIntents.EXTRA_ALERT) ?: return
-        intent.removeExtra(TossyIntents.EXTRA_ALERT)
+        val id = intent?.getStringExtra(TosslingIntents.EXTRA_ALERT) ?: return
+        intent.removeExtra(TosslingIntents.EXTRA_ALERT)
         appComponent?.onAlertOpened(id = id)
     }
 

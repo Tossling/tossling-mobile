@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kopylovis.tossling.core.presentation.theme.Tossy
+import com.kopylovis.tossling.core.presentation.theme.Tossling
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -64,8 +64,8 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier, trailing: String? 
             .padding(start = 6f.dp, end = 6f.dp, top = 24f.dp, bottom = 8f.dp),
         verticalAlignment = Alignment.Bottom,
     ) {
-        Text(text = text, style = Tossy.type.body.copy(fontWeight = FontWeight.SemiBold), color = Tossy.palette.ink2, modifier = Modifier.weight(1f))
-        trailing?.let { Text(text = it, style = Tossy.type.footnote.copy(fontWeight = FontWeight.Medium), color = Tossy.palette.ink2) }
+        Text(text = text, style = Tossling.type.body.copy(fontWeight = FontWeight.SemiBold), color = Tossling.palette.ink2, modifier = Modifier.weight(1f))
+        trailing?.let { Text(text = it, style = Tossling.type.footnote.copy(fontWeight = FontWeight.Medium), color = Tossling.palette.ink2) }
     }
 }
 
@@ -73,8 +73,8 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier, trailing: String? 
 fun FootNote(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = Tossy.type.footnote,
-        color = Tossy.palette.ink2,
+        style = Tossling.type.footnote,
+        color = Tossling.palette.ink2,
         modifier = modifier.padding(start = 6f.dp, end = 6f.dp, top = 10f.dp),
     )
 }
@@ -89,11 +89,11 @@ fun ValueRow(label: String, value: String, modifier: Modifier = Modifier, mono: 
         horizontalArrangement = Arrangement.spacedBy(12f.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = label, style = Tossy.type.body, color = Tossy.palette.ink2)
+        Text(text = label, style = Tossling.type.body, color = Tossling.palette.ink2)
         Text(
             text = value,
-            style = if (mono) Tossy.type.monoSmall else Tossy.type.body.copy(fontWeight = FontWeight.Medium),
-            color = Tossy.palette.ink,
+            style = if (mono) Tossling.type.monoSmall else Tossling.type.body.copy(fontWeight = FontWeight.Medium),
+            color = Tossling.palette.ink,
             textAlign = TextAlign.End,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -144,8 +144,8 @@ fun LinkRow(
     ) {
         RowTexts(label = label, note = note, modifier = Modifier.weight(1f))
         Row(horizontalArrangement = Arrangement.spacedBy(8f.dp), verticalAlignment = Alignment.CenterVertically) {
-            value?.let { Text(text = it, style = Tossy.type.body, color = Tossy.palette.ink2) }
-            Icon(imageVector = TossyIcons.ChevronRight, contentDescription = null, tint = Tossy.palette.ink2, modifier = Modifier.size(16f.dp))
+            value?.let { Text(text = it, style = Tossling.type.body, color = Tossling.palette.ink2) }
+            Icon(imageVector = TosslingIcons.ChevronRight, contentDescription = null, tint = Tossling.palette.ink2, modifier = Modifier.size(16f.dp))
         }
     }
 }
@@ -157,7 +157,7 @@ fun AddRow(
     modifier: Modifier = Modifier,
     badgeSize: Dp = 44f.dp,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -167,16 +167,16 @@ fun AddRow(
         horizontalArrangement = Arrangement.spacedBy(14f.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CircleBadge(icon = TossyIcons.Plus, tint = palette.accentInk, background = palette.accentSoft, size = badgeSize, iconSize = 18f.dp)
-        Text(text = label, style = Tossy.type.row, color = palette.accentInk)
+        CircleBadge(icon = TosslingIcons.Plus, tint = palette.accentInk, background = palette.accentSoft, size = badgeSize, iconSize = 18f.dp)
+        Text(text = label, style = Tossling.type.row, color = palette.accentInk)
     }
 }
 
 @Composable
 fun RowTexts(label: String, note: String?, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2f.dp)) {
-        Text(text = label, style = Tossy.type.row, color = Tossy.palette.ink)
-        note?.let { Text(text = it, style = Tossy.type.footnote, color = Tossy.palette.ink2) }
+        Text(text = label, style = Tossling.type.row, color = Tossling.palette.ink)
+        note?.let { Text(text = it, style = Tossling.type.footnote, color = Tossling.palette.ink2) }
     }
 }
 
@@ -191,8 +191,8 @@ fun GlassField(
     enabled: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    val palette = Tossy.palette
-    val style: TextStyle = if (mono) Tossy.type.mono else Tossy.type.row.copy(fontSize = 17.sp)
+    val palette = Tossling.palette
+    val style: TextStyle = if (mono) Tossling.type.mono else Tossling.type.row.copy(fontSize = 17.sp)
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -200,7 +200,7 @@ fun GlassField(
             .padding(horizontal = 16f.dp, vertical = 10f.dp),
         verticalArrangement = Arrangement.spacedBy(2f.dp, Alignment.CenterVertically),
     ) {
-        Text(text = label, style = Tossy.type.footnote, color = palette.ink2)
+        Text(text = label, style = Tossling.type.footnote, color = palette.ink2)
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -228,7 +228,7 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     dot: Color? = null,
 ) {
-    val palette = Tossy.palette
+    val palette = Tossling.palette
     val shape = RoundedCornerShape(22f.dp)
     Row(
         modifier = modifier
@@ -250,7 +250,7 @@ fun FilterChip(
                     .background(color = color, shape = CircleShape),
             )
         }
-        Text(text = label, style = Tossy.type.body.copy(fontWeight = FontWeight.Medium), color = if (isSelected) palette.onAccent else palette.ink, maxLines = 1)
+        Text(text = label, style = Tossling.type.body.copy(fontWeight = FontWeight.Medium), color = if (isSelected) palette.onAccent else palette.ink, maxLines = 1)
     }
 }
 
@@ -284,7 +284,7 @@ fun ProjectAvatar(
             },
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = initials, style = Tossy.type.body.copy(fontSize = fontSize, fontWeight = FontWeight.Bold), color = Color.White, maxLines = 1)
+        Text(text = initials, style = Tossling.type.body.copy(fontSize = fontSize, fontWeight = FontWeight.Bold), color = Color.White, maxLines = 1)
     }
 }
 
@@ -359,6 +359,6 @@ private fun RowScope.SwipeButton(action: SwipeAction, width: Dp) {
         verticalArrangement = Arrangement.spacedBy(4f.dp, Alignment.CenterVertically),
     ) {
         Icon(imageVector = action.icon, contentDescription = null, tint = action.tint, modifier = Modifier.size(20f.dp))
-        Text(text = action.label, style = Tossy.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold), color = action.tint, maxLines = 1)
+        Text(text = action.label, style = Tossling.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold), color = action.tint, maxLines = 1)
     }
 }

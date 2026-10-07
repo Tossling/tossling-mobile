@@ -80,6 +80,11 @@ data class RoomDevice(
     val shownOwnName: String? get() = ownName.takeIf { hasAlias }
 }
 
+const val ROOM_PREFIX = "tossling-"
+const val OLD_ROOM_PREFIX = "tossy-"
+
+fun isRoomTopic(topic: String): Boolean = topic.startsWith(ROOM_PREFIX) || topic.startsWith(OLD_ROOM_PREFIX)
+
 fun pairingHost(raw: String): String =
     runCatching { SyncJson.decodeFromString(Pairing.serializer(), raw.trim()).host }.getOrDefault("")
 
@@ -155,7 +160,7 @@ data class ClipItem(
     val isPinned: Boolean = false,
 )
 
-enum class PairingProblem { NOT_TOSSY, TOKEN, NETWORK }
+enum class PairingProblem { NOT_TOSSLING, TOKEN, NETWORK }
 
 class PairingException(val problem: PairingProblem, val server: String = "", cause: Throwable? = null) : Exception(problem.name, cause)
 
