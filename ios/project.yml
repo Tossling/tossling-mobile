@@ -30,6 +30,7 @@ targets:
       - target: ShareExtension
       - package: Firebase
         product: FirebaseMessaging
+      - sdk: AppIntents.framework
     info:
       path: Tossling/Info.plist
       properties:

@@ -92,6 +92,16 @@
         }
       }
     },
+    "Content": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что отправить"
+          }
+        }
+      }
+    },
     "Copied": {
       "localizations": {
         "ru": {
@@ -292,6 +302,16 @@
         }
       }
     },
+    "Nothing to send": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нечего отправлять"
+          }
+        }
+      }
+    },
     "Nothing yet": {
       "localizations": {
         "ru": {
@@ -382,12 +402,32 @@
         }
       }
     },
+    "Send to Tossling": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправить в Tossling"
+          }
+        }
+      }
+    },
     "Sending to the room…": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Отправляю в комнату…"
+          }
+        }
+      }
+    },
+    "Sends text, a picture or a file to the other devices of the room. Put Get Clipboard before it to send the clipboard.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправляет текст, картинку или файл остальным устройствам комнаты. Чтобы отправить буфер, поставьте перед ним Получить буфер обмена."
           }
         }
       }

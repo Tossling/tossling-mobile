@@ -77,7 +77,8 @@ Tossling) and sends the clipboard, photos and files. When the app is closed, a p
 which fetches the message from the server, decrypts it and shows the text or the picture. Pushes need
 `ios/Tossling/GoogleService-Info.plist` from the same Firebase project as the Android app, with an APNs key uploaded
 there; without the file the app works only while it is open. Tossling in the share sheet sends text, links, photos
-and files from any app. A Shortcuts action comes next.
+and files from any app. The Shortcuts action Send to Tossling sends what the previous step gives it: with Get
+Clipboard before it the shortcut sends the clipboard, and Back Tap can run it.
 
 ```bash
 brew install xcodegen
