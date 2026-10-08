@@ -59,6 +59,7 @@ final class AppModel {
 
     func becameActive() {
         guard isPaired else { return }
+        Push.shared.follow(room: core?.config.room)
         connect()
     }
 
@@ -87,6 +88,7 @@ final class AppModel {
         self.core = core
         isPaired = true
         refreshDevices()
+        Push.shared.follow(room: core.config.room)
         connect()
         notice = String(localized: "Connected to \(paired.computer.isEmpty ? host : paired.computer)")
     }
@@ -96,6 +98,7 @@ final class AppModel {
         listener?.cancel()
         listener = nil
         store.forgetRoom()
+        Push.shared.follow(room: nil)
         core = nil
         isPaired = false
         connection = .offline
@@ -204,6 +207,7 @@ final class AppModel {
         case let rekeyed as IncomingRekeyed:
             store.config = rekeyed.config
             store.lastEventId = ""
+            Push.shared.follow(room: rekeyed.config.room)
             notice = String(localized: "\(rekeyed.from) changed the room key")
             store.members = core.members
             connect()
@@ -290,6 +294,7 @@ final class AppModel {
         listener?.cancel()
         listener = nil
         store.forgetRoom()
+        Push.shared.follow(room: nil)
         core = nil
         isPaired = false
         connection = .offline

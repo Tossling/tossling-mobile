@@ -4,6 +4,7 @@ import Security
 enum Keychain {
 
     private static let service = "com.kopylovis.tossling"
+    private static let accounts = ["device-id", "identity", "room"]
 
     static func read(_ account: String) -> String? {
         let query: [String: Any] = [
@@ -30,5 +31,11 @@ enum Keychain {
         item[kSecValueData as String] = Data(value.utf8)
         item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
         SecItemAdd(item as CFDictionary, nil)
+    }
+
+    static func moveToSharedGroup() {
+        for account in accounts {
+            if let value = read(account) { write(account, value) }
+        }
     }
 }

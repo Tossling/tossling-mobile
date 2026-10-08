@@ -72,9 +72,11 @@ versions the same screens fall back to system materials. Encryption, rooms and m
 `modules/common/protocol`, built as the static framework `TosslingKit`. The app itself only talks to the server
 through `URLSession` and keeps the room in the Keychain.
 
-It pairs with a computer by its QR code, receives text, images and files while it is open (files go to Files, On My
-iPhone, Tossling) and sends the clipboard, photos and files. Push notifications, a share extension and a Shortcuts
-action come next.
+It pairs with a computer by its QR code, receives text, images and files (files go to Files, On My iPhone,
+Tossling) and sends the clipboard, photos and files. When the app is closed, a push wakes the notification extension,
+which fetches the message from the server, decrypts it and shows the text or the picture. Pushes need
+`ios/Tossling/GoogleService-Info.plist` from the same Firebase project as the Android app, with an APNs key uploaded
+there; without the file the app works only while it is open. A share extension and a Shortcuts action come next.
 
 ```bash
 brew install xcodegen

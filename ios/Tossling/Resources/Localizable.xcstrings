@@ -52,6 +52,16 @@
         }
       }
     },
+    "%@, %@: open Tossling to receive it": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, откройте Tossling, чтобы получить"
+          }
+        }
+      }
+    },
     "Connected to %@": {
       "localizations": {
         "ru": {
@@ -168,6 +178,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "От %@, можно вставлять"
+          }
+        }
+      }
+    },
+    "Image": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Картинка"
           }
         }
       }
@@ -418,6 +438,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Поделиться"
+          }
+        }
+      }
+    },
+    "Something new arrived, open Tossling to see it.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пришло что-то новое, откройте Tossling, чтобы посмотреть."
+          }
+        }
+      }
+    },
+    "Text": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Текст"
           }
         }
       }

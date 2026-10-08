@@ -89,6 +89,17 @@ final class Server {
         return String(decoding: data, as: UTF8.self).split(separator: "\n").compactMap { NtfyModelsKt.parseEvent(line: String($0)) }
     }
 
+    func message(_ config: RoomConfig, topic: String, id: String) async throws -> NtfyEvent? {
+        var components = URLComponents(string: "\(config.server)/\(topic)/json")!
+        components.queryItems = [URLQueryItem(name: "poll", value: "1"), URLQueryItem(name: "since", value: "all"), URLQueryItem(name: "id", value: id)]
+        var request = URLRequest(url: components.url!)
+        request.timeoutInterval = 15
+        authorize(&request, config.token)
+        let (data, response) = try await session.data(for: request)
+        try check(response, data)
+        return String(decoding: data, as: UTF8.self).split(separator: "\n").compactMap { NtfyModelsKt.parseEvent(line: String($0)) }.first { $0.id == id }
+    }
+
     func download(_ config: RoomConfig, url: String) async throws -> Data {
         var request = URLRequest(url: URL(string: url)!)
         authorize(&request, config.token)
