@@ -39,6 +39,9 @@ targets:
         FirebaseAppDelegateProxyEnabled: false
         UIAppFonts: [onest_regular.ttf, onest_medium.ttf, onest_semibold.ttf, onest_bold.ttf, jetbrains_mono_medium.ttf]
         UIBackgroundModes: [remote-notification]
+        CFBundleURLTypes:
+          - CFBundleURLName: com.kopylovis.tossling
+            CFBundleURLSchemes: [tossling]
     entitlements:
       path: Tossling/Tossling.entitlements
       properties:

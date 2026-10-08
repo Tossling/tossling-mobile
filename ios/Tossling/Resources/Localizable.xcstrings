@@ -910,6 +910,26 @@
         }
       }
     },
+    "Join": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Войти"
+          }
+        }
+      }
+    },
+    "Join the room of %@?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Войти в комнату %@?"
+          }
+        }
+      }
+    },
     "Joined": {
       "localizations": {
         "ru": {
@@ -2078,6 +2098,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ключ остался на телефоне после удаления Tossling. Вернитесь тем же устройством, без QR-кода."
+          }
+        }
+      }
+    },
+    "The link leads to a room on %@. Whatever you send to the computer goes to everyone in that room, so join only rooms you trust.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ссылка ведет в комнату на сервере %@. Все, что вы отправите на компьютер, увидят все устройства этой комнаты, поэтому входите только в комнаты, которым доверяете."
           }
         }
       }

@@ -56,7 +56,7 @@ internal class AppComponentImpl(
 
         is GlobalNavigator.Config.Pairing ->
             AppComponent.Child.PairingChild(
-                component = MediatorManager.pairingMediator.getApi().getPairingComponent(componentContext = componentContext, isReconnect = config.isReconnect),
+                component = MediatorManager.pairingMediator.getApi().getPairingComponent(componentContext = componentContext, isReconnect = config.isReconnect, link = config.link),
             )
 
         is GlobalNavigator.Config.Main ->
@@ -100,6 +100,10 @@ internal class AppComponentImpl(
 
     override fun onBackClicked() {
         navigation.pop()
+    }
+
+    override fun onJoinLink(raw: String) {
+        navigation.navigate { stack -> stack.filterNot { it is GlobalNavigator.Config.Pairing } + GlobalNavigator.Config.Pairing(link = raw) }
     }
 
     override fun onAlertOpened(id: String) {

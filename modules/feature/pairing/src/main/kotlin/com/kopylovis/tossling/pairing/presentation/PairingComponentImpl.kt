@@ -11,6 +11,7 @@ import com.kopylovis.tossling.navigation.GlobalNavigator
 import com.kopylovis.tossling.protocol.PairingException
 import com.kopylovis.tossling.protocol.PairingProblem
 import com.kopylovis.tossling.protocol.pairingHost
+import com.kopylovis.tossling.protocol.pairingName
 import com.kopylovis.tossling.sync.data.ClipRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ internal class PairingComponentImpl(
     componentContext: ComponentContext,
     private val repository: ClipRepository,
     @Suppress("unused") private val isReconnect: Boolean,
+    link: String?,
 ) : BaseComponent(componentContext), PairingComponent {
 
     private val globalNavigator: GlobalNavigator by inject()
@@ -29,6 +31,19 @@ internal class PairingComponentImpl(
     override val state: Value<PairingScreenState> = _state.asValue()
 
     private var job: Job? = null
+
+    init {
+        if (link != null) {
+            val switch = repository.roomSwitch(raw = link)
+            _state.value = PairingScreenState(
+                stage = if (switch != null) {
+                    PairingStage.Switching(raw = link, from = switch.from, to = switch.to)
+                } else {
+                    PairingStage.Joining(raw = link, name = pairingName(raw = link).ifEmpty { "?" }, server = pairingHost(raw = link))
+                },
+            )
+        }
+    }
 
     override fun onScanned(raw: String) {
         if (_state.value.stage is PairingStage.Connecting) return
@@ -42,6 +57,11 @@ internal class PairingComponentImpl(
 
     override fun onSwitchConfirmed() {
         val stage = _state.value.stage as? PairingStage.Switching ?: return
+        connect(raw = stage.raw)
+    }
+
+    override fun onJoinConfirmed() {
+        val stage = _state.value.stage as? PairingStage.Joining ?: return
         connect(raw = stage.raw)
     }
 

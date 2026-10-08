@@ -14,6 +14,8 @@ interface AppComponent : BackHandlerOwner {
 
     fun onAlertOpened(id: String)
 
+    fun onJoinLink(raw: String)
+
     sealed class Child {
         class WelcomeChild(val component: CommonComponent) : Child()
         class PairingChild(val component: CommonComponent) : Child()

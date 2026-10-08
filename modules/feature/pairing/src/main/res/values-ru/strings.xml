@@ -31,6 +31,9 @@
     <string name="pairing_switch_text">Телефон бывает только в одной комнате: он выйдет из текущей (%1$s) и перестанет делить с ней буфер.</string>
     <string name="pairing_switch_nobody">там больше никого</string>
     <string name="pairing_switch_confirm">Перейти</string>
+    <string name="pairing_join_title">Войти в комнату %1$s?</string>
+    <string name="pairing_join_text">Ссылка ведет в комнату на сервере %1$s. Все, что вы отправите на компьютер, увидят все устройства этой комнаты, поэтому входите только в комнаты, которым доверяете.</string>
+    <string name="pairing_join_confirm">Войти</string>
     <string name="welcome_saved_title">Этот телефон был в комнате</string>
     <string name="welcome_saved_room">Комната с %1$s</string>
     <string name="welcome_saved_note">Ключ остался на телефоне после удаления Tossling. Вернись тем же устройством, без QR-кода.</string>

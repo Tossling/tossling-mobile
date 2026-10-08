@@ -119,7 +119,7 @@ internal fun PairingContent(
                     when (current) {
                         is PairingStage.Idle -> Steps(onCopyClicked = component::onCopyCommandClicked)
                         is PairingStage.Connecting -> Unit
-                        is PairingStage.Switching -> Steps(onCopyClicked = component::onCopyCommandClicked)
+                        is PairingStage.Switching, is PairingStage.Joining -> Steps(onCopyClicked = component::onCopyCommandClicked)
                         is PairingStage.Failed -> Failed(stage = current)
                         is PairingStage.Paired -> Unit
                     }
@@ -129,7 +129,7 @@ internal fun PairingContent(
         FloatingBar(modifier = Modifier.align(Alignment.BottomCenter)) {
             when (stage) {
                 is PairingStage.Idle -> CapsuleButton(text = stringResource(R.string.pairing_scan), icon = TosslingIcons.Qr, onClick = scan, modifier = Modifier.weight(1f))
-                is PairingStage.Connecting, is PairingStage.Switching -> CapsuleButton(text = stringResource(R.string.pairing_cancel), style = CapsuleStyle.GLASS, onClick = component::onCancelClicked, modifier = Modifier.weight(1f))
+                is PairingStage.Connecting, is PairingStage.Switching, is PairingStage.Joining -> CapsuleButton(text = stringResource(R.string.pairing_cancel), style = CapsuleStyle.GLASS, onClick = component::onCancelClicked, modifier = Modifier.weight(1f))
                 is PairingStage.Failed -> {
                     CapsuleButton(text = stringResource(R.string.pairing_cancel), style = CapsuleStyle.GLASS, onClick = component::onBackClicked)
                     CapsuleButton(text = stringResource(R.string.pairing_scan_again), onClick = scan, modifier = Modifier.weight(1f))
@@ -147,6 +147,17 @@ internal fun PairingContent(
             confirm = stringResource(R.string.pairing_switch_confirm),
             cancel = stringResource(R.string.pairing_cancel),
             onConfirm = component::onSwitchConfirmed,
+            onDismiss = component::onCancelClicked,
+        )
+        val joining = stage as? PairingStage.Joining
+        ConfirmSheet(
+            visible = joining != null,
+            icon = TosslingIcons.Devices,
+            title = stringResource(R.string.pairing_join_title, joining?.name.orEmpty()),
+            text = stringResource(R.string.pairing_join_text, joining?.server.orEmpty()),
+            confirm = stringResource(R.string.pairing_join_confirm),
+            cancel = stringResource(R.string.pairing_cancel),
+            onConfirm = component::onJoinConfirmed,
             onDismiss = component::onCancelClicked,
         )
     }

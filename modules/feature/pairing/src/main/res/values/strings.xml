@@ -31,6 +31,9 @@
     <string name="pairing_switch_text">The phone is in one room at a time: it will leave the current one (%1$s) and stop sharing the clipboard with it.</string>
     <string name="pairing_switch_nobody">no one else is there</string>
     <string name="pairing_switch_confirm">Move</string>
+    <string name="pairing_join_title">Join the room of %1$s?</string>
+    <string name="pairing_join_text">The link leads to a room on %1$s. Whatever you send to the computer goes to everyone in that room, so join only rooms you trust.</string>
+    <string name="pairing_join_confirm">Join</string>
     <string name="welcome_saved_title">This phone was in a room</string>
     <string name="welcome_saved_room">Room with %1$s</string>
     <string name="welcome_saved_note">The key stayed on this phone after Tossling was removed. Return as the same device, no QR code needed.</string>

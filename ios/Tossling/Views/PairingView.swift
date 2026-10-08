@@ -81,9 +81,12 @@ struct PairingView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @Binding var path: [Route]
+    var link: String? = nil
     @State private var stage = Stage.idle
     @State private var scanning = false
     @State private var switching: PairedRoom?
+    @State private var joining: PairedRoom?
+    @State private var linkHandled = false
     @State private var job: Task<Void, Never>?
 
     var body: some View {
@@ -163,13 +166,46 @@ struct PairingView: View {
             }
             .ignoresSafeArea()
         }
-        .confirmationDialog(String(localized: "Move to the room of \(switching?.computer ?? "")?"), isPresented: Binding(get: { switching != nil }, set: { if !$0 { switching = nil } }), titleVisibility: .visible) {
+        .alert(String(localized: "Move to the room of \(switching?.computer ?? "")?"), isPresented: Binding(get: { switching != nil }, set: { if !$0 { switching = nil } })) {
+            Button(String(localized: "Cancel"), role: .cancel) { switching = nil }
             Button(String(localized: "Move"), role: .destructive) {
                 if let target = switching { connect(target) }
                 switching = nil
             }
         } message: {
             Text("The phone is in one room at a time: it will leave the current one and stop sharing the clipboard with it.")
+        }
+        .alert(String(localized: "Join the room of \(joining?.computer ?? "")?"), isPresented: Binding(get: { joining != nil }, set: { if !$0 { joining = nil } })) {
+            Button(String(localized: "Cancel"), role: .cancel) { joining = nil }
+            Button(String(localized: "Join")) {
+                if let target = joining { connect(target) }
+                joining = nil
+            }
+        } message: {
+            Text("The link leads to a room on \(joiningHost). Whatever you send to the computer goes to everyone in that room, so join only rooms you trust.")
+        }
+        .onAppear(perform: openLink)
+    }
+
+    private var joiningHost: String {
+        guard let server = joining?.config.server else { return "" }
+        return URL(string: server)?.host ?? server
+    }
+
+    private func openLink() {
+        guard let link, !linkHandled else { return }
+        linkHandled = true
+        do {
+            let target = try model.pairingTarget(raw: link)
+            if model.isPaired || !model.devices.isEmpty {
+                switching = target
+            } else {
+                joining = target
+            }
+        } catch let error as PairingError {
+            stage = .failed(error.title, error.localizedDescription)
+        } catch {
+            stage = .failed(String(localized: "Something went wrong"), error.localizedDescription)
         }
     }
 

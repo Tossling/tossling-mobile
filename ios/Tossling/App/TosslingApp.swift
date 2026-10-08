@@ -1,4 +1,5 @@
 import SwiftUI
+import TosslingKit
 
 @main
 struct TosslingApp: App {
@@ -23,7 +24,7 @@ struct TosslingApp: App {
 }
 
 enum Route: Hashable {
-    case settings, devices, device(String), addComputer, projects, project(String?), alert(String), pairing
+    case settings, devices, device(String), addComputer, projects, project(String?), alert(String), pairing, join(String)
 }
 
 struct RootView: View {
@@ -50,6 +51,7 @@ struct RootView: View {
                 case let .project(topic): ProjectView(topic: topic)
                 case let .alert(id): AlertView(id: id)
                 case .pairing: PairingView(path: $path)
+                case let .join(raw): PairingView(path: $path, link: raw)
                 }
             }
         }
@@ -65,6 +67,10 @@ struct RootView: View {
         .onChange(of: model.isPaired) { _, _ in path = [] }
         .onAppear { openPendingAlert() }
         .onReceive(NotificationCenter.default.publisher(for: .openAlert)) { _ in openPendingAlert() }
+        .onOpenURL { url in
+            guard let raw = JoinLinkKt.joinLinkCode(link: url.absoluteString) else { return }
+            path = [.join(raw)]
+        }
     }
 
     private func openPendingAlert() {

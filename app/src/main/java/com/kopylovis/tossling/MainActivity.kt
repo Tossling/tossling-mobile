@@ -1,5 +1,6 @@
 package com.kopylovis.tossling
 
+import com.kopylovis.tossling.protocol.joinLinkCode
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -33,7 +34,10 @@ class MainActivity : ComponentActivity() {
 
         val appComponent = AppComponentImpl(componentContext = defaultComponentContext())
         this.appComponent = appComponent
-        if (savedInstanceState == null) openAlert(intent = intent)
+        if (savedInstanceState == null) {
+            openAlert(intent = intent)
+            openJoinLink(intent = intent)
+        }
 
         setContent {
             TosslingTheme {
@@ -46,12 +50,19 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         openAlert(intent = intent)
+        openJoinLink(intent = intent)
     }
 
     private fun openAlert(intent: Intent?) {
         val id = intent?.getStringExtra(TosslingIntents.EXTRA_ALERT) ?: return
         intent.removeExtra(TosslingIntents.EXTRA_ALERT)
         appComponent?.onAlertOpened(id = id)
+    }
+
+    private fun openJoinLink(intent: Intent?) {
+        val raw = intent?.dataString?.let(::joinLinkCode) ?: return
+        intent.data = null
+        appComponent?.onJoinLink(raw = raw)
     }
 
     private fun askForNotifications() {

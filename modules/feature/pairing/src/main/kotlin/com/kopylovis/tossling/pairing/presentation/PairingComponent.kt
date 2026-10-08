@@ -8,6 +8,7 @@ internal sealed interface PairingStage {
     data object Idle : PairingStage
     data class Connecting(val server: String) : PairingStage
     data class Switching(val raw: String, val from: String, val to: String) : PairingStage
+    data class Joining(val raw: String, val name: String, val server: String) : PairingStage
     data class Failed(val problem: PairingProblem, val server: String) : PairingStage
     data class Paired(val macName: String, val server: String) : PairingStage
 }
@@ -25,6 +26,8 @@ internal interface PairingComponent : CommonComponent {
     fun onScanFailed()
 
     fun onSwitchConfirmed()
+
+    fun onJoinConfirmed()
 
     fun onCancelClicked()
 
