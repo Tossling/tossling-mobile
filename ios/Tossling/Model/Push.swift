@@ -8,6 +8,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         Keychain.moveToSharedGroup()
         Push.shared.start()
+        if let large = UIFont(name: "Onest-Bold", size: 34), let small = UIFont(name: "Onest-SemiBold", size: 17) {
+            UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFontMetrics(forTextStyle: .largeTitle).scaledFont(for: large)]
+            UINavigationBar.appearance().titleTextAttributes = [.font: UIFontMetrics(forTextStyle: .headline).scaledFont(for: small)]
+        }
         UNUserNotificationCenter.current().delegate = self
         return true
     }
@@ -32,7 +36,7 @@ final class Push {
     private let defaults = UserDefaults.standard
     private var available = false
     private var hasToken = false
-    private var wanted: String?
+    private var wanted: Set<String> = []
 
     func start() {
         guard Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else { return }
@@ -47,16 +51,11 @@ final class Push {
         subscribe()
     }
 
-    func follow(room: String?) {
+    func follow(topics: [String]) {
         guard available else { return }
-        wanted = room
-        let current = defaults.string(forKey: "push-topic")
-        if let current, current != room, hasToken {
-            Messaging.messaging().unsubscribe(fromTopic: current)
-            defaults.removeObject(forKey: "push-topic")
-        }
-        guard room != nil else {
-            if current == nil || hasToken { defaults.removeObject(forKey: "push-topic") }
+        wanted = Set(topics)
+        if topics.isEmpty {
+            unsubscribeStale()
             return
         }
         Task { @MainActor in
@@ -67,14 +66,33 @@ final class Push {
         }
     }
 
+    private var followed: Set<String> {
+        get { Set(defaults.stringArray(forKey: "push-topics") ?? []) }
+        set { defaults.set(Array(newValue), forKey: "push-topics") }
+    }
+
     private func subscribe() {
-        guard hasToken, let room = wanted, defaults.string(forKey: "push-topic") != room else { return }
-        Messaging.messaging().subscribe(toTopic: room) { [defaults] error in
-            if let error {
-                print("push: could not follow the room: \(error.localizedDescription)")
-            } else {
-                defaults.set(room, forKey: "push-topic")
+        guard hasToken else { return }
+        unsubscribeStale()
+        for topic in wanted.subtracting(followed) {
+            Messaging.messaging().subscribe(toTopic: topic) { [weak self] error in
+                if let error {
+                    print("push: could not follow \(topic): \(error.localizedDescription)")
+                } else {
+                    DispatchQueue.main.async { self?.followed.insert(topic) }
+                }
             }
+        }
+    }
+
+    private func unsubscribeStale() {
+        guard hasToken else { return }
+        let legacy = defaults.string(forKey: "push-topic")
+        if let legacy, !wanted.contains(legacy) { Messaging.messaging().unsubscribe(fromTopic: legacy) }
+        defaults.removeObject(forKey: "push-topic")
+        for topic in followed.subtracting(wanted) {
+            Messaging.messaging().unsubscribe(fromTopic: topic)
+            followed.remove(topic)
         }
     }
 }

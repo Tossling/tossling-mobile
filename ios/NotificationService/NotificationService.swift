@@ -31,6 +31,9 @@ final class NotificationService: UNNotificationServiceExtension {
         let hidden = UNMutableNotificationContent()
         guard let topic, let id else { return problem("no topic or id in the push") }
         guard let raw = Keychain.read("room"), let config = RoomCore.companion.decodeConfig(text: raw) else { return problem("no room in the Keychain") }
+        if let project = FeedStore.projects().first(where: { $0.topic == topic }) {
+            return await alert(config: config, project: project, id: id) ?? hidden
+        }
         guard topic == config.room else { return hidden }
         let event: NtfyEvent
         do {
@@ -70,6 +73,40 @@ final class NotificationService: UNNotificationServiceExtension {
             content.body = String(localized: "\(meta.fileName ?? "file"), \(size): open Tossling to receive it")
         default:
             return hidden
+        }
+        return content
+    }
+
+    private static func alert(config: RoomConfig, project: Project, id: String) async -> UNNotificationContent? {
+        guard let event = try? await Server.shared.message(config, topic: project.topic, id: id), event.event == "message" else { return nil }
+        let alert = ProjectAlert(
+            id: event.id,
+            topic: event.topic,
+            title: event.title ?? "",
+            message: event.message ?? "",
+            priority: event.priority?.intValue ?? 3,
+            click: event.click.flatMap { $0.isEmpty ? nil : $0 },
+            isMarkdown: event.contentType == "text/markdown",
+            time: Date(timeIntervalSince1970: TimeInterval(event.time))
+        )
+        FeedStore.addToInbox(alert)
+        let content = UNMutableNotificationContent()
+        let title = alert.title(for: project.name)
+        content.title = title.isEmpty ? project.name : title
+        if !title.isEmpty { content.subtitle = project.name }
+        content.body = String(alert.plainMessage.prefix(1000))
+        content.threadIdentifier = project.topic
+        content.userInfo = ["alert": alert.id]
+        let hour = Calendar.current.component(.hour, from: Date())
+        let quietHours = (UserDefaults(suiteName: Paths.groupID)?.bool(forKey: "quiet-hours") ?? false) && (hour >= 23 || hour < 8)
+        if alert.isUrgent {
+            content.interruptionLevel = .timeSensitive
+            content.sound = .default
+        } else if project.isMuted || alert.isQuiet || quietHours {
+            content.interruptionLevel = .passive
+        } else {
+            content.interruptionLevel = .active
+            content.sound = .default
         }
         return content
     }

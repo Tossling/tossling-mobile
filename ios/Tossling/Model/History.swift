@@ -14,8 +14,45 @@ struct Clip: Codable, Identifiable, Equatable {
     var name: String?
     var size: Int64 = 0
     var device: String
+    var toAll = false
     var date = Date()
     var event: String?
+    var isPinned = false
+
+    init(incoming: Bool, kind: Kind, text: String? = nil, file: String? = nil, name: String? = nil, size: Int64 = 0, device: String, toAll: Bool = false, event: String? = nil) {
+        self.incoming = incoming
+        self.kind = kind
+        self.text = text
+        self.file = file
+        self.name = name
+        self.size = size
+        self.device = device
+        self.toAll = toAll
+        self.event = event
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        incoming = try c.decode(Bool.self, forKey: .incoming)
+        kind = try c.decode(Kind.self, forKey: .kind)
+        text = try c.decodeIfPresent(String.self, forKey: .text)
+        file = try c.decodeIfPresent(String.self, forKey: .file)
+        name = try c.decodeIfPresent(String.self, forKey: .name)
+        size = try c.decodeIfPresent(Int64.self, forKey: .size) ?? 0
+        device = try c.decodeIfPresent(String.self, forKey: .device) ?? ""
+        toAll = try c.decodeIfPresent(Bool.self, forKey: .toAll) ?? false
+        date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        event = try c.decodeIfPresent(String.self, forKey: .event)
+        isPinned = try c.decodeIfPresent(Bool.self, forKey: .isPinned) ?? false
+    }
+
+    func matches(_ query: String) -> Bool {
+        let words = query.lowercased().split(whereSeparator: \.isWhitespace)
+        guard !words.isEmpty else { return true }
+        let haystack = [text ?? "", name ?? "", device, kind.rawValue].joined(separator: " ").lowercased()
+        return words.allSatisfy { haystack.contains($0) }
+    }
 }
 
 enum Paths {
@@ -72,8 +109,20 @@ final class HistoryStore {
     }
 
     func save(_ clips: [Clip]) {
-        let kept = Array(clips.prefix(Self.limit))
-        for dropped in clips.dropFirst(Self.limit) where dropped.kind == .image {
+        var unpinned = 0
+        var kept: [Clip] = []
+        var dropped: [Clip] = []
+        for clip in clips {
+            if clip.isPinned {
+                kept.append(clip)
+            } else if unpinned < Self.limit {
+                kept.append(clip)
+                unpinned += 1
+            } else {
+                dropped.append(clip)
+            }
+        }
+        for dropped in dropped where dropped.kind == .image {
             if let file = Paths.url(of: dropped) { try? FileManager.default.removeItem(at: file) }
         }
         if let data = try? JSONEncoder().encode(kept) { try? data.write(to: url, options: .atomic) }

@@ -56,11 +56,12 @@ final class Server {
         try check(response, data)
     }
 
-    func events(_ config: RoomConfig, since: String, onOpen: @escaping () -> Void) -> AsyncThrowingStream<NtfyEvent, Error> {
+    func events(_ config: RoomConfig, topics: [String]? = nil, since: String, onOpen: @escaping () -> Void) -> AsyncThrowingStream<NtfyEvent, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
-                    var components = URLComponents(string: "\(config.server)/\(config.room)/json")!
+                    let path = (topics ?? [config.room]).joined(separator: ",")
+                    var components = URLComponents(string: "\(config.server)/\(path)/json")!
                     components.queryItems = [URLQueryItem(name: "since", value: since)]
                     var request = URLRequest(url: components.url!)
                     authorize(&request, config.token)
@@ -79,8 +80,8 @@ final class Server {
         }
     }
 
-    func poll(_ config: RoomConfig, since: String) async throws -> [NtfyEvent] {
-        var components = URLComponents(string: "\(config.server)/\(config.room)/json")!
+    func poll(_ config: RoomConfig, topic: String? = nil, since: String) async throws -> [NtfyEvent] {
+        var components = URLComponents(string: "\(config.server)/\(topic ?? config.room)/json")!
         components.queryItems = [URLQueryItem(name: "poll", value: "1"), URLQueryItem(name: "since", value: since)]
         var request = URLRequest(url: components.url!)
         authorize(&request, config.token)
@@ -117,6 +118,60 @@ final class Server {
         let kept = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.moveItem(at: file, to: kept)
         return kept
+    }
+
+    func subscriptions(_ config: RoomConfig) async throws -> [NtfySubscription] {
+        var request = URLRequest(url: URL(string: "\(config.server)/v1/account")!)
+        authorize(&request, config.token)
+        let (data, response) = try await session.data(for: request)
+        try check(response, data)
+        return NtfyModelsKt.parseAccount(text: String(decoding: data, as: UTF8.self))?.subscriptions ?? []
+    }
+
+    func createProject(_ config: RoomConfig, topic: String, name: String) async throws -> TosslingProject? {
+        let body = Data(NtfyModelsKt.encodeProjectRequest(topic: topic, name: name).utf8)
+        let (data, _) = try await api(config, path: "projects", method: "POST", body: body)
+        return NtfyModelsKt.parseProject(text: String(decoding: data, as: UTF8.self))
+    }
+
+    func deleteProject(_ config: RoomConfig, topic: String) async throws {
+        _ = try await api(config, path: "projects/\(topic)", method: "DELETE", body: nil)
+    }
+
+    func createToken(_ config: RoomConfig) async throws -> String {
+        var request = URLRequest(url: URL(string: "\(config.server)/v1/account/token")!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        authorize(&request, config.token)
+        let (data, response) = try await session.upload(for: request, from: Data("{\"label\":\"tossling\"}".utf8))
+        try check(response, data)
+        guard let token = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["token"] as? String, !token.isEmpty else {
+            throw ServerError(code: 0, text: "no token in the answer")
+        }
+        return token
+    }
+
+    func deleteToken(_ config: RoomConfig, token: String) async throws {
+        var request = URLRequest(url: URL(string: "\(config.server)/v1/account/token")!)
+        request.httpMethod = "DELETE"
+        request.setValue(token, forHTTPHeaderField: "X-Token")
+        authorize(&request, config.token)
+        let (data, response) = try await session.data(for: request)
+        try check(response, data)
+    }
+
+    private func api(_ config: RoomConfig, path: String, method: String, body: Data?) async throws -> (Data, URLResponse) {
+        for prefix in ["/v1/tossling", "/v1/tossy"] {
+            var request = URLRequest(url: URL(string: "\(config.server)\(prefix)/\(path)")!)
+            request.httpMethod = method
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            authorize(&request, config.token)
+            let (data, response) = if let body { try await session.upload(for: request, from: body) } else { try await session.data(for: request) }
+            if (response as? HTTPURLResponse)?.statusCode == 404, prefix == "/v1/tossling", !String(decoding: data, as: UTF8.self).contains("\"code\"") { continue }
+            try check(response, data)
+            return (data, response)
+        }
+        throw ServerError(code: 404, text: "")
     }
 
     func accountWorks(server: String, token: String) async throws -> Bool {

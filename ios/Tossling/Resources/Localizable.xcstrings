@@ -2,6 +2,19 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "": {
+      "shouldTranslate": false
+    },
+    "%@ and this phone now share one clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ и этот телефон теперь делят один буфер"
+          }
+        }
+      }
+    },
     "%@ changed the room key": {
       "localizations": {
         "ru": {
@@ -12,12 +25,32 @@
         }
       }
     },
+    "%@ disconnected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ отключен"
+          }
+        }
+      }
+    },
     "%@ disconnected this phone from the room": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "%@ отключил этот телефон от комнаты"
+          }
+        }
+      }
+    },
+    "%@ does not respond. Check the internet on the phone and that the server is running.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ не отвечает. Проверьте интернет на телефоне и что сервер запущен."
           }
         }
       }
@@ -42,12 +75,55 @@
         }
       }
     },
+    "%@ is in Files, Tossling": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ лежит в Файлах, в папке Tossling"
+          }
+        }
+      }
+    },
+    "%@ is in the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ в комнате"
+          }
+        }
+      }
+    },
     "%@ is larger than 500 MB": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "%@ больше 500 МБ"
+          }
+        }
+      }
+    },
+    "%@ · %@": {
+      "shouldTranslate": false
+    },
+    "%@ · key saved": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · ключ сохранен"
+          }
+        }
+      }
+    },
+    "%@ · will get it when back": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · получит, когда появится"
           }
         }
       }
@@ -62,12 +138,394 @@
         }
       }
     },
+    "%lld": {
+      "shouldTranslate": false
+    },
+    "%lld devices: computers and phones": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld device: computers and phones"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld devices: computers and phones"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld устройство, компьютеры и телефоны"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld устройства, компьютеры и телефоны"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld устройств, компьютеры и телефоны"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld устройства, компьютеры и телефоны"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld h": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ч"
+          }
+        }
+      }
+    },
+    "%lld min": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld мин"
+          }
+        }
+      }
+    },
+    "%lld projects": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld project"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld projects"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld проект"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld проекта"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld проектов"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld проекта"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld unread": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld unread"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld unread"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld непрочитанное"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld непрочитанных"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld непрочитанных"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld непрочитанных"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "23:00 to 08:00, urgent ones always come through": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С 23:00 до 08:00, срочные приходят всегда"
+          }
+        }
+      }
+    },
+    "99+": {
+      "shouldTranslate": false
+    },
+    "A device that is offline gets the clipboard when it is back. Another phone joins by scanning the QR code of a computer in the room: Devices, then Connect a Phone in the Tossling menu, or tossling pair on a Mac.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устройство без связи получит буфер, когда появится. Другой телефон подключается по QR-коду компьютера из комнаты. Это Устройства, затем Подключить телефон в меню Tossling или tossling pair на Маке."
+          }
+        }
+      }
+    },
+    "About": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "О приложении"
+          }
+        }
+      }
+    },
+    "About a minute, only once": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Около минуты, один раз"
+          }
+        }
+      }
+    },
+    "Add a computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить компьютер"
+          }
+        }
+      }
+    },
+    "Add a project": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить проект"
+          }
+        }
+      }
+    },
+    "Add project": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Добавить проект"
+          }
+        }
+      }
+    },
+    "All": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все"
+          }
+        }
+      }
+    },
+    "All devices": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все устройства"
+          }
+        }
+      }
+    },
+    "All notifications will be removed from the phone. Projects and their settings stay.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все уведомления будут удалены с телефона. Проекты и их настройки останутся."
+          }
+        }
+      }
+    },
+    "All read": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Все прочитано"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отмена"
+          }
+        }
+      }
+    },
+    "Channel": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Канал"
+          }
+        }
+      }
+    },
+    "Channel: latin letters, digits, - and _": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В канале только латиница, цифры, - и _"
+          }
+        }
+      }
+    },
+    "Checking the channel": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверяю канал"
+          }
+        }
+      }
+    },
+    "Checking the token and exchanging keys": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверяю токен и обмениваюсь ключами"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить"
+          }
+        }
+      }
+    },
+    "Clear the feed?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистить ленту?"
+          }
+        }
+      }
+    },
+    "Clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Буфер"
+          }
+        }
+      }
+    },
     "Close": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Закрыть"
+          }
+        }
+      }
+    },
+    "Color": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цвет"
           }
         }
       }
@@ -122,6 +580,36 @@
         }
       }
     },
+    "Copy text": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопировать текст"
+          }
+        }
+      }
+    },
+    "Copy text or an image on the computer and it shows up here in a second.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопируйте текст или картинку на компьютере, и через секунду они появятся здесь."
+          }
+        }
+      }
+    },
+    "Could not leave": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не получилось выйти"
+          }
+        }
+      }
+    },
     "Could not reach the server: %@": {
       "localizations": {
         "ru": {
@@ -142,12 +630,52 @@
         }
       }
     },
+    "Delete project": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить проект"
+          }
+        }
+      }
+    },
+    "Delete project %@?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить проект %@?"
+          }
+        }
+      }
+    },
+    "Deleted": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалено"
+          }
+        }
+      }
+    },
     "Devices": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Устройства"
+          }
+        }
+      }
+    },
+    "Devices in the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устройства в комнате"
           }
         }
       }
@@ -172,12 +700,122 @@
         }
       }
     },
+    "Disconnect %@?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отключить %@?"
+          }
+        }
+      }
+    },
+    "Disconnect and revoke the key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отключить и отозвать ключ"
+          }
+        }
+      }
+    },
+    "Disconnect this computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отключить этот компьютер"
+          }
+        }
+      }
+    },
+    "Disconnect this device": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отключить это устройство"
+          }
+        }
+      }
+    },
+    "Disconnecting": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отключаю"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Готово"
+          }
+        }
+      }
+    },
+    "Events from your projects show up here: sign-ins, denials, rule hits.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Здесь появятся события от ваших проектов, например входы, отказы и срабатывания правил."
+          }
+        }
+      }
+    },
+    "Every device in the room sees this name.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это имя видят все устройства в комнате."
+          }
+        }
+      }
+    },
+    "Example: the new computer gets its own code": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это пример, у нового компьютера будет свой код"
+          }
+        }
+      }
+    },
+    "Feed cleared": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лента очищена"
+          }
+        }
+      }
+    },
+    "For example, Home NAS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Например, Домашний NAS"
+          }
+        }
+      }
+    },
+    "From %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С %@"
           }
         }
       }
@@ -202,6 +840,16 @@
         }
       }
     },
+    "From the computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С компьютера"
+          }
+        }
+      }
+    },
     "Image": {
       "localizations": {
         "ru": {
@@ -222,12 +870,62 @@
         }
       }
     },
+    "Images are turned off in settings": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Картинки выключены в настройках"
+          }
+        }
+      }
+    },
+    "In iOS Settings set Paste from Other Apps to Allow, then To Computer sends at once": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В настройках iOS поставьте Вставка из других приложений на Разрешить, и кнопка На компьютер будет отправлять сразу"
+          }
+        }
+      }
+    },
     "In the room": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "В комнате"
+          }
+        }
+      }
+    },
+    "Its own name": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Свое имя"
+          }
+        }
+      }
+    },
+    "Joined": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключен"
+          }
+        }
+      }
+    },
+    "Last contact": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Последняя связь"
           }
         }
       }
@@ -242,7 +940,27 @@
         }
       }
     },
+    "Leave and remove the key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти и удалить ключ"
+          }
+        }
+      }
+    },
     "Leave the Room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти из комнаты"
+          }
+        }
+      }
+    },
+    "Leave the room": {
       "localizations": {
         "ru": {
           "stringUnit": {
@@ -262,6 +980,76 @@
         }
       }
     },
+    "Leaving the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выхожу из комнаты"
+          }
+        }
+      }
+    },
+    "Mark all read": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прочитать все"
+          }
+        }
+      }
+    },
+    "Menu": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Меню"
+          }
+        }
+      }
+    },
+    "Move": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перейти"
+          }
+        }
+      }
+    },
+    "Move to the room of %@?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перейти в комнату %@?"
+          }
+        }
+      }
+    },
+    "Muted": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без звука"
+          }
+        }
+      }
+    },
+    "Muted: events land in the feed but the push comes silently. Urgent ones (5) always ring.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без звука события попадают в ленту, но пуш приходит тихо. Срочные (5) звенят всегда."
+          }
+        }
+      }
+    },
     "Name": {
       "localizations": {
         "ru": {
@@ -272,12 +1060,72 @@
         }
       }
     },
+    "Name in iOS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Имя в iOS"
+          }
+        }
+      }
+    },
     "Name of this phone": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Имя этого телефона"
+          }
+        }
+      }
+    },
+    "New device in the room: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новое устройство в комнате, %@"
+          }
+        }
+      }
+    },
+    "New project": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новый проект"
+          }
+        }
+      }
+    },
+    "New user": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новый пользователь"
+          }
+        }
+      }
+    },
+    "No access to the channel: ntfy access": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет доступа к каналу, проверьте ntfy access"
+          }
+        }
+      }
+    },
+    "No connection to the server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет связи с сервером"
           }
         }
       }
@@ -302,6 +1150,26 @@
         }
       }
     },
+    "Nothing found": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего не нашлось"
+          }
+        }
+      }
+    },
+    "Nothing in \"%@\"": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В \"%@\" пусто"
+          }
+        }
+      }
+    },
     "Nothing to send": {
       "localizations": {
         "ru": {
@@ -322,12 +1190,62 @@
         }
       }
     },
+    "Notifications": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Уведомления"
+          }
+        }
+      }
+    },
+    "On a computer that is already in the room choose Devices, then Invite a Computer in the Tossling menu, or run on a Mac": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На компьютере, который уже в комнате, выберите в меню Tossling Устройства, затем Пригласить компьютер, или выполните на Маке"
+          }
+        }
+      }
+    },
+    "On a computer with Tossling open Devices, then Connect a Phone in its menu. On a Mac you can also run": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На компьютере с Tossling откройте в меню Устройства, затем Подключить телефон. На Маке можно еще выполнить"
+          }
+        }
+      }
+    },
     "On a computer with Tossling open Devices, then Connect a Phone, and scan the code it shows. On a Mac you can also run tossling pair.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "На компьютере с Tossling откройте Устройства, затем Подключить телефон, и отсканируйте код. На Маке можно еще запустить tossling pair."
+          }
+        }
+      }
+    },
+    "On the clipboard: \"%@\"": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В буфере \"%@\""
+          }
+        }
+      }
+    },
+    "On the new Mac run the command it shows. On Windows and Linux choose Join Another Room and paste the address with the code": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На новом Маке выполните команду, которую он покажет. На Windows и Linux выберите Войти в другую комнату и вставьте адрес с кодом"
           }
         }
       }
@@ -342,6 +1260,26 @@
         }
       }
     },
+    "One clipboard with your computer: copy there, paste here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Общий буфер обмена с компьютером. Скопировали там, вставили здесь."
+          }
+        }
+      }
+    },
+    "One room: whatever is copied on any of them, the others see": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Одна комната. Что скопировано на любом из них, видят все остальные"
+          }
+        }
+      }
+    },
     "Online": {
       "localizations": {
         "ru": {
@@ -352,12 +1290,394 @@
         }
       }
     },
+    "Open link": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть ссылку"
+          }
+        }
+      }
+    },
+    "Pair with a computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключить компьютер"
+          }
+        }
+      }
+    },
+    "Pair with a computer first: it brings the server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сначала подключите компьютер, сервер берется от него"
+          }
+        }
+      }
+    },
+    "Pair with another computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключить другой компьютер"
+          }
+        }
+      }
+    },
+    "Paired": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Связались"
+          }
+        }
+      }
+    },
+    "Pairing": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключение"
+          }
+        }
+      }
+    },
+    "Pairing…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключаюсь…"
+          }
+        }
+      }
+    },
+    "Paste without asking": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вставлять без вопроса"
+          }
+        }
+      }
+    },
+    "Pause sending": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пауза отправки"
+          }
+        }
+      }
+    },
+    "Phones and computers in the room receive it at the same time": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Телефоны и компьютеры в комнате получат одновременно"
+          }
+        }
+      }
+    },
+    "Pin": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрепить"
+          }
+        }
+      }
+    },
+    "Pinned: it stays until you remove it": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закреплено, останется, пока не удалите"
+          }
+        }
+      }
+    },
+    "Priority": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приоритет"
+          }
+        }
+      }
+    },
+    "Project": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проект"
+          }
+        }
+      }
+    },
+    "Project added": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проект добавлен"
+          }
+        }
+      }
+    },
+    "Project created": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проект создан"
+          }
+        }
+      }
+    },
+    "Project deleted": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проект удален"
+          }
+        }
+      }
+    },
+    "Projects": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проекты"
+          }
+        }
+      }
+    },
+    "Publisher token": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Токен отправителя"
+          }
+        }
+      }
+    },
     "Put received items into the clipboard": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Класть полученное в буфер обмена"
+          }
+        }
+      }
+    },
+    "Quiet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тишина"
+          }
+        }
+      }
+    },
+    "Quiet hours": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тихие часы"
+          }
+        }
+      }
+    },
+    "Read": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прочитано"
+          }
+        }
+      }
+    },
+    "Receiving %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Получаю %@"
+          }
+        }
+      }
+    },
+    "Recent": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Недавнее"
+          }
+        }
+      }
+    },
+    "Request example": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пример запроса"
+          }
+        }
+      }
+    },
+    "Return to the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вернуться в комнату"
+          }
+        }
+      }
+    },
+    "Room creator": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Создатель комнаты"
+          }
+        }
+      }
+    },
+    "Room on %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Комната на %@"
+          }
+        }
+      }
+    },
+    "Room · %lld devices": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Room · %lld device"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Room · %lld devices"
+                }
+              }
+            }
+          }
+        },
+        "ru": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Комната · %lld устройство"
+                }
+              },
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Комната · %lld устройства"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Комната · %lld устройств"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Комната · %lld устройства"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранить"
+          }
+        }
+      }
+    },
+    "Saved": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранено"
+          }
+        }
+      }
+    },
+    "Scan QR": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканировать QR"
+          }
+        }
+      }
+    },
+    "Scan again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканировать снова"
+          }
+        }
+      }
+    },
+    "Scan it with Tossling": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отсканируйте его в Tossling"
           }
         }
       }
@@ -402,12 +1722,62 @@
         }
       }
     },
+    "Send images": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Передавать картинки"
+          }
+        }
+      }
+    },
     "Send to Tossling": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Отправить в Tossling"
+          }
+        }
+      }
+    },
+    "Send where?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Куда отправить?"
+          }
+        }
+      }
+    },
+    "Sending is on": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправка включена"
+          }
+        }
+      }
+    },
+    "Sending is paused": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправка на паузе"
+          }
+        }
+      }
+    },
+    "Sending to %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправляю на %@"
           }
         }
       }
@@ -472,6 +1842,16 @@
         }
       }
     },
+    "Sent to %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправлено на %@"
+          }
+        }
+      }
+    },
     "Sent to the room": {
       "localizations": {
         "ru": {
@@ -502,6 +1882,16 @@
         }
       }
     },
+    "Services that send events to Tossling": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервисы, которые шлют события в Tossling"
+          }
+        }
+      }
+    },
     "Settings": {
       "localizations": {
         "ru": {
@@ -522,12 +1912,52 @@
         }
       }
     },
+    "Shown once: put it into the service settings now. It can only publish to this channel.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показывается один раз, сразу пропишите его в настройках сервиса. Он может только писать в этот канал."
+          }
+        }
+      }
+    },
+    "Signed up **dmitry**": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зарегистрировался **dmitry**"
+          }
+        }
+      }
+    },
     "Something new arrived, open Tossling to see it.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Пришло что-то новое, откройте Tossling, чтобы посмотреть."
+          }
+        }
+      }
+    },
+    "Something went wrong": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что-то пошло не так"
+          }
+        }
+      }
+    },
+    "Sound on": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Звук включен"
           }
         }
       }
@@ -542,6 +1972,26 @@
         }
       }
     },
+    "Text, file name or device": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Текст, имя файла или устройство"
+          }
+        }
+      }
+    },
+    "The QR code does not look like a pairing code. On the computer open Devices, then Connect a Phone, and scan that code.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "QR-код не похож на код подключения. На компьютере откройте Устройства, затем Подключить телефон, и отсканируйте тот код."
+          }
+        }
+      }
+    },
     "The camera is not available here: copy the code text on the computer and paste it.": {
       "localizations": {
         "ru": {
@@ -552,12 +2002,182 @@
         }
       }
     },
+    "The clipboard is empty": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Буфер обмена пуст"
+          }
+        }
+      }
+    },
+    "The code is outdated or already used. Get a new one on the computer and scan it again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Код устарел или уже использован. Получите новый на компьютере и отсканируйте еще раз."
+          }
+        }
+      }
+    },
+    "The computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Компьютер"
+          }
+        }
+      }
+    },
+    "The computer shows a QR code": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Компьютер покажет QR-код"
+          }
+        }
+      }
+    },
+    "The device loses access to the room: the others move to a new key. Everyone else keeps working.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устройство потеряет доступ к комнате, остальные перейдут на новый ключ и продолжат работать."
+          }
+        }
+      }
+    },
+    "The file is gone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файла уже нет"
+          }
+        }
+      }
+    },
+    "The image is gone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Картинки уже нет"
+          }
+        }
+      }
+    },
+    "The key stayed on this phone after Tossling was removed. Return as the same device, no QR code needed.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ остался на телефоне после удаления Tossling. Вернитесь тем же устройством, без QR-кода."
+          }
+        }
+      }
+    },
+    "The new computer joins the room and sees the shared clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Новый компьютер войдет в комнату и увидит общий буфер"
+          }
+        }
+      }
+    },
     "The other devices of the room see this name.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Это имя видят остальные устройства комнаты."
+          }
+        }
+      }
+    },
+    "The phone clipboard does not go to the computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Буфер телефона не уходит на компьютер"
+          }
+        }
+      }
+    },
+    "The phone is in one room at a time: it will leave the current one and stop sharing the clipboard with it.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Телефон бывает только в одной комнате. Он выйдет из текущей и перестанет делить с ней буфер."
+          }
+        }
+      }
+    },
+    "The phone left the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Телефон вышел из комнаты"
+          }
+        }
+      }
+    },
+    "The phone removes the room key and stops sharing the clipboard with its devices. To come back, scan the QR code on a computer.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Телефон удалит ключ комнаты и перестанет делить буфер с ее устройствами. Чтобы вернуться, отсканируйте QR-код на компьютере."
+          }
+        }
+      }
+    },
+    "The room creator can't be removed": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Создателя комнаты нельзя отключить"
+          }
+        }
+      }
+    },
+    "The room has moved on without this phone. Pair again with the QR code.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Комната сменила ключ без этого телефона. Подключитесь заново по QR-коду."
+          }
+        }
+      }
+    },
+    "The room was created on this computer, so it can't be removed from the room. If you no longer want its clipboard, leave the room on the main screen.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Комнату создали на этом компьютере, поэтому отключить его нельзя. Если его буфер больше не нужен, выйдите из комнаты на главном экране."
+          }
+        }
+      }
+    },
+    "The server did not accept the token": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер не принял токен"
           }
         }
       }
@@ -582,12 +2202,52 @@
         }
       }
     },
+    "This channel is already added": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот канал уже добавлен"
+          }
+        }
+      }
+    },
+    "This device": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это устройство"
+          }
+        }
+      }
+    },
+    "This is not a Tossling code": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это не код Tossling"
+          }
+        }
+      }
+    },
     "This is not a Tossling code. Open Devices, then Connect a Phone on a computer.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Это не код Tossling. На компьютере откройте Устройства, затем Подключить телефон."
+          }
+        }
+      }
+    },
+    "This name is shown on this phone only. Leave it empty to go back to the device's own name.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это имя видно только на этом телефоне. Оставьте его пустым, чтобы вернуть устройству собственное имя."
           }
         }
       }
@@ -602,12 +2262,112 @@
         }
       }
     },
+    "This phone was in a room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот телефон был в комнате"
+          }
+        }
+      }
+    },
+    "This project has no events yet.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "У этого проекта пока нет событий."
+          }
+        }
+      }
+    },
+    "Through your own server, encrypted on the devices.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Через ваш сервер, с шифрованием на устройствах."
+          }
+        }
+      }
+    },
+    "Time": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Время"
+          }
+        }
+      }
+    },
+    "To %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На %@"
+          }
+        }
+      }
+    },
+    "To Computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На компьютер"
+          }
+        }
+      }
+    },
+    "To all devices": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На все устройства"
+          }
+        }
+      }
+    },
     "To join again, scan the code on a computer.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Чтобы вернуться, отсканируйте код на компьютере."
+          }
+        }
+      }
+    },
+    "To the computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На компьютер"
+          }
+        }
+      }
+    },
+    "Today": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сегодня"
+          }
+        }
+      }
+    },
+    "Too large: up to 1 MB of text, 15 MB per image or 500 MB per file": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слишком большое. Текст до 1 МБ, картинка до 15 МБ, файл до 500 МБ"
           }
         }
       }
@@ -625,12 +2385,92 @@
         }
       }
     },
+    "Tossling for iOS": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tossling для iOS"
+          }
+        }
+      }
+    },
     "Tossling is not in a room yet. Open it and scan the code on a computer.": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Tossling еще не в комнате. Откройте его и отсканируйте код на компьютере."
+          }
+        }
+      }
+    },
+    "Tossling is not paired with a computer yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tossling еще не подключен к компьютеру"
+          }
+        }
+      }
+    },
+    "Tossling stops listening to %@ and its notifications leave the feed.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tossling перестанет слушать канал %@, его уведомления исчезнут из ленты."
+          }
+        }
+      }
+    },
+    "Unpin": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открепить"
+          }
+        }
+      }
+    },
+    "Unpinned": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откреплено"
+          }
+        }
+      }
+    },
+    "Unread": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не прочитано"
+          }
+        }
+      }
+    },
+    "Updated": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обновлено"
+          }
+        }
+      }
+    },
+    "Waiting for the new device…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Жду новое устройство…"
           }
         }
       }
@@ -645,6 +2485,26 @@
         }
       }
     },
+    "When off, only text": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Если выключено, только текст"
+          }
+        }
+      }
+    },
+    "While Tossling is open, text and images from a computer go straight into the clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока Tossling открыт, текст и картинки с компьютера сразу попадают в буфер обмена"
+          }
+        }
+      }
+    },
     "While Tossling is open, text and images from a computer go straight into the clipboard.": {
       "localizations": {
         "ru": {
@@ -654,6 +2514,249 @@
           }
         }
       }
+    },
+    "Yesterday": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вчера"
+          }
+        }
+      }
+    },
+    "all devices": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "все устройства"
+          }
+        }
+      }
+    },
+    "creator": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "создатель"
+          }
+        }
+      }
+    },
+    "image": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "картинка"
+          }
+        }
+      }
+    },
+    "important": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "важно"
+          }
+        }
+      }
+    },
+    "no events yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "событий пока нет"
+          }
+        }
+      }
+    },
+    "normal": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "обычно"
+          }
+        }
+      }
+    },
+    "not seen yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "еще не на связи"
+          }
+        }
+      }
+    },
+    "now": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "сейчас"
+          }
+        }
+      }
+    },
+    "online": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "на связи"
+          }
+        }
+      }
+    },
+    "or scan the QR code of the new computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "или отсканируйте QR-код нового компьютера"
+          }
+        }
+      }
+    },
+    "priority is 1 to 5, 3 by default. With \"markdown\": true the message understands Markdown, click opens on tap.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "priority от 1 до 5, по умолчанию 3. С \"markdown\": true сообщение понимает Markdown, click открывается по нажатию."
+          }
+        }
+      }
+    },
+    "quiet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "тихо"
+          }
+        }
+      }
+    },
+    "seen %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "был %@"
+          }
+        }
+      }
+    },
+    "seen %lld h ago": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "был %lld ч назад"
+          }
+        }
+      }
+    },
+    "seen %lld min ago": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "был %lld мин назад"
+          }
+        }
+      }
+    },
+    "seen just now": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "был только что"
+          }
+        }
+      }
+    },
+    "seen yesterday": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "был вчера"
+          }
+        }
+      }
+    },
+    "the computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "компьютер"
+          }
+        }
+      }
+    },
+    "this device": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "это устройство"
+          }
+        }
+      }
+    },
+    "today, %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "сегодня, %@"
+          }
+        }
+      }
+    },
+    "urgent": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "срочно"
+          }
+        }
+      }
+    },
+    "yesterday": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "вчера"
+          }
+        }
+      }
+    },
+    "yesterday, %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "вчера, %@"
+          }
+        }
+      }
+    },
+    "•  ": {
+      "shouldTranslate": false
     }
   }
 }

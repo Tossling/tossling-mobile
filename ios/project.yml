@@ -37,6 +37,7 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         FirebaseAppDelegateProxyEnabled: false
+        UIAppFonts: [onest_regular.ttf, onest_medium.ttf, onest_semibold.ttf, onest_bold.ttf, jetbrains_mono_medium.ttf]
         UIBackgroundModes: [remote-notification]
     entitlements:
       path: Tossling/Tossling.entitlements
@@ -77,6 +78,8 @@ targets:
       - path: NotificationService
       - path: Tossling/Model/Keychain.swift
       - path: Tossling/Model/Server.swift
+      - path: Tossling/Model/Feed.swift
+      - path: Tossling/Model/History.swift
       - path: Tossling/Resources/Localizable.xcstrings
     info:
       path: NotificationService/Info.plist
@@ -90,6 +93,8 @@ targets:
     entitlements:
       path: NotificationService/NotificationService.entitlements
       properties:
+        com.apple.security.application-groups:
+          - group.com.kopylovis.tossling
         keychain-access-groups:
           - $(AppIdentifierPrefix)com.kopylovis.tossling.shared
     settings:
@@ -114,6 +119,7 @@ targets:
       - path: Tossling/Model/Keychain.swift
       - path: Tossling/Model/Server.swift
       - path: Tossling/Model/History.swift
+      - path: Tossling/Model/Feed.swift
       - path: Tossling/Model/Sender.swift
       - path: Tossling/Resources/Localizable.xcstrings
     info:

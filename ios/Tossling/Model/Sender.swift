@@ -13,6 +13,11 @@ enum SendError: LocalizedError {
     }
 }
 
+struct Target: Hashable {
+    let id: String
+    let name: String
+}
+
 struct Sender {
 
     static let maxFile: Int64 = 500_000_000
@@ -29,19 +34,19 @@ struct Sender {
         core = RoomCore(config: config, members: [:])
     }
 
-    func text(_ text: String) async throws -> Clip {
-        try await server.publish(core.config, core.text(text: text, to: nil))
-        return Clip(incoming: false, kind: .text, text: text, device: "")
+    func text(_ text: String, to target: Target? = nil) async throws -> Clip {
+        try await server.publish(core.config, core.text(text: text, to: target.map { [$0.id] }))
+        return Clip(incoming: false, kind: .text, text: text, device: target?.name ?? "", toAll: target == nil)
     }
 
-    func image(_ data: Data, type: UTType) async throws -> Clip {
-        try await server.publish(core.config, core.image(data: data, mime: type.preferredMIMEType ?? "image/png"))
+    func image(_ data: Data, type: UTType, to target: Target? = nil) async throws -> Clip {
+        try await server.publish(core.config, core.image(data: data, mime: type.preferredMIMEType ?? "image/png", to: target.map { [$0.id] }))
         let file = Paths.unique("\(UUID().uuidString).\(type.preferredFilenameExtension ?? "png")", in: Paths.images)
         try? data.write(to: file)
-        return Clip(incoming: false, kind: .image, file: file.lastPathComponent, size: Int64(data.count), device: "")
+        return Clip(incoming: false, kind: .image, file: file.lastPathComponent, size: Int64(data.count), device: target?.name ?? "", toAll: target == nil)
     }
 
-    func file(_ url: URL) async throws -> Clip {
+    func file(_ url: URL, to target: Target? = nil) async throws -> Clip {
         let access = url.startAccessingSecurityScopedResource()
         defer { if access { url.stopAccessingSecurityScopedResource() } }
         let name = url.lastPathComponent
@@ -52,7 +57,7 @@ struct Sender {
         let mime = UTType(filenameExtension: url.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
         let core = core
         _ = try await Task.detached { FileCrypto.shared.seal(cipher: core.fileCipher(), from: url.path, to: sealed.path) }.value
-        try await server.publishFile(core.config, message: core.file(name: name, size: size, mime: mime, to: nil).message, file: sealed)
-        return Clip(incoming: false, kind: .file, name: name, size: size, device: "")
+        try await server.publishFile(core.config, message: core.file(name: name, size: size, mime: mime, to: target.map { [$0.id] }).message, file: sealed)
+        return Clip(incoming: false, kind: .file, name: name, size: size, device: target?.name ?? "", toAll: target == nil)
     }
 }

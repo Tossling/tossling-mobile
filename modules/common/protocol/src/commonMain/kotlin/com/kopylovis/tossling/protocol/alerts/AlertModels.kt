@@ -1,7 +1,10 @@
 package com.kopylovis.tossling.protocol.alerts
 
 import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.SyncJson
+import com.kopylovis.tossling.protocol.network.NtfyEvent
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 
 @Serializable
 data class Project(
@@ -78,3 +81,24 @@ data class AddedProject(
 )
 
 class ProjectException(val problem: ProjectProblem, cause: Throwable? = null) : Exception(problem.name, cause)
+
+fun alertOf(event: NtfyEvent): Alert? {
+    if (event.event != "message") return null
+    return Alert(
+        id = event.id,
+        topic = event.topic,
+        title = event.title.orEmpty(),
+        message = event.message.orEmpty(),
+        priority = event.priority ?: Alert.DEFAULT_PRIORITY,
+        click = event.click?.takeIf { it.isNotBlank() },
+        tags = event.tags.orEmpty(),
+        isMarkdown = event.contentType == "text/markdown",
+        time = event.time,
+        icon = event.icon?.takeIf { it.isNotBlank() },
+    )
+}
+
+fun encodeAlerts(alerts: List<Alert>): String = SyncJson.encodeToString(ListSerializer(Alert.serializer()), alerts)
+
+fun decodeAlerts(text: String): List<Alert> =
+    runCatching { SyncJson.decodeFromString(ListSerializer(Alert.serializer()), text) }.getOrDefault(emptyList())

@@ -84,3 +84,10 @@ fun parseEvent(line: String): NtfyEvent? =
 
 fun parseHealth(text: String): TosslingHealth? =
     runCatching { SyncJson.decodeFromString(TosslingHealth.serializer(), text) }.getOrNull()?.takeIf { it.isOurs }
+
+fun parseAccount(text: String): NtfyAccount? = runCatching { SyncJson.decodeFromString(NtfyAccount.serializer(), text) }.getOrNull()
+
+fun parseProject(text: String): TosslingProject? = runCatching { SyncJson.decodeFromString(TosslingProject.serializer(), text) }.getOrNull()
+
+fun encodeProjectRequest(topic: String, name: String): String =
+    SyncJson.encodeToString(TosslingProjectRequest.serializer(), TosslingProjectRequest(topic = topic, name = name))

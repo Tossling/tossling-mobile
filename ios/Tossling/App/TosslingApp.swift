@@ -22,43 +22,46 @@ struct TosslingApp: App {
     }
 }
 
+enum Route: Hashable {
+    case settings, devices, device(String), addComputer, projects, project(String?), alert(String), pairing
+}
+
 struct RootView: View {
 
     @Environment(AppModel.self) private var model
+    @State private var path: [Route] = []
 
     var body: some View {
-        Group {
-            if model.isPaired {
-                HomeView()
-            } else {
-                WelcomeView()
+        NavigationStack(path: $path) {
+            Group {
+                if model.isPaired {
+                    MainView(path: $path)
+                } else {
+                    WelcomeView(path: $path)
+                }
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .settings: SettingsView(path: $path)
+                case .devices: DevicesView(path: $path)
+                case let .device(id): DeviceView(id: id, path: $path)
+                case .addComputer: AddComputerView(path: $path)
+                case .projects: ProjectsView(path: $path)
+                case let .project(topic): ProjectView(topic: topic)
+                case let .alert(id): AlertView(id: id)
+                case .pairing: PairingView(path: $path)
+                }
             }
         }
-        .overlay(alignment: .top) { NoticeView() }
-        .animation(.default, value: model.isPaired)
-    }
-}
-
-struct NoticeView: View {
-
-    @Environment(AppModel.self) private var model
-
-    var body: some View {
-        if let notice = model.notice {
-            Text(notice)
-                .font(.subheadline)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .glassCapsule()
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .task(id: notice) {
-                    try? await Task.sleep(for: .seconds(3))
-                    withAnimation { model.notice = nil }
-                }
-                .onTapGesture { withAnimation { model.notice = nil } }
+        .tint(Palette.accent)
+        .overlay(alignment: .top) {
+            if let message = model.island {
+                IslandView(message: message)
+                    .padding(.top, 8)
+                    .transition(.scale(scale: 0.6, anchor: .top).combined(with: .opacity))
+                    .id(message.id)
+            }
         }
+        .onChange(of: model.isPaired) { _, _ in path = [] }
     }
 }

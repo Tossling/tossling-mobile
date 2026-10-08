@@ -20,6 +20,14 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>onest_regular.ttf</string>
+		<string>onest_medium.ttf</string>
+		<string>onest_semibold.ttf</string>
+		<string>onest_bold.ttf</string>
+		<string>jetbrains_mono_medium.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

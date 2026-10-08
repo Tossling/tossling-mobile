@@ -48,9 +48,42 @@ final class Store {
         set { defaults.set(newValue, forKey: "auto-copy") }
     }
 
+    var paused: Bool {
+        get { defaults.bool(forKey: "paused") }
+        set { defaults.set(newValue, forKey: "paused") }
+    }
+
+    var sendsImages: Bool {
+        get { defaults.object(forKey: "sends-images") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "sends-images") }
+    }
+
+    var quietHours: Bool {
+        get { shared.bool(forKey: "quiet-hours") }
+        set { shared.set(newValue, forKey: "quiet-hours") }
+    }
+
+    var aliases: [String: String] {
+        get { defaults.dictionary(forKey: "aliases") as? [String: String] ?? [:] }
+        set { defaults.set(newValue, forKey: "aliases") }
+    }
+
+    var hasStarted: Bool {
+        get { defaults.bool(forKey: "started") }
+        set { defaults.set(newValue, forKey: "started") }
+    }
+
+    var retiredTokens: [String: Date] {
+        get { (defaults.dictionary(forKey: "retired-tokens") as? [String: Double] ?? [:]).mapValues { Date(timeIntervalSince1970: $0) } }
+        set { defaults.set(newValue.mapValues { $0.timeIntervalSince1970 }, forKey: "retired-tokens") }
+    }
+
+    private var shared: UserDefaults { UserDefaults(suiteName: Paths.groupID) ?? .standard }
+
     func forgetRoom() {
         config = nil
         defaults.removeObject(forKey: "members")
+        defaults.removeObject(forKey: "aliases")
         lastEventId = ""
     }
 

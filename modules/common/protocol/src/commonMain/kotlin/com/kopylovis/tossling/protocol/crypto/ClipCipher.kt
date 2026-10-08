@@ -91,7 +91,7 @@ class ClipCipher(private val key: ByteArray) {
 
         fun fromBase64(key: String): ClipCipher = ClipCipher(Base64.decode(key))
 
-        fun newKey(): String = Base64.encode(Primitives.random(KEY_SIZE))
+        fun randomKey(): String = Base64.encode(Primitives.random(KEY_SIZE))
     }
 }
 

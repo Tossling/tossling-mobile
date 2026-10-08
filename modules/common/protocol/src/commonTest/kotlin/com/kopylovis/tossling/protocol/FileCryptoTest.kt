@@ -16,7 +16,7 @@ class FileCryptoTest {
 
     @Test
     fun sealsAndOpensFilesOnDisk() {
-        val cipher = ClipCipher.fromBase64(ClipCipher.newKey())
+        val cipher = ClipCipher.fromBase64(ClipCipher.randomKey())
         val dir = SystemTemporaryDirectory
         val tag = Random.nextLong().toString(16).removePrefix("-")
         val plain = Path(dir, "plain-$tag")

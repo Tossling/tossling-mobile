@@ -19,7 +19,7 @@ import kotlin.test.assertTrue
 class RoomCoreTest {
 
     private val now = 1_800_000_000_000L
-    private val key = ClipCipher.newKey()
+    private val key = ClipCipher.randomKey()
     private val room = "tossling-0123456789abcdef01234567"
 
     private fun core(id: String, name: String, owner: String = "mac", source: String = "ios") = RoomCore(
@@ -92,7 +92,7 @@ class RoomCoreTest {
         val pixel = core(id = "pixel", name = "Pixel", source = "android")
         mac.open(phone.hello(renewed = true).event(id = "h1"), nowMs = now)
         mac.open(pixel.hello(renewed = true).event(id = "h2"), nowMs = now)
-        val newKey = ClipCipher.newKey()
+        val newKey = ClipCipher.randomKey()
         val messages = mac.revoke(id = "pixel", room = "tossling-new", key = newKey, token = "t2")
         assertEquals(2, messages.size)
         assertIs<Incoming.Skipped>(phone.open(messages[0].event(id = "k"), nowMs = now))
@@ -109,7 +109,7 @@ class RoomCoreTest {
     fun theOwnerIgnoresAKick() {
         val mac = core(id = "mac", name = "Studio", owner = "mac", source = "mac")
         val phone = core(id = "phone", name = "iPhone")
-        val kick = RoomCore(phone.config.copy(owner = "someone")).revoke(id = "mac", room = "r", key = ClipCipher.newKey(), token = null).first()
+        val kick = RoomCore(phone.config.copy(owner = "someone")).revoke(id = "mac", room = "r", key = ClipCipher.randomKey(), token = null).first()
         assertTrue(assertIs<Incoming.Kicked>(mac.open(kick.event(), nowMs = now)).ignored)
     }
 
