@@ -11,7 +11,7 @@ interface PairingFeatureApi {
     @Composable
     fun openWelcomeContent(component: CommonComponent)
 
-    fun getPairingComponent(componentContext: ComponentContext, isReconnect: Boolean, link: String? = null): CommonComponent
+    fun getPairingComponent(componentContext: ComponentContext, isReconnect: Boolean, link: String? = null, isDemo: Boolean = false): CommonComponent
 
     @Composable
     fun openPairingContent(component: CommonComponent)

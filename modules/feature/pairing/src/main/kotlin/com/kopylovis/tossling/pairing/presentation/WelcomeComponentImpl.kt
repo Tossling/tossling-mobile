@@ -3,6 +3,7 @@ package com.kopylovis.tossling.pairing.presentation
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.kopylovis.tossling.core.decompose.base.BaseComponent
+import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.navigation.GlobalNavigator
 import com.kopylovis.tossling.protocol.PairingException
 import com.kopylovis.tossling.protocol.PairingProblem
@@ -32,6 +33,19 @@ internal class WelcomeComponentImpl(
 
     override fun onPairClicked() {
         globalNavigator.pushNew(configuration = GlobalNavigator.Config.Pairing())
+    }
+
+    override fun onDemoClicked() {
+        if (current.value.isOpeningDemo) return
+        current.update { it.copy(isOpeningDemo = true) }
+        launchCoroutine(onError = {
+            current.update { it.copy(isOpeningDemo = false) }
+            messenger.error(tr("The demo does not respond. Try again a bit later.", "Демо не отвечает. Попробуйте чуть позже."))
+        }) {
+            val code = repository.demoRoom()
+            current.update { it.copy(isOpeningDemo = false) }
+            withContext(Dispatchers.Main.immediate) { globalNavigator.pushNew(configuration = GlobalNavigator.Config.Pairing(link = code, isDemo = true)) }
+        }
     }
 
     override fun onRestoreClicked() {

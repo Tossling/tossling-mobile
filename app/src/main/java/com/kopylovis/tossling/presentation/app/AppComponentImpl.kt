@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
@@ -16,6 +17,9 @@ import com.kopylovis.tossling.navigation.delegates.toDelegate
 import com.kopylovis.tossling.presentation.main.MainComponentImpl
 import com.kopylovis.tossling.presentation.main.MainTab
 import com.kopylovis.tossling.sync.data.ClipRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import org.koin.core.component.inject
 
 internal class AppComponentImpl(
@@ -40,6 +44,14 @@ internal class AppComponentImpl(
         lifecycle.doOnCreate {
             globalNavigator.setDelegate(delegate = navigation.toDelegate())
         }
+        launchCoroutine(dispatcher = Dispatchers.Main.immediate) {
+            repository.isPaired.drop(1).filter { paired -> !paired }.collect {
+                val active = _stack.value.active.configuration
+                if (active !is GlobalNavigator.Config.Welcome && active !is GlobalNavigator.Config.Pairing) {
+                    navigation.replaceAll(GlobalNavigator.Config.Welcome)
+                }
+            }
+        }
         lifecycle.doOnDestroy {
             globalNavigator.onDestroy()
         }
@@ -56,7 +68,7 @@ internal class AppComponentImpl(
 
         is GlobalNavigator.Config.Pairing ->
             AppComponent.Child.PairingChild(
-                component = MediatorManager.pairingMediator.getApi().getPairingComponent(componentContext = componentContext, isReconnect = config.isReconnect, link = config.link),
+                component = MediatorManager.pairingMediator.getApi().getPairingComponent(componentContext = componentContext, isReconnect = config.isReconnect, link = config.link, isDemo = config.isDemo),
             )
 
         is GlobalNavigator.Config.Main ->

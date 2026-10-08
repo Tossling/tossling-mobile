@@ -12,7 +12,7 @@ class GlobalNavigator : Navigator<GlobalNavigator.Config>() {
         data object Welcome : Config
 
         @Serializable
-        data class Pairing(val isReconnect: Boolean = false, val link: String? = null) : Config
+        data class Pairing(val isReconnect: Boolean = false, val link: String? = null, val isDemo: Boolean = false) : Config
 
         @Serializable
         data object Main : Config

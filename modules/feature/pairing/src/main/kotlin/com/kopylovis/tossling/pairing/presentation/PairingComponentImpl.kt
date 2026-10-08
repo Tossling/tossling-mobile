@@ -22,6 +22,7 @@ internal class PairingComponentImpl(
     private val repository: ClipRepository,
     @Suppress("unused") private val isReconnect: Boolean,
     link: String?,
+    isDemo: Boolean,
 ) : BaseComponent(componentContext), PairingComponent {
 
     private val globalNavigator: GlobalNavigator by inject()
@@ -33,7 +34,9 @@ internal class PairingComponentImpl(
     private var job: Job? = null
 
     init {
-        if (link != null) {
+        if (link != null && isDemo) {
+            onScanned(raw = link)
+        } else if (link != null) {
             val switch = repository.roomSwitch(raw = link)
             _state.value = PairingScreenState(
                 stage = if (switch != null) {
@@ -96,7 +99,7 @@ internal class PairingComponentImpl(
     }
 
     override fun onDoneClicked() {
-        globalNavigator.replaceAll(GlobalNavigator.Config.Main)
+        globalNavigator.replaceAll(if (repository.isPaired.value) GlobalNavigator.Config.Main else GlobalNavigator.Config.Welcome)
     }
 
     override fun onBackClicked() {

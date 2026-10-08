@@ -239,6 +239,16 @@ class NtfyClient {
         poll(endpoint = endpoint, topic = topic, since = "1s")
     }
 
+    suspend fun fetchText(url: String): String = withContext(Dispatchers.IO) {
+        val connection = open(endpoint = Endpoint(server = "", token = ""), url = url)
+        connection.ensureOk()
+        try {
+            connection.inputStream.bufferedReader().use { it.readText() }
+        } finally {
+            connection.disconnect()
+        }
+    }
+
     private fun openApi(endpoint: Endpoint, path: String, prepare: HttpURLConnection.() -> Unit = {}): HttpURLConnection {
         API_PREFIXES.forEachIndexed { index, prefix ->
             val connection = open(endpoint = endpoint, url = "${endpoint.server}$prefix/$path").apply(prepare)

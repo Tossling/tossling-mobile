@@ -4,6 +4,9 @@
     <string name="welcome_lead">One clipboard with your computer: copy there, paste here.</string>
     <string name="welcome_note">Through your own server, encrypted on the devices.</string>
     <string name="welcome_pair">Pair with a computer</string>
+    <string name="welcome_demo">Try without a computer</string>
+    <string name="welcome_demo_opening">Opening the demo…</string>
+    <string name="welcome_demo_note">A demo computer answers for an hour, then the phone comes back here</string>
     <string name="pairing_title">Pairing</string>
     <string name="pairing_subtitle">About a minute, only once</string>
     <string name="pairing_back">Back</string>

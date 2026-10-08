@@ -8,6 +8,7 @@ import com.kopylovis.tossling.sync.data.SavedRooms
 internal data class WelcomeState(
     val saved: SavedRooms? = null,
     val isRestoring: Boolean = false,
+    val isOpeningDemo: Boolean = false,
     val problem: PairingProblem? = null,
 )
 
@@ -18,4 +19,6 @@ internal interface WelcomeComponent : CommonComponent {
     fun onPairClicked()
 
     fun onRestoreClicked()
+
+    fun onDemoClicked()
 }

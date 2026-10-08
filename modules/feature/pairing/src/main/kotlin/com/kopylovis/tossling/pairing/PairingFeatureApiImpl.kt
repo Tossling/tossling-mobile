@@ -23,8 +23,8 @@ internal class PairingFeatureApiImpl(
         WelcomeContent(component = component as WelcomeComponent)
     }
 
-    override fun getPairingComponent(componentContext: ComponentContext, isReconnect: Boolean, link: String?): CommonComponent =
-        PairingComponentImpl(componentContext = componentContext, repository = repository, isReconnect = isReconnect, link = link)
+    override fun getPairingComponent(componentContext: ComponentContext, isReconnect: Boolean, link: String?, isDemo: Boolean): CommonComponent =
+        PairingComponentImpl(componentContext = componentContext, repository = repository, isReconnect = isReconnect, link = link, isDemo = isDemo)
 
     @Composable
     override fun openPairingContent(component: CommonComponent) {

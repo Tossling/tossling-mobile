@@ -330,6 +330,16 @@
     "99+": {
       "shouldTranslate": false
     },
+    "A demo computer answers for an hour, then the phone comes back here": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Час с вами переписывается демо-компьютер, потом телефон вернется сюда"
+          }
+        }
+      }
+    },
     "A device that is offline gets the clipboard when it is back. Another phone joins by scanning the QR code of a computer in the room: Devices, then Connect a Phone in the Tossling menu, or tossling pair on a Mac.": {
       "localizations": {
         "ru": {
@@ -1320,6 +1330,16 @@
         }
       }
     },
+    "Opening the demo…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открываю демо…"
+          }
+        }
+      }
+    },
     "Pair with a computer": {
       "localizations": {
         "ru": {
@@ -2062,6 +2082,16 @@
         }
       }
     },
+    "The demo does not respond. Try again a bit later.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Демо не отвечает. Попробуйте чуть позже."
+          }
+        }
+      }
+    },
     "The device loses access to the room: the others move to a new key. Everyone else keeps working.": {
       "localizations": {
         "ru": {
@@ -2451,6 +2481,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tossling перестанет слушать канал %@, его уведомления исчезнут из ленты."
+          }
+        }
+      }
+    },
+    "Try without a computer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Попробовать без компьютера"
           }
         }
       }

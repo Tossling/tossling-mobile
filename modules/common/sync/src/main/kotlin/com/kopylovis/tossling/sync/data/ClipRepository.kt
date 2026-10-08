@@ -27,6 +27,8 @@ import com.kopylovis.tossling.protocol.crypto.RoomKeys
 import com.kopylovis.tossling.protocol.crypto.RoomSecret
 import com.kopylovis.tossling.protocol.crypto.openStream
 import com.kopylovis.tossling.protocol.crypto.sealStream
+import com.kopylovis.tossling.protocol.DEMO_ROOM_URL
+import com.kopylovis.tossling.protocol.demoRoomCode
 import com.kopylovis.tossling.protocol.network.NtfyClient
 import com.kopylovis.tossling.protocol.network.NtfyEvent
 import com.kopylovis.tossling.protocol.network.NtfyException
@@ -126,13 +128,23 @@ class ClipRepository internal constructor(
     init {
         scope.launch {
             combine(store.pairings, settings.deviceName) { pairings, name ->
-                val rooms = pairings.filter { it.isRoom }.map { it.copy(members = emptyList(), since = 0) }
+                val rooms = pairings.filter { it.isRoom && it.host != Endpoint(server = DEMO_ROOM_URL).host }.map { it.copy(members = emptyList(), since = 0) }
                 if (rooms.isEmpty()) null else SavedRooms(deviceId = settings.deviceId, identity = Base64.getEncoder().encodeToString(settings.identity.privateKey), name = name, rooms = rooms)
             }.filterNotNull().distinctUntilChanged().collect { backup.save(saved = it) }
         }
     }
 
     internal fun moveServer(from: String, to: String) = store.moveServer(from = from, to = to)
+
+    suspend fun demoRoom(): String {
+        val host = Endpoint(server = DEMO_ROOM_URL).host
+        val answer = try {
+            client.fetchText(url = DEMO_ROOM_URL)
+        } catch (error: Exception) {
+            throw PairingException(problem = PairingProblem.NETWORK, server = host, cause = error)
+        }
+        return demoRoomCode(answer = answer) ?: throw PairingException(problem = PairingProblem.NETWORK, server = host)
+    }
 
     suspend fun savedRooms(): SavedRooms? = if (store.pairings.value.isNotEmpty()) null else backup.load()
 
@@ -203,6 +215,7 @@ class ClipRepository internal constructor(
     suspend fun unpair(id: String) {
         val pairing = store.pairings.value.firstOrNull { it.id == id } ?: return
         push.unsubscribe(topic = pairing.inTopic)
+        if (store.pairings.value.size == 1) backup.clear()
         store.removePairing(id = id)
         links.update { it - id }
         if (store.pairings.value.isEmpty()) {

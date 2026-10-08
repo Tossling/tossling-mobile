@@ -1,5 +1,7 @@
 package com.kopylovis.tossling.protocol
 
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.io.encoding.Base64
 
 const val JOIN_LINK_PREFIX = "tossling://join"
@@ -17,3 +19,9 @@ fun joinLink(code: String): String =
 
 fun pairingName(raw: String): String =
     runCatching { SyncJson.decodeFromString(Pairing.serializer(), raw.trim()).macName }.getOrDefault("")
+
+const val DEMO_ROOM_URL = "https://tossling-demo.monoroh.com/demo/room"
+
+fun demoRoomCode(answer: String): String? =
+    runCatching { SyncJson.parseToJsonElement(answer).jsonObject["code"]?.jsonPrimitive?.content }.getOrNull()
+        ?.takeIf { pairingHost(raw = it).isNotEmpty() }

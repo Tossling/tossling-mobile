@@ -24,7 +24,7 @@ struct TosslingApp: App {
 }
 
 enum Route: Hashable {
-    case settings, devices, device(String), addComputer, projects, project(String?), alert(String), pairing, join(String)
+    case settings, devices, device(String), addComputer, projects, project(String?), alert(String), pairing, join(String), demo(String)
 }
 
 struct RootView: View {
@@ -52,6 +52,7 @@ struct RootView: View {
                 case let .alert(id): AlertView(id: id)
                 case .pairing: PairingView(path: $path)
                 case let .join(raw): PairingView(path: $path, link: raw)
+                case let .demo(raw): PairingView(path: $path, link: raw, isDemo: true)
                 }
             }
         }

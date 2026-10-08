@@ -70,6 +70,24 @@ internal fun WelcomeContent(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 300f.dp),
             )
+            if (saved == null) {
+                CapsuleButton(
+                    text = stringResource(if (state.isOpeningDemo) R.string.welcome_demo_opening else R.string.welcome_demo),
+                    onClick = component::onDemoClicked,
+                    style = CapsuleStyle.PLAIN,
+                    enabled = !state.isOpeningDemo,
+                    modifier = Modifier.padding(top = 18f.dp),
+                )
+                Text(
+                    text = stringResource(R.string.welcome_demo_note),
+                    style = Tossling.type.footnote,
+                    color = Tossling.palette.ink2,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(top = 6f.dp)
+                        .widthIn(max = 300f.dp),
+                )
+            }
             if (saved != null) {
                 Spacer(modifier = Modifier.height(28f.dp))
                 SavedRoomCard(saved = saved, problem = state.problem)

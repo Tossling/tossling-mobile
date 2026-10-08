@@ -8,6 +8,7 @@ struct WelcomeView: View {
     @Binding var path: [Route]
     @State private var restoring = false
     @State private var problem: String?
+    @State private var openingDemo = false
 
     var body: some View {
         ScrollView {
@@ -22,6 +23,14 @@ struct WelcomeView: View {
                     .font(Fonts.lead).foregroundStyle(Palette.ink).multilineTextAlignment(.center).frame(maxWidth: 320).padding(.top, 14)
                 Text("Through your own server, encrypted on the devices.")
                     .font(Fonts.body).foregroundStyle(Palette.ink2).multilineTextAlignment(.center).frame(maxWidth: 300).padding(.top, 14)
+                if model.savedRoom == nil {
+                    CapsuleButton(title: openingDemo ? String(localized: "Opening the demo…") : String(localized: "Try without a computer"), style: .plain) { Task { await openDemo() } }
+                        .disabled(openingDemo)
+                        .frame(maxWidth: 360)
+                        .padding(.top, 18)
+                    Text("A demo computer answers for an hour, then the phone comes back here")
+                        .font(Fonts.footnote).foregroundStyle(Palette.ink2).multilineTextAlignment(.center).frame(maxWidth: 300).padding(.top, 6)
+                }
                 if let saved = model.savedRoom {
                     VStack(spacing: 6) {
                         Text("This phone was in a room").font(Fonts.footnote).foregroundStyle(Palette.ink2)
@@ -61,6 +70,18 @@ struct WelcomeView: View {
         .toolbar(.hidden, for: .navigationBar)
     }
 
+    private func openDemo() async {
+        openingDemo = true
+        defer { openingDemo = false }
+        guard let url = URL(string: JoinLinkKt.DEMO_ROOM_URL),
+              let (data, _) = try? await URLSession.shared.data(from: url),
+              let code = JoinLinkKt.demoRoomCode(answer: String(decoding: data, as: UTF8.self)) else {
+            model.say(String(localized: "The demo does not respond. Try again a bit later."), .error)
+            return
+        }
+        path.append(.demo(code))
+    }
+
     private func restore() async {
         restoring = true
         defer { restoring = false }
@@ -82,6 +103,7 @@ struct PairingView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var path: [Route]
     var link: String? = nil
+    var isDemo = false
     @State private var stage = Stage.idle
     @State private var scanning = false
     @State private var switching: PairedRoom?
@@ -197,7 +219,9 @@ struct PairingView: View {
         linkHandled = true
         do {
             let target = try model.pairingTarget(raw: link)
-            if model.isPaired || !model.devices.isEmpty {
+            if isDemo, !model.isPaired {
+                connect(target)
+            } else if model.isPaired || !model.devices.isEmpty {
                 switching = target
             } else {
                 joining = target

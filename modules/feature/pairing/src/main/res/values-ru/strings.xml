@@ -3,6 +3,9 @@
     <string name="app_title">Tossling</string>
     <string name="welcome_lead">Общий буфер обмена с компьютером: скопировал там — вставил здесь.</string>
     <string name="welcome_note">Через ваш сервер, с шифрованием на устройствах.</string>
+    <string name="welcome_demo">Попробовать без компьютера</string>
+    <string name="welcome_demo_opening">Открываю демо…</string>
+    <string name="welcome_demo_note">Час с вами переписывается демо-компьютер, потом телефон вернется сюда</string>
     <string name="welcome_pair">Подключить компьютер</string>
     <string name="pairing_title">Подключение</string>
     <string name="pairing_subtitle">Около минуты, один раз</string>

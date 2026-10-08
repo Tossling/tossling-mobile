@@ -27,4 +27,12 @@ class JoinLinkTest {
         assertNull(joinLinkCode(link = "tossling://join?code=bm90IGpzb24"))
         assertNull(joinLinkCode(link = "tossling://join"))
     }
+
+    @Test
+    fun demoAnswer() {
+        val answer = """{"code":${kotlinx.serialization.json.JsonPrimitive(code)},"link":"tossling://join?code=x","expires":1}"""
+        assertEquals(code, demoRoomCode(answer = answer))
+        assertNull(demoRoomCode(answer = """{"error":"Too many demo rooms"}"""))
+        assertNull(demoRoomCode(answer = "<html>"))
+    }
 }
