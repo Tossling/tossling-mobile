@@ -18,7 +18,6 @@ import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.PredictiveBackParams
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.experimental.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.materialPredictiveBackAnimatable
 import com.kopylovis.tossling.core.presentation.glass.Island
 import com.kopylovis.tossling.core.presentation.messages.AppMessage
 import com.kopylovis.tossling.core.presentation.messages.AppMessageKind
@@ -71,7 +70,6 @@ internal fun AppContent(
                     PredictiveBackParams(
                         backHandler = component.backHandler,
                         onBack = component::onBackClicked,
-                        animatable = { event -> materialPredictiveBackAnimatable(initialBackEvent = event) },
                     )
                 },
             ),
