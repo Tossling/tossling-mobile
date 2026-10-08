@@ -65,6 +65,25 @@ Optional local files, all ignored by git:
 | `tossling.jks` + `keystore_password`, `keystore_alias` in `local.properties` | Signing release builds. Without it the release APK is unsigned. |
 | `firebase_app_id`, `firebase_project`, `firebase_groups` in `local.properties` | Firebase App Distribution, see below. The same values can come from `FIREBASE_APP_ID`, `FIREBASE_PROJECT`, `FIREBASE_GROUPS`. |
 
+## iOS (in progress)
+
+`ios/` is the iPhone and iPad app, native SwiftUI on iOS 17 and newer. On iOS 26 it uses Liquid Glass, on older
+versions the same screens fall back to system materials. Encryption, rooms and messages come from
+`modules/common/protocol`, built as the static framework `TosslingKit`. The app itself only talks to the server
+through `URLSession` and keeps the room in the Keychain.
+
+It pairs with a computer by its QR code, receives text, images and files while it is open (files go to Files, On My
+iPhone, Tossling) and sends the clipboard, photos and files. Push notifications, a share extension and a Shortcuts
+action come next.
+
+```bash
+brew install xcodegen
+cd ios && xcodegen generate && open Tossling.xcodeproj
+```
+
+The Xcode project is generated from `ios/project.yml`. Its build phase runs Gradle to build `TosslingKit`, so
+JDK 21 must be installed.
+
 ## Distribution to testers
 
 ```bash
@@ -88,7 +107,8 @@ with its SHA-256 as the GitHub release `v<version>`. The key never leaves the ma
 ## Continuous integration
 
 `.github/workflows/android.yml` runs the unit tests and builds debug and unsigned release APKs on every push
-and pull request, and the APKs are attached to the run. A second job runs the protocol tests on the iOS simulator.
+and pull request, and the APKs are attached to the run. A second job runs the protocol tests on the iOS simulator and builds
+the iOS app.
 It needs no secrets.
 
 ## Protocol compatibility

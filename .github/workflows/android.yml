@@ -34,7 +34,7 @@ jobs:
             app/build/outputs/apk/release/app-release-unsigned.apk
           if-no-files-found: error
 
-  protocol-ios:
+  ios:
     runs-on: macos-latest
     timeout-minutes: 40
     steps:
@@ -46,3 +46,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Shared protocol tests on the iOS simulator
         run: ./gradlew :modules:common:protocol:iosSimulatorArm64Test --console=plain
+      - name: Build the iOS app for the simulator
+        working-directory: ios
+        run: |
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          xcodebuild -project Tossling.xcodeproj -scheme Tossling -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build | tail -20

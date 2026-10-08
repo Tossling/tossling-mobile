@@ -1,0 +1,519 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "%@ changed the room key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ сменил ключ комнаты"
+          }
+        }
+      }
+    },
+    "%@ disconnected this phone from the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ отключил этот телефон от комнаты"
+          }
+        }
+      }
+    },
+    "%@ from %@ is in Files, On My iPhone, Tossling": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ от %2$@ лежит в Файлах, в папке На iPhone, Tossling"
+          }
+        }
+      }
+    },
+    "%@ is connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключен %@"
+          }
+        }
+      }
+    },
+    "%@ is larger than 500 MB": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ больше 500 МБ"
+          }
+        }
+      }
+    },
+    "Connected to %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключено к %@"
+          }
+        }
+      }
+    },
+    "Connecting to %@…": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключаюсь к %@…"
+          }
+        }
+      }
+    },
+    "Copied": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопировано"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скопировать"
+          }
+        }
+      }
+    },
+    "Could not reach the server: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер не отвечает: %@"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить"
+          }
+        }
+      }
+    },
+    "Devices": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устройства"
+          }
+        }
+      }
+    },
+    "Did not receive %@ from %@: the server has already deleted it": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не получил %1$@ от %2$@, сервер его уже удалил"
+          }
+        }
+      }
+    },
+    "Did not send: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не отправил: %@"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Готово"
+          }
+        }
+      }
+    },
+    "From %@, %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "От %1$@, %2$@"
+          }
+        }
+      }
+    },
+    "From %@: ready to paste": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "От %@, можно вставлять"
+          }
+        }
+      }
+    },
+    "Image, %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Картинка, %@"
+          }
+        }
+      }
+    },
+    "In the room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В комнате"
+          }
+        }
+      }
+    },
+    "Leave": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти"
+          }
+        }
+      }
+    },
+    "Leave the Room": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти из комнаты"
+          }
+        }
+      }
+    },
+    "Leave the room?": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выйти из комнаты?"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Имя"
+          }
+        }
+      }
+    },
+    "Name of this phone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Имя этого телефона"
+          }
+        }
+      }
+    },
+    "No other devices yet. Copy something on a computer and it shows up here.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Других устройств пока нет. Скопируйте что-нибудь на компьютере, и он появится здесь."
+          }
+        }
+      }
+    },
+    "Not connected": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет подключения"
+          }
+        }
+      }
+    },
+    "Nothing yet": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока пусто"
+          }
+        }
+      }
+    },
+    "On a computer with Tossling open Devices, then Connect a Phone, and scan the code it shows. On a Mac you can also run tossling pair.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На компьютере с Tossling откройте Устройства, затем Подключить телефон, и отсканируйте код. На Маке можно еще запустить tossling pair."
+          }
+        }
+      }
+    },
+    "One clipboard for your computers and this phone, through your own server.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Общий буфер обмена для ваших компьютеров и этого телефона через ваш сервер."
+          }
+        }
+      }
+    },
+    "Online": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В сети"
+          }
+        }
+      }
+    },
+    "Put received items into the clipboard": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Класть полученное в буфер обмена"
+          }
+        }
+      }
+    },
+    "Scan the QR Code": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отсканировать QR-код"
+          }
+        }
+      }
+    },
+    "Seen %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Был в сети %@"
+          }
+        }
+      }
+    },
+    "Send a File": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправить файл"
+          }
+        }
+      }
+    },
+    "Send a Photo": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправить фото"
+          }
+        }
+      }
+    },
+    "Sent %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправил %@"
+          }
+        }
+      }
+    },
+    "Sent the image": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправил картинку"
+          }
+        }
+      }
+    },
+    "Sent the text": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправил текст"
+          }
+        }
+      }
+    },
+    "Sent, %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправлено %@"
+          }
+        }
+      }
+    },
+    "Server": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Share": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поделиться"
+          }
+        }
+      }
+    },
+    "The camera is not available here: copy the code text on the computer and paste it.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Камеры здесь нет. Скопируйте текст кода на компьютере и вставьте его."
+          }
+        }
+      }
+    },
+    "The other devices of the room see this name.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это имя видят остальные устройства комнаты."
+          }
+        }
+      }
+    },
+    "The server did not accept the token. Show a new code on the computer.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер не принял токен. Покажите на компьютере новый код."
+          }
+        }
+      }
+    },
+    "The server has already deleted what %@ sent": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер уже удалил то, что прислал %@"
+          }
+        }
+      }
+    },
+    "This is not a Tossling code. Open Devices, then Connect a Phone on a computer.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это не код Tossling. На компьютере откройте Устройства, затем Подключить телефон."
+          }
+        }
+      }
+    },
+    "This phone": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот телефон"
+          }
+        }
+      }
+    },
+    "To join again, scan the code on a computer.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы вернуться, отсканируйте код на компьютере."
+          }
+        }
+      }
+    },
+    "Tossling": {
+      "shouldTranslate": false
+    },
+    "What you copy on a computer appears here and in the clipboard.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "То, что вы копируете на компьютере, появится здесь и в буфере обмена."
+          }
+        }
+      }
+    },
+    "While Tossling is open, text and images from a computer go straight into the clipboard.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пока Tossling открыт, текст и картинки с компьютера сразу попадают в буфер обмена."
+          }
+        }
+      }
+    }
+  }
+}

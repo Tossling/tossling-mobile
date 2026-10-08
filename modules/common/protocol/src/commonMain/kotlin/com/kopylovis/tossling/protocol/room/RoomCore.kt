@@ -230,6 +230,12 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
         private val CONTENT_KINDS = setOf(ClipMeta.TEXT, ClipMeta.IMAGE, ClipMeta.FILE)
         private val MEMBERS = MapSerializer(String.serializer(), Member.serializer())
 
+        fun encodeConfig(config: RoomConfig): String = SyncJson.encodeToString(RoomConfig.serializer(), config)
+
+        fun decodeConfig(text: String): RoomConfig? = runCatching { SyncJson.decodeFromString(RoomConfig.serializer(), text) }.getOrNull()
+
+        fun encodeMembers(members: Map<String, Member>): String = SyncJson.encodeToString(MEMBERS, members)
+
         fun decodeMembers(text: String): Map<String, Member> = runCatching { SyncJson.decodeFromString(MEMBERS, text) }.getOrDefault(emptyMap())
 
         fun createRoom(prefix: String): String = prefix + Primitives.random(ROOM_BYTES).hex()
