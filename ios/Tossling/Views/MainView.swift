@@ -23,9 +23,7 @@ struct MainView: View {
                 }
             }
             .frame(width: width, height: geometry.size.height)
-            .clipped()
         }
-        .ignoresSafeArea(edges: .bottom)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             TabBar(tab: $tab, unread: model.unread) { send() }
         }
