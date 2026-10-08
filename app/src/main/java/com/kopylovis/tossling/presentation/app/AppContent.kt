@@ -70,6 +70,7 @@ internal fun AppContent(
                     PredictiveBackParams(
                         backHandler = component.backHandler,
                         onBack = component::onBackClicked,
+                        animatable = ::PageBackAnimatable,
                     )
                 },
             ),

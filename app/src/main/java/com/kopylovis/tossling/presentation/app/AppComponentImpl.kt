@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnCreate
@@ -13,6 +14,7 @@ import com.kopylovis.tossling.mediators.MediatorManager
 import com.kopylovis.tossling.navigation.GlobalNavigator
 import com.kopylovis.tossling.navigation.delegates.toDelegate
 import com.kopylovis.tossling.presentation.main.MainComponentImpl
+import com.kopylovis.tossling.presentation.main.MainTab
 import com.kopylovis.tossling.sync.data.ClipRepository
 import org.koin.core.component.inject
 
@@ -102,6 +104,9 @@ internal class AppComponentImpl(
 
     override fun onAlertOpened(id: String) {
         if (!repository.isPaired.value) return
-        globalNavigator.pushNew(configuration = GlobalNavigator.Config.Alert(id = id))
+        navigation.navigate { listOf(GlobalNavigator.Config.Main, GlobalNavigator.Config.Alert(id = id)) }
+        _stack.value.items
+            .firstNotNullOfOrNull { (it.instance as? AppComponent.Child.MainChild)?.component }
+            ?.onTabClicked(tab = MainTab.NOTIFICATIONS)
     }
 }
