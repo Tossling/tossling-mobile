@@ -99,6 +99,8 @@ enum FeedStore {
         write(inbox, "alerts-inbox.json")
     }
 
+    static func inboxCount() -> Int { (read("alerts-inbox.json") as [ProjectAlert]?)?.count ?? 0 }
+
     static func takeInbox() -> [ProjectAlert] {
         let inbox: [ProjectAlert] = read("alerts-inbox.json") ?? []
         if let url = dir?.appendingPathComponent("alerts-inbox.json") { try? FileManager.default.removeItem(at: url) }

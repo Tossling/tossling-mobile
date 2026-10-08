@@ -63,5 +63,15 @@ struct RootView: View {
             }
         }
         .onChange(of: model.isPaired) { _, _ in path = [] }
+        .onAppear { openPendingAlert() }
+        .onReceive(NotificationCenter.default.publisher(for: .openAlert)) { _ in openPendingAlert() }
+    }
+
+    private func openPendingAlert() {
+        guard let id = Push.shared.openedAlert, model.isPaired else { return }
+        Push.shared.openedAlert = nil
+        guard model.openAlert(id) else { return }
+        UserDefaults.standard.set(Tab.notifications.rawValue, forKey: "tab")
+        path = [.alert(id)]
     }
 }

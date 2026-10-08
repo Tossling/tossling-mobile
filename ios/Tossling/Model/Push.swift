@@ -24,6 +24,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         print("push: APNs registration failed: \(error.localizedDescription)")
     }
 
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        guard let id = response.notification.request.content.userInfo["alert"] as? String else { return }
+        await MainActor.run {
+            Push.shared.openedAlert = id
+            NotificationCenter.default.post(name: .openAlert, object: id)
+        }
+    }
+
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         UIApplication.shared.applicationState == .active ? [] : [.banner, .list, .sound]
     }
@@ -37,6 +45,7 @@ final class Push {
     private var available = false
     private var hasToken = false
     private var wanted: Set<String> = []
+    var openedAlert: String?
 
     func start() {
         guard Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else { return }
@@ -95,4 +104,8 @@ final class Push {
             followed.remove(topic)
         }
     }
+}
+
+extension Notification.Name {
+    static let openAlert = Notification.Name("com.kopylovis.tossling.open-alert")
 }

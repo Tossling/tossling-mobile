@@ -3,6 +3,7 @@ import Observation
 import SwiftUI
 import TosslingKit
 import UniformTypeIdentifiers
+import UserNotifications
 
 struct DeviceItem: Identifiable, Hashable {
     let id: String
@@ -123,6 +124,7 @@ final class AppModel {
     }
 
     func becameActive() {
+        UNUserNotificationCenter.current().setBadgeCount(unread)
         let sent = Outbox.take()
         if !sent.isEmpty {
             clips = (sent + clips).sorted { $0.date > $1.date }
@@ -584,6 +586,13 @@ final class AppModel {
         if !fresh.isEmpty { setAlerts(fresh + alerts) }
     }
 
+    func openAlert(_ id: String) -> Bool {
+        mergeInbox()
+        guard let alert = alerts.first(where: { $0.id == id }) else { return false }
+        markRead(alert)
+        return true
+    }
+
     private func mergeInbox() {
         let inbox = FeedStore.takeInbox().filter { alert in !alerts.contains { $0.id == alert.id } }
         if !inbox.isEmpty { setAlerts(inbox + alerts) }
@@ -609,6 +618,7 @@ final class AppModel {
     private func setAlerts(_ value: [ProjectAlert]) {
         alerts = Array(value.sorted { $0.time > $1.time }.prefix(FeedStore.limit))
         FeedStore.save(alerts: alerts)
+        UNUserNotificationCenter.current().setBadgeCount(unread)
     }
 
     private func add(_ clip: Clip) {

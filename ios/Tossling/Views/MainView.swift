@@ -12,12 +12,20 @@ struct MainView: View {
     @State private var picking: Payload?
 
     var body: some View {
-        ZStack {
-            switch tab {
-            case .clipboard: ClipboardPage(path: $path)
-            case .notifications: FeedPage(path: $path)
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            ZStack {
+                switch tab {
+                case .clipboard:
+                    ClipboardPage(path: $path).transition(slide(width: width, edge: .leading))
+                case .notifications:
+                    FeedPage(path: $path).transition(slide(width: width, edge: .trailing))
+                }
             }
+            .frame(width: width, height: geometry.size.height)
+            .clipped()
         }
+        .ignoresSafeArea(edges: .bottom)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             TabBar(tab: $tab, unread: model.unread) { send() }
         }
@@ -29,6 +37,14 @@ struct MainView: View {
                 }
             }
         }
+    }
+
+    private func slide(width: CGFloat, edge: Edge) -> AnyTransition {
+        let away: CGFloat = edge == .leading ? -0.3 : 0.3
+        return .asymmetric(
+            insertion: .move(edge: edge),
+            removal: .offset(x: away * width).combined(with: .opacity.animation(.easeOut(duration: 0.2)))
+        )
     }
 
     private func send() {

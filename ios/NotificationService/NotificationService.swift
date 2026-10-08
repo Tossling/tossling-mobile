@@ -91,6 +91,8 @@ final class NotificationService: UNNotificationServiceExtension {
         )
         FeedStore.addToInbox(alert)
         let content = UNMutableNotificationContent()
+        let inbox = FeedStore.inboxCount()
+        content.badge = NSNumber(value: FeedStore.alerts().filter { !$0.isRead }.count + inbox)
         let title = alert.title(for: project.name)
         content.title = title.isEmpty ? project.name : title
         if !title.isEmpty { content.subtitle = project.name }
