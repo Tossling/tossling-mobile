@@ -1,13 +1,14 @@
 package com.kopylovis.tossling.protocol
 
-import java.net.URI
+private val SERVER_URL = Regex("^([A-Za-z][A-Za-z0-9+.-]*)://([A-Za-z0-9.-]+|\\[[0-9A-Fa-f:.]+])(?::([0-9]{1,5}))?(?:[/?#].*)?$")
 
 fun normalizedServer(raw: String): String? {
-    val uri = runCatching { URI(raw.trim()) }.getOrNull() ?: return null
-    val scheme = uri.scheme?.lowercase() ?: return null
-    val host = uri.host?.lowercase()?.takeIf { it.isNotEmpty() } ?: return null
+    val match = SERVER_URL.matchEntire(raw.trim()) ?: return null
+    val scheme = match.groupValues[1].lowercase()
+    val host = match.groupValues[2].lowercase()
     if (scheme != "https" && scheme != "http") return null
-    val port = uri.port.takeUnless { it == -1 || (scheme == "https" && it == 443) || (scheme == "http" && it == 80) }
+    val port = match.groupValues[3].takeIf { it.isNotEmpty() }?.toIntOrNull()
+        ?.takeUnless { (scheme == "https" && it == 443) || (scheme == "http" && it == 80) }
     return "$scheme://$host" + (port?.let { ":$it" } ?: "")
 }
 

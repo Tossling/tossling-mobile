@@ -88,16 +88,22 @@ with its SHA-256 as the GitHub release `v<version>`. The key never leaves the ma
 ## Continuous integration
 
 `.github/workflows/android.yml` runs the unit tests and builds debug and unsigned release APKs on every push
-and pull request; the APKs are attached to the run. It needs no secrets.
+and pull request, and the APKs are attached to the run. A second job runs the protocol tests on the iOS simulator.
+It needs no secrets.
 
 ## Protocol compatibility
 
 What the apps send to each other is described in
 [PROTOCOL.md](https://github.com/tossling/tossling-server/blob/main/docs/PROTOCOL.md) in the server repository.
-`modules/common/protocol` implements it: messages, encryption, rooms, invites and the server API, in plain Kotlin
-for the JVM with no Android code, so the desktop apps for Windows and Linux use the same module. Its test vectors
-in `modules/common/protocol/src/test/resources/vectors.json` are a copy of the server's `docs/vectors.json`, the same
-file the Mac app tests against.
+`modules/common/protocol` implements it. It is a Kotlin Multiplatform module with no Android code. Messages,
+encryption, rooms and invites live in common code and build for the JVM and for iOS. The Android app, the desktop
+apps for Windows and Linux and the iOS app in progress use it. Encryption goes through
+[cryptography-kotlin](https://github.com/whyoleg/cryptography-kotlin), which uses CryptoKit on iOS, and through
+`javax.crypto` on the JVM. The server API client is JVM-only for now.
+
+The test vectors in `modules/common/protocol/src/jvmTest/resources/vectors.json` are a copy of the server's
+`docs/vectors.json`, the same file the Mac app tests against. The common tests run on the JVM and on the iOS
+simulator (`./gradlew :modules:common:protocol:allTests` on a Mac), and CI runs both.
 
 ## Reporting a vulnerability
 
