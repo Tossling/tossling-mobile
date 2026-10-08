@@ -76,7 +76,8 @@ It pairs with a computer by its QR code, receives text, images and files (files 
 Tossling) and sends the clipboard, photos and files. When the app is closed, a push wakes the notification extension,
 which fetches the message from the server, decrypts it and shows the text or the picture. Pushes need
 `ios/Tossling/GoogleService-Info.plist` from the same Firebase project as the Android app, with an APNs key uploaded
-there; without the file the app works only while it is open. A share extension and a Shortcuts action come next.
+there; without the file the app works only while it is open. Tossling in the share sheet sends text, links, photos
+and files from any app. A Shortcuts action comes next.
 
 ```bash
 brew install xcodegen

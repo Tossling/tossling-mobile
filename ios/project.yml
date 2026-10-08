@@ -27,6 +27,7 @@ targets:
       - path: Tossling
     dependencies:
       - target: NotificationService
+      - target: ShareExtension
       - package: Firebase
         product: FirebaseMessaging
     info:
@@ -40,6 +41,8 @@ targets:
       path: Tossling/Tossling.entitlements
       properties:
         aps-environment: development
+        com.apple.security.application-groups:
+          - group.com.kopylovis.tossling
         keychain-access-groups:
           - $(AppIdentifierPrefix)com.kopylovis.tossling.shared
     settings:
@@ -91,6 +94,53 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kopylovis.tossling.notifications
+        TARGETED_DEVICE_FAMILY: "1,2"
+        FRAMEWORK_SEARCH_PATHS: $(SRCROOT)/../modules/common/protocol/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+        OTHER_LDFLAGS: -framework TosslingKit
+        APPLICATION_EXTENSION_API_ONLY: YES
+    preBuildScripts:
+      - name: Build TosslingKit
+        basedOnDependencyAnalysis: false
+        script: |
+          cd "$SRCROOT/.."
+          export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+          ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
+  ShareExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ShareExtension
+      - path: Tossling/Model/Keychain.swift
+      - path: Tossling/Model/Server.swift
+      - path: Tossling/Model/History.swift
+      - path: Tossling/Model/Sender.swift
+      - path: Tossling/Resources/Localizable.xcstrings
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: Tossling
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsImageWithMaxCount: 10
+              NSExtensionActivationSupportsMovieWithMaxCount: 5
+              NSExtensionActivationSupportsFileWithMaxCount: 10
+    entitlements:
+      path: ShareExtension/ShareExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.kopylovis.tossling
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.kopylovis.tossling.shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kopylovis.tossling.share
         TARGETED_DEVICE_FAMILY: "1,2"
         FRAMEWORK_SEARCH_PATHS: $(SRCROOT)/../modules/common/protocol/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
         OTHER_LDFLAGS: -framework TosslingKit

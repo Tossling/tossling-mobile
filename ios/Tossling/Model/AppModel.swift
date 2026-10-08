@@ -58,6 +58,11 @@ final class AppModel {
     func isComputer(_ member: Member) -> Bool { member.isComputer }
 
     func becameActive() {
+        let sent = Outbox.take()
+        if !sent.isEmpty {
+            clips = (sent + clips).sorted { $0.date > $1.date }
+            history.save(clips)
+        }
         guard isPaired else { return }
         Push.shared.follow(room: core?.config.room)
         connect()
@@ -113,39 +118,17 @@ final class AppModel {
 
     func sendText(_ text: String) async {
         guard let core, !text.isEmpty else { return }
-        await perform(String(localized: "Sent the text")) {
-            try await self.server.publish(core.config, core.text(text: text, to: nil))
-            self.add(Clip(incoming: false, kind: .text, text: text, device: ""))
-        }
+        await perform(String(localized: "Sent the text")) { try await Sender(core: core).text(text) }
     }
 
     func sendImage(_ data: Data, type: UTType) async {
         guard let core else { return }
-        let mime = type.preferredMIMEType ?? "image/png"
-        await perform(String(localized: "Sent the image")) {
-            try await self.server.publish(core.config, core.image(data: data, mime: mime))
-            let file = Paths.unique("\(UUID().uuidString).\(type.preferredFilenameExtension ?? "png")", in: Paths.images)
-            try? data.write(to: file)
-            self.add(Clip(incoming: false, kind: .image, file: file.lastPathComponent, size: Int64(data.count), device: ""))
-        }
+        await perform(String(localized: "Sent the image")) { try await Sender(core: core).image(data, type: type) }
     }
 
     func sendFile(_ url: URL) async {
         guard let core else { return }
-        let access = url.startAccessingSecurityScopedResource()
-        defer { if access { url.stopAccessingSecurityScopedResource() } }
-        let name = url.lastPathComponent
-        await perform(String(localized: "Sent \(name)")) {
-            let sealed = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-            defer { try? FileManager.default.removeItem(at: sealed) }
-            let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize).map { Int64($0) } ?? 0
-            guard size <= 500_000_000 else { throw SendError.tooLarge(name) }
-            let mime = UTType(filenameExtension: url.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
-            _ = try await Task.detached { FileCrypto.shared.seal(cipher: core.fileCipher(), from: url.path, to: sealed.path) }.value
-            let message = core.file(name: name, size: size, mime: mime, to: nil).message
-            try await self.server.publishFile(core.config, message: message, file: sealed)
-            self.add(Clip(incoming: false, kind: .file, name: name, size: size, device: ""))
-        }
+        await perform(String(localized: "Sent \(url.lastPathComponent)")) { try await Sender(core: core).file(url) }
     }
 
     func copy(_ clip: Clip) {
@@ -301,11 +284,11 @@ final class AppModel {
         devices = []
     }
 
-    private func perform(_ done: String, _ work: @escaping () async throws -> Void) async {
+    private func perform(_ done: String, _ work: @escaping () async throws -> Clip) async {
         busy = true
         defer { busy = false }
         do {
-            try await work()
+            add(try await work())
             notice = done
         } catch {
             notice = String(localized: "Did not send: \(error.localizedDescription)")
@@ -332,16 +315,6 @@ enum PairingError: LocalizedError {
         case .notACode: String(localized: "This is not a Tossling code. Open Devices, then Connect a Phone on a computer.")
         case .token: String(localized: "The server did not accept the token. Show a new code on the computer.")
         case let .network(text): String(localized: "Could not reach the server: \(text)")
-        }
-    }
-}
-
-enum SendError: LocalizedError {
-    case tooLarge(String)
-
-    var errorDescription: String? {
-        switch self {
-        case let .tooLarge(name): String(localized: "\(name) is larger than 500 MB")
         }
     }
 }

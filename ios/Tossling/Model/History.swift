@@ -28,15 +28,22 @@ enum Paths {
         return url
     }
 
+    static let groupID = "group.com.kopylovis.tossling"
+
+    static var shared: URL? { FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID) }
+
     static var images: URL {
-        let url = support.appendingPathComponent("images", isDirectory: true)
+        let url = (shared ?? support).appendingPathComponent("images", isDirectory: true)
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
     }
 
     static func url(of clip: Clip) -> URL? {
         guard let file = clip.file else { return nil }
-        return clip.kind == .image ? images.appendingPathComponent(file) : documents.appendingPathComponent(file)
+        guard clip.kind == .image else { return documents.appendingPathComponent(file) }
+        let current = images.appendingPathComponent(file)
+        if FileManager.default.fileExists(atPath: current.path) { return current }
+        return support.appendingPathComponent("images", isDirectory: true).appendingPathComponent(file)
     }
 
     static func unique(_ name: String, in dir: URL) -> URL {
@@ -70,5 +77,23 @@ final class HistoryStore {
             if let file = Paths.url(of: dropped) { try? FileManager.default.removeItem(at: file) }
         }
         if let data = try? JSONEncoder().encode(kept) { try? data.write(to: url, options: .atomic) }
+    }
+}
+
+enum Outbox {
+
+    private static var url: URL? { Paths.shared?.appendingPathComponent("outbox.json") }
+
+    static func add(_ clip: Clip) {
+        guard let url else { return }
+        var clips = (try? Data(contentsOf: url)).flatMap { try? JSONDecoder().decode([Clip].self, from: $0) } ?? []
+        clips.append(clip)
+        if let data = try? JSONEncoder().encode(clips) { try? data.write(to: url, options: .atomic) }
+    }
+
+    static func take() -> [Clip] {
+        guard let url, let data = try? Data(contentsOf: url) else { return [] }
+        try? FileManager.default.removeItem(at: url)
+        return (try? JSONDecoder().decode([Clip].self, from: data)) ?? []
     }
 }
