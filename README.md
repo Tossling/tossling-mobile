@@ -5,13 +5,14 @@
 <h1 align="center">Tossling for Android</h1>
 
 <p align="center">
-  One clipboard for your Android phone and your Macs, through your own server.<br>
-  Copy on the Mac, paste on the phone, and the other way round. Everything is encrypted on the devices.
+  One clipboard for your Android phone and your computers, through your own server.<br>
+  Copy on the computer, paste on the phone, and the other way round. Everything is encrypted on the devices.
 </p>
 
 <p align="center">
   <a href="https://github.com/tossling/tossling-mobile/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/tossling/tossling-mobile?color=3067B8"></a>
   <img alt="Android 13 or newer" src="https://img.shields.io/badge/Android-13%2B-3067B8">
+  <img alt="iOS in progress" src="https://img.shields.io/badge/iOS-in%20progress-8A8F98">
   <a href="LICENSE"><img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-3067B8"></a>
 </p>
 
@@ -24,13 +25,13 @@
 It works with your own [Tossling Server](https://github.com/tossling/tossling-server); the server only relays
 ciphertext.
 
-The Mac side (menu bar helper, `tossling` command, Finder extension) lives in
-[tossling/tossling-desktop](https://github.com/tossling/tossling-desktop).
+The apps for macOS, Windows and Linux live in
+[tossling/tossling-desktop](https://github.com/tossling/tossling-desktop). An iOS app is in progress.
 
 ## What it does
 
 - Text, links, images and files up to 500 MB in both directions; files land in Downloads/Tossling.
-- All devices share one room: a phone and any number of Macs.
+- All devices share one room: a phone and any number of computers.
 - Pairing with a Mac by QR code (`tossling pair` on the Mac), another Mac joins with `tossling invite` / `tossling join`.
 - Every device has its own X25519 key. Disconnecting a device moves the rest of the room to a new key
   and to a new server token.
@@ -45,7 +46,7 @@ The Mac side (menu bar helper, `tossling` command, Finder extension) lives in
 
 - Android 13 (API 33) or newer.
 - A [Tossling Server](https://github.com/tossling/tossling-server): one Docker container with a setup page.
-  Pairing goes through a Mac (`tossling pair` shows a QR code). Any ntfy server with token authentication,
+  Pairing goes through a computer (`tossling pair` on a Mac or Devices, then Connect a Phone on Windows and Linux shows a QR code). Any ntfy server with token authentication,
   attachments up to 520 MB and the right access rules works too; Tossling Server sets all of that up by itself.
 
 ## Building
