@@ -47,6 +47,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -110,6 +111,7 @@ import com.kopylovis.tossling.core.presentation.glass.GlassLevel
 import com.kopylovis.tossling.core.presentation.glass.GlassPage
 import com.kopylovis.tossling.core.presentation.glass.GlassSheet
 import com.kopylovis.tossling.core.presentation.glass.GlassTopBar
+import com.kopylovis.tossling.core.presentation.glass.glassSegment
 import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.LocalHazeState
 import com.kopylovis.tossling.core.presentation.glass.STATUS_FADE_MS
@@ -299,46 +301,43 @@ internal fun HomeContent(
                         )
                     }
                 } else {
-                    item(key = "history") {
-                        GlassGroup(modifier = Modifier.animateContentSize(animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f))) {
-                            shown.forEachIndexed { index, item ->
-                                key(item.id) {
-                                    SwipeRow(
-                                        isOpen = openSwipe == item.id,
-                                        onOpenChange = { open -> openSwipe = if (open) item.id else openSwipe.takeIf { it != item.id } },
-                                        actions = listOf(
-                                            SwipeAction(
-                                                icon = TosslingIcons.Pin,
-                                                label = stringResource(if (item.isPinned) R.string.home_unpin else R.string.home_pin),
-                                                background = palette.accentSoft,
-                                                tint = palette.accentInk,
-                                                onClick = {
-                                                    openSwipe = null
-                                                    component.onPinToggled(item = item)
-                                                },
-                                            ),
-                                            SwipeAction(
-                                                icon = TosslingIcons.Trash,
-                                                label = stringResource(R.string.home_delete),
-                                                background = palette.danger,
-                                                tint = palette.onDanger,
-                                                onClick = {
-                                                    openSwipe = null
-                                                    component.onDeleteClicked(item = item)
-                                                },
-                                            ),
-                                        ),
-                                    ) {
-                                        HistoryRow(
-                                            item = item,
-                                            isRoom = othersCount > 1,
-                                            isFirst = index == 0,
-                                            isFresh = !initial.value && item.id !in seen,
-                                            onClick = { if (openSwipe != null) openSwipe = null else component.onItemClicked(item = item) },
-                                        )
-                                    }
-                                }
-                            }
+                    itemsIndexed(items = shown, key = { _, item -> item.id }, contentType = { _, item -> item.kind }) { index, item ->
+                        SwipeRow(
+                            isOpen = openSwipe == item.id,
+                            onOpenChange = { open -> openSwipe = if (open) item.id else openSwipe.takeIf { it != item.id } },
+                            actions = listOf(
+                                SwipeAction(
+                                    icon = TosslingIcons.Pin,
+                                    label = stringResource(if (item.isPinned) R.string.home_unpin else R.string.home_pin),
+                                    background = palette.accentSoft,
+                                    tint = palette.accentInk,
+                                    onClick = {
+                                        openSwipe = null
+                                        component.onPinToggled(item = item)
+                                    },
+                                ),
+                                SwipeAction(
+                                    icon = TosslingIcons.Trash,
+                                    label = stringResource(R.string.home_delete),
+                                    background = palette.danger,
+                                    tint = palette.onDanger,
+                                    onClick = {
+                                        openSwipe = null
+                                        component.onDeleteClicked(item = item)
+                                    },
+                                ),
+                            ),
+                            modifier = Modifier
+                                .animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                .glassSegment(isFirst = index == 0, isLast = index == shown.lastIndex),
+                        ) {
+                            HistoryRow(
+                                item = item,
+                                isRoom = othersCount > 1,
+                                isFirst = index == 0,
+                                isFresh = !initial.value && item.id !in seen,
+                                onClick = { if (openSwipe != null) openSwipe = null else component.onItemClicked(item = item) },
+                            )
                         }
                     }
                 }
