@@ -2,6 +2,8 @@ package com.kopylovis.tossling.home.presentation
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.BitmapRegionDecoder
+import android.graphics.Rect
 import android.text.format.Formatter
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -841,8 +843,9 @@ private fun Thumbnail(path: String?) {
                 .background(palette.glassWeak)
                 .border(width = 1f.dp, color = palette.hairline, shape = RoundedCornerShape(14f.dp)),
         ) {
+            val shown by animateFloatAsState(targetValue = if (bitmap != null) 1f else 0f, animationSpec = tween(durationMillis = THUMBNAIL_FADE_MS), label = "thumbnail")
             bitmap?.let { image ->
-                Image(bitmap = image, contentDescription = null, contentScale = ContentScale.Crop, filterQuality = FilterQuality.High, modifier = Modifier.fillMaxSize())
+                Image(bitmap = image, contentDescription = null, contentScale = ContentScale.Crop, filterQuality = FilterQuality.High, modifier = Modifier.fillMaxSize().alpha(shown))
             }
             if (label.isNotEmpty()) {
                 Text(
@@ -1004,21 +1007,41 @@ private fun decodeImage(path: String, target: IntSize, fill: Boolean): ImageBitm
     if (target.width <= 0 || target.height <= 0) return null
     val horizontal = target.width.toFloat() / source.width
     val vertical = target.height.toFloat() / source.height
-    val need = (if (fill) maxOf(horizontal, vertical) else minOf(horizontal, vertical)).coerceAtMost(1f)
+    val cover = if (fill) maxOf(horizontal, vertical) else minOf(horizontal, vertical)
+    val need = cover.coerceAtMost(1f)
+    val region = if (fill) {
+        val width = (target.width / cover).roundToInt().coerceIn(1, source.width)
+        val height = (target.height / cover).roundToInt().coerceIn(1, source.height)
+        val left = (source.width - width) / 2
+        val top = (source.height - height) / 2
+        Rect(left, top, left + width, top + height)
+    } else {
+        Rect(0, 0, source.width, source.height)
+    }
     var sample = 1
     while (1f / (sample * 2) >= need) sample *= 2
-    val decoded = BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = sample }) ?: return null
-    val width = (source.width * need).roundToInt().coerceAtLeast(1)
-    val height = (source.height * need).roundToInt().coerceAtLeast(1)
-    if (!fill || decoded.width <= width) return decoded.asImageBitmap()
-    val scaled = Bitmap.createScaledBitmap(decoded, width, height, true)
-    if (scaled !== decoded) decoded.recycle()
-    return scaled.asImageBitmap()
+    val options = BitmapFactory.Options().apply { inSampleSize = sample }
+    val decoded = if (region.width() == source.width && region.height() == source.height) {
+        BitmapFactory.decodeFile(path, options)
+    } else {
+        val decoder = BitmapRegionDecoder.newInstance(path)
+        try {
+            decoder.decodeRegion(region, options)
+        } finally {
+            decoder.recycle()
+        }
+    } ?: return null
+    val width = (region.width() * need).roundToInt().coerceAtLeast(1)
+    val height = (region.height() * need).roundToInt().coerceAtLeast(1)
+    val sized = if (decoded.width > width) Bitmap.createScaledBitmap(decoded, width, height, true).also { if (it !== decoded) decoded.recycle() } else decoded
+    val uploaded = sized.copy(Bitmap.Config.HARDWARE, false)?.also { sized.recycle() } ?: sized
+    return uploaded.asImageBitmap()
 }
 
 private const val DEFAULT_ASPECT = 16f / 10f
 private val THUMBNAIL_MIN = 96f.dp
 private val THUMBNAIL_MAX = 240f.dp
+private const val THUMBNAIL_FADE_MS = 180
 private const val PREVIEW_FADE_MS = 220
 private const val PREVIEW_TINT = 0.82f
 private val PREVIEW_BLUR = 40f.dp
