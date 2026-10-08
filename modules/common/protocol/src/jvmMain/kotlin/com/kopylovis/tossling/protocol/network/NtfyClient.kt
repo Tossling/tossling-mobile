@@ -9,88 +9,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-
-@Serializable
-data class NtfyEvent(
-    val id: String = "",
-    val time: Long = 0,
-    val event: String = "",
-    val topic: String = "",
-    val title: String? = null,
-    val message: String? = null,
-    val priority: Int? = null,
-    val tags: List<String>? = null,
-    val click: String? = null,
-    val icon: String? = null,
-    @SerialName("content_type") val contentType: String? = null,
-    val attachment: NtfyAttachment? = null,
-)
-
-@Serializable
-data class NtfyAttachment(
-    val url: String = "",
-    val type: String? = null,
-    val size: Long? = null,
-)
-
-@Serializable
-data class NtfyToken(
-    val token: String = "",
-)
-
-@Serializable
-data class NtfySubscription(
-    @SerialName("base_url") val baseUrl: String = "",
-    val topic: String = "",
-    @SerialName("display_name") val displayName: String? = null,
-)
-
-@Serializable
-data class NtfyAccount(
-    val subscriptions: List<NtfySubscription> = emptyList(),
-)
-
-@Serializable
-data class NtfyTokenRequest(
-    val label: String,
-)
-
-@Serializable
-data class TosslingHealth(
-    val server: String = "",
-    val push: Boolean? = null,
-    val url: String = "",
-) {
-    val isOurs: Boolean get() = server == TOSSLING_SERVER || server == TOSSY_SERVER
-    val isTossling: Boolean get() = server == TOSSLING_SERVER
-
-    companion object {
-        const val TOSSLING_SERVER = "tossling-server"
-        const val TOSSY_SERVER = "tossy-server"
-    }
-}
-
-@Serializable
-data class TosslingProjectRequest(
-    val topic: String,
-    val name: String,
-)
-
-@Serializable
-data class TosslingProject(
-    val topic: String = "",
-    val name: String = "",
-    val publisher: String? = null,
-    val token: String? = null,
-    val example: String? = null,
-)
 
 class NtfyException(val code: Int, message: String) : Exception(message)
 
