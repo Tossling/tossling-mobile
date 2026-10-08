@@ -3,6 +3,8 @@
 Drafts for App Store Connect and Google Play. The demo link and its QR code carry the demo server's token, so they
 are not in this file: `sudo docker exec tossling-demo-bot python bot.py code` on the demo host prints them.
 
+Screenshots live outside the repo, in ~/Documents/tossling/store on the release Mac: `ios/` (iPhone 6.9", 1320 x 2868) and `android/` (1080 x 2160).
+
 Privacy policy: https://monoroh.com/tossling/privacy
 Support: https://github.com/Tossling/tossling-mobile/issues
 
