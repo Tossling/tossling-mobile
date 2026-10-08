@@ -1,7 +1,6 @@
 # Store listing
 
-Drafts for App Store Connect and Google Play. The demo link and its QR code carry the demo server's token, so they
-are not in this file: `sudo docker exec tossling-demo-bot python bot.py code` on the demo host prints them.
+Drafts for App Store Connect and Google Play.
 
 Screenshots live outside the repo, in ~/Documents/tossling/store on the release Mac: `ios/` (iPhone 6.9", 1320 x 2868) and `android/` (1080 x 2160).
 
@@ -42,6 +41,8 @@ Description:
 > show what has arrived.
 >
 > You need a computer with Tossling and a Tossling Server. Both are free at github.com/Tossling.
+>
+> To look around first, tap Try without a computer, and a demo computer answers you for an hour.
 
 What's new: First release.
 
@@ -77,6 +78,8 @@ What's new: First release.
 > показывают, что пришло.
 >
 > Нужны компьютер с Tossling и Tossling Server. И то и другое бесплатно на github.com/Tossling.
+>
+> Чтобы сначала осмотреться, нажмите "Попробовать без компьютера", и час вам будет отвечать демо-компьютер.
 
 Что нового: первый выпуск.
 
@@ -107,6 +110,8 @@ Full description:
 > live connection so that items arrive at once.
 >
 > You need a computer with Tossling and a Tossling Server. Both are free at github.com/Tossling.
+>
+> To look around first, tap Try without a computer, and a demo computer answers you for an hour.
 
 ## Google Play, Russian
 
@@ -134,31 +139,31 @@ Full description:
 > держит одно соединение, и все приходит сразу.
 >
 > Нужны компьютер с Tossling и Tossling Server. И то и другое бесплатно на github.com/Tossling.
+>
+> Чтобы сначала осмотреться, нажмите "Попробовать без компьютера", и час вам будет отвечать демо-компьютер.
 
 ## Notes for reviewers
 
-App Store Connect, App Review Information, Notes. Attach the QR code PNG as well. Google Play, App content, App
-access, with the same text.
+App Store Connect, App Review Information, Notes. Google Play, App content, App access, with the same text.
 
 > Tossling shares the clipboard between a phone and the user's own computers through the user's own server, so the app
-> needs a computer in its room to do anything. For review we run a demo room where a bot plays the computer. No
-> account or sign-in is needed.
+> needs a computer in its room to do anything. For review there is a demo: a bot plays the computer. No account or
+> sign-in is needed.
 >
-> 1. On the phone, tap this link (from Notes, Mail or the browser): DEMO_LINK
->    Or open the app, tap Pair with a computer, then Scan QR, and scan the attached QR code.
-> 2. Confirm Join. The demo computer sends a greeting, an image and a project notification within a few seconds.
+> 1. On the first screen tap Try without a computer. The phone joins a room of its own with the demo computer.
+> 2. Within a few seconds the demo computer sends a greeting, an image and a project notification.
 > 3. Copy any text in another app, open Tossling and tap To Computer. The demo computer answers within a second.
 >    Send the word "image" or "alert" to get another image or notification.
 > 4. The Notifications tab shows the notifications of the demo project. Allow notifications to see them as pushes.
 >
-> The demo room is shared by everyone who joins it, so please do not send anything private.
+> The demo room lasts an hour, then the app returns to the first screen and the demo can be started again.
 
 ## Privacy answers
 
 App Store, App Privacy. Data collected: Identifiers, Device ID (the Firebase installation ID and push token), used for
 App Functionality, not linked to the user, not used for tracking. Clipboard content is end-to-end encrypted and goes
-to the user's own server, so it is not collected. The one gray area is the demo room: if a user joins it, our bot
-decrypts what they send. If App Review asks, declare Other User Content for App Functionality, not linked.
+to the user's own server, so it is not collected. The one gray area is the demo: if a user starts it, our bot decrypts
+what they send to the demo computer. If App Review asks, declare Other User Content for App Functionality, not linked.
 
 Google Play, Data safety. Collected: Device or other IDs, for App functionality, not shared, encrypted in transit,
 cannot be deleted on request (it is reset with the app). No data shared with third parties beyond the push service.

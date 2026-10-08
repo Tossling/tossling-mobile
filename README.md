@@ -25,6 +25,10 @@
 It works with your own [Tossling Server](https://github.com/tossling/tossling-server); the server only relays
 ciphertext.
 
+No computer at hand? Tap Try without a computer on the first screen, or open
+[tossling-demo.monoroh.com/demo](https://tossling-demo.monoroh.com/demo) and scan its code. A demo computer shares a
+room with your phone for an hour, answers what you send and posts a project notification.
+
 The apps for macOS, Windows and Linux live in
 [tossling/tossling-desktop](https://github.com/tossling/tossling-desktop). An iOS app is in progress.
 
