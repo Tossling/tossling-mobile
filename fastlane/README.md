@@ -29,6 +29,14 @@ Verify Firebase access and list App Distribution tester groups
 
 Build a release APK and send it to Firebase App Distribution testers
 
+### ios_beta
+
+```sh
+[bundle exec] fastlane ios_beta
+```
+
+Archive the iOS app and upload it to App Store Connect for TestFlight
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
