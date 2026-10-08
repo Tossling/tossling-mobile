@@ -81,6 +81,7 @@ targets:
       - path: Tossling/Model/Feed.swift
       - path: Tossling/Model/History.swift
       - path: Tossling/Resources/Localizable.xcstrings
+      - path: Tossling/Resources/PrivacyInfo.xcprivacy
     info:
       path: NotificationService/Info.plist
       properties:
@@ -122,6 +123,7 @@ targets:
       - path: Tossling/Model/Feed.swift
       - path: Tossling/Model/Sender.swift
       - path: Tossling/Resources/Localizable.xcstrings
+      - path: Tossling/Resources/PrivacyInfo.xcprivacy
     info:
       path: ShareExtension/Info.plist
       properties:

@@ -5,8 +5,10 @@ require "tempfile"
 #   fastlane upload                          build and distribute the app
 #   fastlane upload notes:"what changed"     with release notes for testers
 #   fastlane check                           verify Firebase access and the tester group
+#   fastlane ios_beta                        archive the iOS app and upload it to TestFlight
 
 ANDROID_SCRIPT = "deploy/distribute-android.sh"
+IOS_SCRIPT = "deploy/testflight-ios.sh"
 def local_property(key)
   path = File.expand_path("../local.properties", __dir__)
   return nil unless File.exist?(path)
@@ -41,4 +43,9 @@ lane :upload do |options|
   ensure
     notes.unlink
   end
+end
+
+desc "Archive the iOS app and upload it to App Store Connect for TestFlight"
+lane :ios_beta do
+  sh("../#{IOS_SCRIPT}")
 end
