@@ -7,6 +7,8 @@ import com.kopylovis.tossling.core.decompose.base.BaseComponent
 import com.kopylovis.tossling.core.presentation.dayLabel
 import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.navigation.GlobalNavigator
+import com.kopylovis.tossling.protocol.alerts.Alert
+import com.kopylovis.tossling.protocol.alerts.Project
 import com.kopylovis.tossling.sync.alerts.AlertRepository
 import com.kopylovis.tossling.sync.data.SyncCoordinator
 import kotlinx.collections.immutable.toImmutableList
@@ -26,23 +28,10 @@ internal class FeedComponentImpl(
     private val isClearSheetVisible = MutableStateFlow(false)
 
     override val state: Value<FeedScreenState> =
-        combine(alerts.alerts, alerts.projects, filter) { list, projects, topic ->
-            val byTopic = projects.associateBy { it.topic }
-            val chosen = topic?.takeIf { it in byTopic }
-            val visible = list.filter { chosen == null || it.topic == chosen }
-            FeedScreenState(
-                unread = list.count { !it.isRead },
-                projects = projects.toImmutableList(),
-                filter = chosen,
-                days = visible.groupBy { dayLabel(time = it.time) }
-                    .map { (label, items) -> FeedDay(label = label, items = items.map { FeedItem(alert = it, project = byTopic[it.topic]) }.toImmutableList()) }
-                    .toImmutableList(),
-                hasAlerts = list.isNotEmpty(),
-            )
-        }
+        combine(alerts.alerts, alerts.projects, filter, ::feedState)
             .combine(isRefreshing) { state, refreshing -> state.copy(isRefreshing = refreshing) }
             .combine(isClearSheetVisible) { state, visible -> state.copy(isClearSheetVisible = visible) }
-            .asValueUtil(initialValue = FeedScreenState(), lifecycle = lifecycle)
+            .asValueUtil(initialValue = feedState(list = alerts.alerts.value, projects = alerts.projects.value, topic = null), lifecycle = lifecycle)
 
     override fun onFilterClicked(topic: String?) {
         filter.value = topic
@@ -99,5 +88,20 @@ internal class FeedComponentImpl(
             isRefreshing.value = false
             messenger.done(tr("Updated", "Обновлено"))
         }
+    }
+
+    private fun feedState(list: List<Alert>, projects: List<Project>, topic: String?): FeedScreenState {
+        val byTopic = projects.associateBy { it.topic }
+        val chosen = topic?.takeIf { it in byTopic }
+        val visible = list.filter { chosen == null || it.topic == chosen }
+        return FeedScreenState(
+            unread = list.count { !it.isRead },
+            projects = projects.toImmutableList(),
+            filter = chosen,
+            days = visible.groupBy { dayLabel(time = it.time) }
+                .map { (label, items) -> FeedDay(label = label, items = items.map { FeedItem(alert = it, project = byTopic[it.topic]) }.toImmutableList()) }
+                .toImmutableList(),
+            hasAlerts = list.isNotEmpty(),
+        )
     }
 }

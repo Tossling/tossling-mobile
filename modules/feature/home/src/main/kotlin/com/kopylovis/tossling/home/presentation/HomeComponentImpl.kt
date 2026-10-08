@@ -12,6 +12,8 @@ import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.navigation.GlobalNavigator
 import com.kopylovis.tossling.protocol.ClipItem
 import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.MacDevice
+import com.kopylovis.tossling.protocol.Pairing
 import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.protocol.localDeviceNames
 import com.kopylovis.tossling.sync.clipboard.Outgoing
@@ -43,17 +45,7 @@ internal class HomeComponentImpl(
     private var pending: Outgoing? = null
 
     override val state: Value<HomeScreenState> =
-        combine(repository.macs, repository.devices, repository.pairings, repository.history) { macs, devices, pairings, history ->
-            HomeScreenState(
-                isRoom = pairings.any { it.isRoom },
-                devices = devices.toImmutableList(),
-                macName = macs.joinToString(separator = ", ") { it.name }.ifEmpty { "Mac" },
-                server = macs.map { it.host }.distinct().joinToString(separator = ", "),
-                isOnline = macs.all { it.link.isOnline },
-                lastContact = macs.maxOfOrNull { it.link.lastContact } ?: 0,
-                history = history.map { it.copy(device = localDeviceNames(names = it.device, devices = devices)) }.toImmutableList(),
-            )
-        }
+        combine(repository.macs, repository.devices, repository.pairings, repository.history, ::homeState)
             .combine(settings.isInstant) { state, instant -> state.copy(isInstant = instant && repository.isPushAvailable) }
             .combine(settings.isTileHintHidden) { state, hidden -> state.copy(showsTileHint = sender.canRequestTile && !hidden) }
             .combine(isRefreshing) { state, refreshing -> state.copy(isRefreshing = refreshing) }
@@ -62,7 +54,10 @@ internal class HomeComponentImpl(
             .combine(preview) { state, preview -> state.copy(preview = preview) }
             .combine(query) { state, query -> state.copy(query = query) }
             .combine(leaving) { state, leaving -> state.copy(leaving = leaving) }
-            .asValueUtil(initialValue = HomeScreenState(), lifecycle = lifecycle)
+            .asValueUtil(
+                initialValue = homeState(macs = repository.macs.value, devices = repository.devices.value, pairings = repository.pairings.value, history = repository.history.value),
+                lifecycle = lifecycle,
+            )
 
     init {
         lifecycle.doOnResume { refresh(quiet = true) }
@@ -251,4 +246,15 @@ internal class HomeComponentImpl(
     private companion object {
         private const val PREVIEW_CHARS = 200
     }
+
+    private fun homeState(macs: List<MacDevice>, devices: List<RoomDevice>, pairings: List<Pairing>, history: List<ClipItem>): HomeScreenState =
+        HomeScreenState(
+            isRoom = pairings.any { it.isRoom },
+            devices = devices.toImmutableList(),
+            macName = macs.joinToString(separator = ", ") { it.name }.ifEmpty { "Mac" },
+            server = macs.map { it.host }.distinct().joinToString(separator = ", "),
+            isOnline = macs.all { it.link.isOnline },
+            lastContact = macs.maxOfOrNull { it.link.lastContact } ?: 0,
+            history = history.map { it.copy(device = localDeviceNames(names = it.device, devices = devices)) }.toImmutableList(),
+        )
 }
