@@ -56,4 +56,9 @@
     <string name="home_leave_title">Leave the room?</string>
     <string name="home_leave_text">The phone removes the room key and stops sharing the clipboard with its devices. To come back, scan the QR on a computer.</string>
     <string name="home_leave_confirm">Leave and remove the key</string>
+    <string name="home_refused_token">The server no longer accepts this phone\'s token</string>
+    <string name="home_refused_token_text">Connect the phone to the room again: in the Tossling menu on the computer choose Devices, then Connect a Phone.</string>
+    <string name="home_refused_busy">Too many requests from this network</string>
+    <string name="home_refused_busy_text">The server asks to wait. Tossling will try again by itself.</string>
+    <string name="home_reconnect">Connect again</string>
 </resources>

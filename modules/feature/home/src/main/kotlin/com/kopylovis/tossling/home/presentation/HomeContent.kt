@@ -111,7 +111,6 @@ import com.kopylovis.tossling.core.presentation.glass.GlassLevel
 import com.kopylovis.tossling.core.presentation.glass.GlassPage
 import com.kopylovis.tossling.core.presentation.glass.GlassSheet
 import com.kopylovis.tossling.core.presentation.glass.GlassTopBar
-import com.kopylovis.tossling.core.presentation.glass.glassSegment
 import com.kopylovis.tossling.core.presentation.glass.Hairline
 import com.kopylovis.tossling.core.presentation.glass.LocalHazeState
 import com.kopylovis.tossling.core.presentation.glass.STATUS_FADE_MS
@@ -125,6 +124,7 @@ import com.kopylovis.tossling.core.presentation.glass.TosslingIcons
 import com.kopylovis.tossling.core.presentation.glass.TrackOverlay
 import com.kopylovis.tossling.core.presentation.glass.animateStatusColor
 import com.kopylovis.tossling.core.presentation.glass.glass
+import com.kopylovis.tossling.core.presentation.glass.glassSegment
 import com.kopylovis.tossling.core.presentation.glass.pressable
 import com.kopylovis.tossling.core.presentation.glass.rememberTitleCollapse
 import com.kopylovis.tossling.core.presentation.glass.rowPress
@@ -137,6 +137,7 @@ import com.kopylovis.tossling.protocol.ClipKind
 import com.kopylovis.tossling.protocol.DeviceKind
 import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.protocol.Transfer
+import com.kopylovis.tossling.protocol.network.ServerRefusal
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
@@ -241,6 +242,11 @@ internal fun HomeContent(
                         DevicesGroup(state = state, component = component, modifier = Modifier.padding(top = 20f.dp))
                     } else {
                         StatusCard(state = state, modifier = Modifier.padding(top = 20f.dp))
+                    }
+                }
+                state.refusal?.let { refusal ->
+                    item(key = "refusal") {
+                        RefusalCard(refusal = refusal, onReconnect = component::onReconnectClicked, modifier = Modifier.padding(top = 12f.dp))
                     }
                 }
                 if (state.showsTileHint) {
@@ -587,6 +593,40 @@ private fun InfoRow(label: String, value: String, modifier: Modifier = Modifier)
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f),
         )
+    }
+}
+
+@Composable
+private fun RefusalCard(refusal: ServerRefusal, onReconnect: () -> Unit, modifier: Modifier = Modifier) {
+    val palette = Tossling.palette
+    val isToken = refusal == ServerRefusal.TOKEN
+    GlassCard(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(18f.dp), verticalArrangement = Arrangement.spacedBy(14f.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(14f.dp), verticalAlignment = Alignment.CenterVertically) {
+                CircleBadge(
+                    icon = if (isToken) TosslingIcons.KeyOff else TosslingIcons.Alert,
+                    tint = palette.dangerInk,
+                    background = palette.dangerSoft,
+                    size = 44f.dp,
+                    iconSize = 22f.dp,
+                )
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2f.dp)) {
+                    Text(
+                        text = stringResource(if (isToken) R.string.home_refused_token else R.string.home_refused_busy),
+                        style = Tossling.type.headline,
+                        color = palette.ink,
+                    )
+                    Text(
+                        text = stringResource(if (isToken) R.string.home_refused_token_text else R.string.home_refused_busy_text),
+                        style = Tossling.type.footnote,
+                        color = palette.ink2,
+                    )
+                }
+            }
+            if (isToken) {
+                CapsuleButton(text = stringResource(R.string.home_reconnect), onClick = onReconnect, modifier = Modifier.fillMaxWidth(), height = 48f.dp)
+            }
+        }
     }
 }
 

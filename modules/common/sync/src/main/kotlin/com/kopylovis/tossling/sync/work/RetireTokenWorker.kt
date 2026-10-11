@@ -31,8 +31,13 @@ internal class RetireTokenWorker(
             client.deleteToken(endpoint = Endpoint(server = server, token = token), token = old)
             Result.success()
         } catch (error: NtfyException) {
-            Log.w(TAG, "old token not deleted: HTTP ${error.code}")
-            if (error.code in HTTP_CLIENT_ERRORS) Result.success() else retryOrFail()
+            when (error.code) {
+                HTTP_NOT_FOUND, HTTP_GONE -> Result.success().also { Log.i(TAG, "the old token is already gone") }
+                HTTP_CONFLICT -> Result.success().also { Log.w(TAG, "the old token is the server's own token, the server keeps it") }
+                HTTP_UNAUTHORIZED, HTTP_TOO_MANY_REQUESTS -> retryOrFail().also { Log.w(TAG, "old token not deleted yet: HTTP ${error.code}") }
+                in HTTP_CLIENT_ERRORS -> Result.success().also { Log.w(TAG, "old token not deleted: HTTP ${error.code}") }
+                else -> retryOrFail().also { Log.w(TAG, "old token not deleted: HTTP ${error.code}") }
+            }
         } catch (error: Exception) {
             Log.w(TAG, "old token not deleted", error)
             retryOrFail()
@@ -48,6 +53,11 @@ internal class RetireTokenWorker(
         private const val KEY_OLD = "old"
         private const val MAX_ATTEMPTS = 20
         private const val DELAY_HOURS = 24L
+        private const val HTTP_UNAUTHORIZED = 401
+        private const val HTTP_NOT_FOUND = 404
+        private const val HTTP_CONFLICT = 409
+        private const val HTTP_GONE = 410
+        private const val HTTP_TOO_MANY_REQUESTS = 429
         private val HTTP_CLIENT_ERRORS = 400..499
 
         fun enqueue(context: Context, server: String, token: String, old: String) {

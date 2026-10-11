@@ -112,7 +112,7 @@ internal class LiveConnectionService : Service(), KoinComponent {
                 Log.w(TAG, "connection to ${endpoint.server} dropped: ${error.message}")
             }
             if (SystemClock.elapsedRealtime() - started > STABLE_MS) pause = MIN_PAUSE_MS
-            delay(pause)
+            delay(maxOf(pause, client.gate.pauseLeft(endpoint = endpoint)))
             pause = (pause * 2).coerceAtMost(MAX_PAUSE_MS)
         }
     }

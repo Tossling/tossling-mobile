@@ -16,6 +16,9 @@ import com.kopylovis.tossling.protocol.MacDevice
 import com.kopylovis.tossling.protocol.Pairing
 import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.protocol.localDeviceNames
+import com.kopylovis.tossling.protocol.network.NtfyException
+import com.kopylovis.tossling.protocol.network.ServerRefusal
+import com.kopylovis.tossling.protocol.network.serverRefusal
 import com.kopylovis.tossling.sync.clipboard.Outgoing
 import com.kopylovis.tossling.sync.data.ClipRepository
 import com.kopylovis.tossling.sync.data.SyncCoordinator
@@ -54,8 +57,10 @@ internal class HomeComponentImpl(
             .combine(preview) { state, preview -> state.copy(preview = preview) }
             .combine(query) { state, query -> state.copy(query = query) }
             .combine(leaving) { state, leaving -> state.copy(leaving = leaving) }
+            .combine(repository.refusal) { state, refusal -> state.copy(refusal = refusal) }
             .asValueUtil(
-                initialValue = homeState(macs = repository.macs.value, devices = repository.devices.value, pairings = repository.pairings.value, history = repository.history.value),
+                initialValue = homeState(macs = repository.macs.value, devices = repository.devices.value, pairings = repository.pairings.value, history = repository.history.value)
+                    .copy(refusal = repository.refusal.value),
                 lifecycle = lifecycle,
             )
 
@@ -128,6 +133,10 @@ internal class HomeComponentImpl(
 
     override fun onAddMacClicked() {
         globalNavigator.pushNew(configuration = GlobalNavigator.Config.AddMac)
+    }
+
+    override fun onReconnectClicked() {
+        globalNavigator.pushNew(configuration = GlobalNavigator.Config.Pairing(isReconnect = true))
     }
 
     override fun onTileHintClicked() {
@@ -231,9 +240,9 @@ internal class HomeComponentImpl(
         if (!repository.isPaired.value || isRefreshing.value) return
         isRefreshing.value = !quiet
         launchCoroutine(
-            onError = {
+            onError = { error ->
                 isRefreshing.value = false
-                if (!quiet) messenger.error(tr("No connection to the server", "Нет связи с сервером"))
+                if (!quiet) messenger.error(refreshError(error = error))
             },
         ) {
             coordinator.fetch()
@@ -242,6 +251,13 @@ internal class HomeComponentImpl(
             if (!quiet) messenger.done(tr("Updated", "Обновлено"))
         }
     }
+
+    private fun refreshError(error: Throwable): String =
+        when ((error as? NtfyException)?.code?.let { serverRefusal(code = it) }) {
+            ServerRefusal.TOKEN -> tr("The server no longer accepts this phone's token", "Сервер больше не принимает токен этого телефона")
+            ServerRefusal.BUSY -> tr("The server asks to wait a little", "Сервер просит немного подождать")
+            null -> tr("No connection to the server", "Нет связи с сервером")
+        }
 
     private companion object {
         private const val PREVIEW_CHARS = 200

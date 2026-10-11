@@ -47,7 +47,14 @@ data class NtfyAccount(
 @Serializable
 data class NtfyTokenRequest(
     val label: String,
-)
+    val expires: Long = NEVER_EXPIRES,
+) {
+    companion object {
+        const val NEVER_EXPIRES = 0L
+    }
+}
+
+fun encodeTokenRequest(label: String): String = SyncJson.encodeToString(NtfyTokenRequest.serializer(), NtfyTokenRequest(label = label))
 
 @Serializable
 data class TosslingHealth(

@@ -15,9 +15,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-class NtfyException(val code: Int, message: String) : Exception(message)
+class NtfyException(val code: Int, message: String, val isHeld: Boolean = false) : Exception(message)
 
-class NtfyClient {
+class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMillis)) {
 
     suspend fun publish(endpoint: Endpoint, topic: String, message: String, body: ByteArray?, headers: Map<String, String> = emptyMap()) = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/$topic")
@@ -34,7 +34,7 @@ class NtfyClient {
         }
         connection.setFixedLengthStreamingMode(payload.size)
         connection.outputStream.use { it.write(payload) }
-        connection.ensureOk()
+        connection.ensureOk(endpoint = endpoint)
         connection.disconnect()
     }
 
@@ -49,7 +49,7 @@ class NtfyClient {
         connection.setFixedLengthStreamingMode(length)
         try {
             connection.outputStream.use(write)
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint)
         } finally {
             connection.disconnect()
         }
@@ -59,7 +59,7 @@ class NtfyClient {
         val connection = open(endpoint = endpoint, url = url)
         connection.readTimeout = STREAM_TIMEOUT_MS
         try {
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint)
             connection.inputStream.buffered(STREAM_BUFFER).use(read)
         } finally {
             connection.disconnect()
@@ -69,7 +69,7 @@ class NtfyClient {
     suspend fun poll(endpoint: Endpoint, topic: String, since: String): List<NtfyEvent> = withContext(Dispatchers.IO) {
         val query = URLEncoder.encode(since, Charsets.UTF_8.name())
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/$topic/json?poll=1&since=$query")
-        connection.ensureOk()
+        connection.ensureOk(endpoint = endpoint)
         val lines = connection.inputStream.bufferedReader().use { it.readLines() }
         connection.disconnect()
         lines.filter { it.isNotBlank() }.map { SyncJson.decodeFromString(NtfyEvent.serializer(), it) }
@@ -78,7 +78,7 @@ class NtfyClient {
     suspend fun download(endpoint: Endpoint, url: String): ByteArray = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = url)
         connection.readTimeout = DOWNLOAD_TIMEOUT_MS
-        connection.ensureOk()
+        connection.ensureOk(endpoint = endpoint)
         val bytes = connection.inputStream.use { it.readBytes() }
         connection.disconnect()
         bytes
@@ -89,11 +89,11 @@ class NtfyClient {
         connection.requestMethod = "POST"
         connection.doOutput = true
         connection.setRequestProperty("Content-Type", "application/json")
-        val body = SyncJson.encodeToString(NtfyTokenRequest.serializer(), NtfyTokenRequest(label = label)).toByteArray()
+        val body = encodeTokenRequest(label = label).toByteArray()
         connection.setFixedLengthStreamingMode(body.size)
         try {
             connection.outputStream.use { it.write(body) }
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint)
             val text = connection.inputStream.bufferedReader().use { it.readText() }
             SyncJson.decodeFromString(NtfyToken.serializer(), text).token.takeIf { it.isNotEmpty() } ?: throw NtfyException(code = 0, message = "no token in the answer")
         } finally {
@@ -106,7 +106,7 @@ class NtfyClient {
         connection.requestMethod = "DELETE"
         connection.setRequestProperty("X-Token", token)
         try {
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint)
         } finally {
             connection.disconnect()
         }
@@ -115,7 +115,7 @@ class NtfyClient {
     suspend fun subscriptions(endpoint: Endpoint): List<NtfySubscription> = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/account")
         try {
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint, isAccount = true)
             val text = connection.inputStream.bufferedReader().use { it.readText() }
             SyncJson.decodeFromString(NtfyAccount.serializer(), text).subscriptions
         } finally {
@@ -132,7 +132,7 @@ class NtfyClient {
         connection.setFixedLengthStreamingMode(body.size)
         try {
             connection.outputStream.use { it.write(body) }
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint, isAccount = true)
         } finally {
             connection.disconnect()
         }
@@ -144,7 +144,7 @@ class NtfyClient {
         connection.setRequestProperty("X-BaseURL", endpoint.server)
         connection.setRequestProperty("X-Topic", topic)
         try {
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint, isAccount = true)
         } finally {
             connection.disconnect()
         }
@@ -168,7 +168,7 @@ class NtfyClient {
         }
         try {
             withContext(Dispatchers.IO) {
-                connection.ensureOk()
+                connection.ensureOk(endpoint = endpoint)
                 opened.complete(Unit)
                 answer.cancel()
                 onOpen()
@@ -184,7 +184,7 @@ class NtfyClient {
     }
 
     suspend fun tosslingHealth(endpoint: Endpoint): TosslingHealth? = withContext(Dispatchers.IO) {
-        val connection = runCatching { openApi(endpoint = endpoint, path = "health") }.getOrNull() ?: return@withContext null
+        val connection = runCatching { openApi(endpoint = endpoint, path = "health", isGated = false) }.getOrNull() ?: return@withContext null
         try {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) return@withContext null
             SyncJson.decodeFromString(TosslingHealth.serializer(), connection.inputStream.bufferedReader().use { it.readText() })
@@ -199,7 +199,7 @@ class NtfyClient {
     suspend fun isTosslingServer(endpoint: Endpoint): Boolean = tosslingHealth(endpoint = endpoint) != null
 
     suspend fun isReachable(endpoint: Endpoint): Boolean = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/health")
+        val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/health", isGated = false)
         try {
             connection.responseCode in HttpURLConnection.HTTP_OK until HttpURLConnection.HTTP_INTERNAL_ERROR
         } catch (error: Exception) {
@@ -219,7 +219,7 @@ class NtfyClient {
             outputStream.use { it.write(body) }
         }
         try {
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint)
             SyncJson.decodeFromString(TosslingProject.serializer(), connection.inputStream.bufferedReader().use { it.readText() })
         } finally {
             connection.disconnect()
@@ -229,7 +229,7 @@ class NtfyClient {
     suspend fun deleteProject(endpoint: Endpoint, topic: String) = withContext(Dispatchers.IO) {
         val connection = openApi(endpoint = endpoint, path = "projects/$topic") { requestMethod = "DELETE" }
         try {
-            connection.ensureOk()
+            connection.ensureOk(endpoint = endpoint)
         } finally {
             connection.disconnect()
         }
@@ -240,8 +240,8 @@ class NtfyClient {
     }
 
     suspend fun fetchText(url: String): String = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = Endpoint(server = "", token = ""), url = url)
-        connection.ensureOk()
+        val connection = open(endpoint = Endpoint(server = "", token = ""), url = url, isGated = false)
+        connection.ensureOk(endpoint = null)
         try {
             connection.inputStream.bufferedReader().use { it.readText() }
         } finally {
@@ -249,25 +249,39 @@ class NtfyClient {
         }
     }
 
-    private fun openApi(endpoint: Endpoint, path: String, prepare: HttpURLConnection.() -> Unit = {}): HttpURLConnection {
+    private fun openApi(endpoint: Endpoint, path: String, isGated: Boolean = true, prepare: HttpURLConnection.() -> Unit = {}): HttpURLConnection {
         API_PREFIXES.forEachIndexed { index, prefix ->
-            val connection = open(endpoint = endpoint, url = "${endpoint.server}$prefix/$path").apply(prepare)
+            val connection = open(endpoint = endpoint, url = "${endpoint.server}$prefix/$path", isGated = isGated).apply(prepare)
             if (connection.responseCode != HttpURLConnection.HTTP_NOT_FOUND || index == API_PREFIXES.lastIndex) return connection
             connection.disconnect()
         }
         error("no API prefixes")
     }
 
-    private fun open(endpoint: Endpoint, url: String): HttpURLConnection =
-        (URL(url).openConnection() as HttpURLConnection).apply {
+    private fun open(endpoint: Endpoint, url: String, isGated: Boolean = true): HttpURLConnection {
+        if (isGated) gate.held(endpoint = endpoint)?.let { held -> throw heldBack(refusal = held) }
+        return (URL(url).openConnection() as HttpURLConnection).apply {
             connectTimeout = CONNECT_TIMEOUT_MS
             readTimeout = READ_TIMEOUT_MS
             if (endpoint.token.isNotEmpty()) setRequestProperty("Authorization", "Bearer ${endpoint.token}")
         }
+    }
 
-    private fun HttpURLConnection.ensureOk() {
+    private fun heldBack(refusal: Refusal): NtfyException {
+        val code = when (refusal.kind) {
+            ServerRefusal.TOKEN -> HttpURLConnection.HTTP_UNAUTHORIZED
+            ServerRefusal.BUSY -> HTTP_TOO_MANY_REQUESTS
+        }
+        return NtfyException(code = code, message = "HTTP $code, not asking the server again for ${(refusal.until - System.currentTimeMillis()) / 1000} s", isHeld = true)
+    }
+
+    private fun HttpURLConnection.ensureOk(endpoint: Endpoint?, isAccount: Boolean = false) {
         val code = responseCode
-        if (code in HttpURLConnection.HTTP_OK until HttpURLConnection.HTTP_MULT_CHOICE) return
+        if (code in HttpURLConnection.HTTP_OK until HttpURLConnection.HTTP_MULT_CHOICE) {
+            endpoint?.let(gate::passed)
+            return
+        }
+        if (endpoint != null) serverRefusal(code = code, isAccount = isAccount)?.let { kind -> gate.refused(endpoint = endpoint, kind = kind) }
         val text = errorStream?.bufferedReader()?.use { it.readText() }.orEmpty().trim()
         disconnect()
         throw NtfyException(code = code, message = "HTTP $code $text".trim())
@@ -282,5 +296,6 @@ class NtfyClient {
         private const val ANSWER_TIMEOUT_MS = 15_000L
         private val API_PREFIXES = listOf("/v1/tossling", "/v1/tossy")
         private const val STREAM_BUFFER = 1 shl 16
+        private const val HTTP_TOO_MANY_REQUESTS = 429
     }
 }

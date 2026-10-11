@@ -58,4 +58,9 @@
     <string name="home_leave_title">Выйти из комнаты?</string>
     <string name="home_leave_text">Телефон удалит ключ комнаты и перестанет делить буфер с её устройствами. Вернуться — отсканировать QR на компьютере.</string>
     <string name="home_leave_confirm">Выйти и удалить ключ</string>
+    <string name="home_refused_token">Сервер больше не принимает токен этого телефона</string>
+    <string name="home_refused_token_text">Подключите телефон к комнате заново. На компьютере в меню Tossling выберите \"Устройства\", затем \"Подключить телефон\".</string>
+    <string name="home_refused_busy">С этой сети слишком много запросов</string>
+    <string name="home_refused_busy_text">Сервер просит подождать. Tossling сам попробует позже.</string>
+    <string name="home_reconnect">Подключить заново</string>
 </resources>

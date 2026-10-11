@@ -20,7 +20,7 @@ import org.koin.dsl.module
 val syncModule = module {
     singleOf(constructor = ::PairingStore)
     singleOf(constructor = ::SyncSettings)
-    singleOf(constructor = ::NtfyClient)
+    single { NtfyClient() }
     singleOf(constructor = ::ClipboardBridge)
     singleOf(constructor = ::SyncNotifications)
     singleOf(constructor = ::PushRegistrar)

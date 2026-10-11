@@ -5,6 +5,7 @@ import com.kopylovis.tossling.core.decompose.base.CommonComponent
 import com.kopylovis.tossling.protocol.ClipItem
 import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.protocol.Transfer
+import com.kopylovis.tossling.protocol.network.ServerRefusal
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -15,6 +16,7 @@ internal data class HomeScreenState(
     val server: String = "",
     val isOnline: Boolean = true,
     val lastContact: Long = 0,
+    val refusal: ServerRefusal? = null,
     val isInstant: Boolean = true,
     val showsTileHint: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -50,6 +52,8 @@ internal interface HomeComponent : CommonComponent {
     fun onDeviceClicked(device: RoomDevice)
 
     fun onAddMacClicked()
+
+    fun onReconnectClicked()
 
     fun onTileHintClicked()
 

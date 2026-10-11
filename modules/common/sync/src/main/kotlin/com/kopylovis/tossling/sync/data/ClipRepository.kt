@@ -7,6 +7,7 @@ import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.protocol.ClipItem
 import com.kopylovis.tossling.protocol.ClipKind
 import com.kopylovis.tossling.protocol.ClipMeta
+import com.kopylovis.tossling.protocol.DEMO_ROOM_URL
 import com.kopylovis.tossling.protocol.DeviceKind
 import com.kopylovis.tossling.protocol.Endpoint
 import com.kopylovis.tossling.protocol.LinkStatus
@@ -27,11 +28,12 @@ import com.kopylovis.tossling.protocol.crypto.RoomKeys
 import com.kopylovis.tossling.protocol.crypto.RoomSecret
 import com.kopylovis.tossling.protocol.crypto.openStream
 import com.kopylovis.tossling.protocol.crypto.sealStream
-import com.kopylovis.tossling.protocol.DEMO_ROOM_URL
 import com.kopylovis.tossling.protocol.demoRoomCode
 import com.kopylovis.tossling.protocol.network.NtfyClient
 import com.kopylovis.tossling.protocol.network.NtfyEvent
 import com.kopylovis.tossling.protocol.network.NtfyException
+import com.kopylovis.tossling.protocol.network.RefusalGate
+import com.kopylovis.tossling.protocol.network.ServerRefusal
 import com.kopylovis.tossling.sync.clipboard.ClipboardBridge
 import com.kopylovis.tossling.sync.clipboard.Outgoing
 import com.kopylovis.tossling.sync.entry.ClipWidget
@@ -41,6 +43,7 @@ import com.kopylovis.tossling.sync.work.RetireTokenWorker
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -61,6 +64,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.security.DigestInputStream
@@ -100,13 +104,18 @@ class ClipRepository internal constructor(
         .map { it.isNotEmpty() }
         .stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = store.pairings.value.isNotEmpty())
 
-    val macs: StateFlow<List<MacDevice>> = combine(store.pairings, links) { pairings, status ->
-        pairings.flatMap { pairing -> macsOf(pairing = pairing, link = status[pairing.id] ?: LinkStatus()) }
+    private val refusals = combine(client.gate.tokens, client.gate.servers) { _, _ -> client.gate }
+
+    val macs: StateFlow<List<MacDevice>> = combine(store.pairings, links, refusals) { pairings, status, gate ->
+        pairings.flatMap { pairing -> macsOf(pairing = pairing, link = linkOf(pairing = pairing, status = status, gate = gate)) }
     }.stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = emptyList())
 
-    val devices: StateFlow<List<RoomDevice>> = combine(store.pairings, links, settings.deviceName, clock) { pairings, status, name, now ->
-        pairings.flatMap { pairing -> devicesOf(pairing = pairing, link = status[pairing.id] ?: LinkStatus(), selfName = name, now = now) }
+    val devices: StateFlow<List<RoomDevice>> = combine(store.pairings, links, refusals, settings.deviceName, clock) { pairings, status, gate, name, now ->
+        pairings.flatMap { pairing -> devicesOf(pairing = pairing, link = linkOf(pairing = pairing, status = status, gate = gate), selfName = name, now = now) }
     }.stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = emptyList())
+
+    val refusal: StateFlow<ServerRefusal?> = combine(store.pairings, refusals) { pairings, gate -> worstRefusal(pairings = pairings, gate = gate) }
+        .stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = worstRefusal(pairings = store.pairings.value, gate = client.gate))
 
     val history: StateFlow<List<ClipItem>> = store.history
 
@@ -254,20 +263,39 @@ class ClipRepository internal constructor(
         val token = if (isLegacy || pairing.token.isEmpty()) null else runCatching { client.createToken(endpoint = pairing.endpoint, label = TOKEN_LABEL) }
             .onFailure { Log.w(TAG, "kept the old token", it) }
             .getOrNull()
-        publishControl(pairing = pairing, meta = control(kind = ClipMeta.KICK).copy(to = listOf(deviceId)))
-        if (remaining.isNotEmpty()) {
-            val sealed = RoomKeys.seal(secret = RoomSecret(room = room, key = key, token = token), recipients = remaining.associate { it.id to it.pk })
-            val rekey = control(kind = ClipMeta.REKEY).copy(
-                to = remaining.map { it.id },
-                ephemeral = sealed.ephemeral,
-                keys = sealed.keys,
-                room = room.takeIf { isLegacy },
-                key = key.takeIf { isLegacy },
-            )
-            publishControl(pairing = pairing, meta = rekey)
+        try {
+            publishControl(pairing = pairing, meta = control(kind = ClipMeta.KICK).copy(to = listOf(deviceId)))
+            if (remaining.isNotEmpty()) {
+                val sealed = RoomKeys.seal(secret = RoomSecret(room = room, key = key, token = token), recipients = remaining.associate { it.id to it.pk })
+                val rekey = control(kind = ClipMeta.REKEY).copy(
+                    to = remaining.map { it.id },
+                    ephemeral = sealed.ephemeral,
+                    keys = sealed.keys,
+                    room = room.takeIf { isLegacy },
+                    key = key.takeIf { isLegacy },
+                )
+                publishControl(pairing = pairing, meta = rekey)
+            }
+        } catch (error: Throwable) {
+            if (token != null) withContext(NonCancellable) { dropToken(server = pairing.server, token = token) }
+            throw error
         }
         switchRoom(pairing = pairing, room = room, key = key, token = token, keep = null, without = deviceId)
         if (token != null) RetireTokenWorker.enqueue(context = context, server = pairing.server, token = token, old = pairing.token)
+    }
+
+    private suspend fun dropToken(server: String, token: String) {
+        runCatching { client.deleteToken(endpoint = Endpoint(server = server, token = token), token = token) }
+            .onSuccess { Log.i(TAG, "the removal stopped, its new token is deleted") }
+            .onFailure { Log.w(TAG, "the removal stopped and its new token stays on the server", it) }
+    }
+
+    private fun linkOf(pairing: Pairing, status: Map<String, LinkStatus>, gate: RefusalGate): LinkStatus =
+        (status[pairing.id] ?: LinkStatus()).copy(refusal = gate.refusal(endpoint = pairing.endpoint)?.kind)
+
+    private fun worstRefusal(pairings: List<Pairing>, gate: RefusalGate): ServerRefusal? {
+        val kinds = pairings.mapNotNull { gate.refusal(endpoint = it.endpoint)?.kind }
+        return if (ServerRefusal.TOKEN in kinds) ServerRefusal.TOKEN else kinds.firstOrNull()
     }
 
     private suspend fun roomPrefix(endpoint: Endpoint): String =

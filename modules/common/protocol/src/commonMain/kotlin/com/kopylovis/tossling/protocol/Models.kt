@@ -1,5 +1,6 @@
 package com.kopylovis.tossling.protocol
 
+import com.kopylovis.tossling.protocol.network.ServerRefusal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -168,6 +169,7 @@ class PairingException(val problem: PairingProblem, val server: String = "", cau
 data class LinkStatus(
     val isOnline: Boolean = true,
     val lastContact: Long = 0,
+    val refusal: ServerRefusal? = null,
 )
 
 data class Transfer(
