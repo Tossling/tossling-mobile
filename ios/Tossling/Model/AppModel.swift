@@ -59,6 +59,9 @@ final class AppModel {
     private var lastPing = Date.distantPast
     private var lastProjectSync = Date.distantPast
     private var islandTask: Task<Void, Never>?
+    private var withoutDeviceTokens: Set<String> = []
+    private var exchanging = false
+    private var revoking = false
 
     init() {
         clips = history.load()
@@ -139,6 +142,7 @@ final class AppModel {
         guard isPaired else { return }
         followPush()
         connect()
+        Task { await ensureOwnToken() }
         Task {
             await syncProjects(force: false)
             await retireTokens()
@@ -170,9 +174,11 @@ final class AppModel {
             throw PairingError.network(URL(string: paired.config.server)?.host ?? paired.config.server)
         }
         guard works else { throw PairingError.token }
-        if let old = core { try? await server.publish(old.config, old.bye()) }
+        let old = core
+        if let old { try? await server.publish(old.config, old.bye()) }
         let core = RoomCore(config: paired.config, members: paired.members)
         try await server.publish(core.config, core.hello(to: nil, renewed: true, invite: nil))
+        if let old { await removeOwnToken(old.config) }
         listener?.cancel()
         store.forgetRoom()
         store.config = core.config
@@ -182,12 +188,14 @@ final class AppModel {
         savedRoom = nil
         self.core = core
         refreshDevices()
+        Task { await ensureOwnToken() }
     }
 
     func finishPairing() {
         isPaired = true
         followPush()
         connect()
+        Task { await ensureOwnToken() }
         Task { await syncProjects(force: true) }
     }
 
@@ -195,7 +203,7 @@ final class AppModel {
         guard let saved = savedRoom else { return }
         let works: Bool
         do {
-            works = try await server.accountWorks(server: saved.server, token: saved.token)
+            works = try await server.accountWorks(server: saved.server, token: saved.authToken)
         } catch let refused as ServerRefused {
             throw refused.kind == .busy ? PairingError.busy : PairingError.roomMoved
         } catch {
@@ -212,13 +220,18 @@ final class AppModel {
     }
 
     func leave() async throws {
-        if let core { try await server.publish(core.config, core.bye()) }
+        if let core {
+            try await server.publish(core.config, core.bye())
+            await removeOwnToken(core.config)
+        }
         forget()
     }
 
     func revoke(_ device: DeviceItem) async throws {
         guard let core else { return }
         guard device.id != core.config.owner else { throw RoomError.creator }
+        revoking = true
+        defer { revoking = false }
         let prefix = core.config.room.hasPrefix("tossy-") ? "tossy-" : "tossling-"
         let room = RoomCore.companion.createRoom(prefix: prefix)
         let key = ClipCipher.companion.randomKey()
@@ -243,6 +256,17 @@ final class AppModel {
         refreshDevices()
         followPush()
         connect()
+        guard !core.config.own.isEmpty else { return }
+        let config = core.config
+        let server = server
+        Task {
+            do {
+                let removed = try await server.removeDevice(config, id: device.id)
+                print("tokens: \(removed) own token(s) of the removed device deleted")
+            } catch {
+                print("tokens: the removed device's own token stays on the server: \(error.localizedDescription)")
+            }
+        }
     }
 
     func setAlias(_ device: DeviceItem, _ alias: String) {
@@ -616,6 +640,58 @@ final class AppModel {
     private func mergeInbox() {
         let inbox = FeedStore.takeInbox().filter { alert in !alerts.contains { $0.id == alert.id } }
         if !inbox.isEmpty { setAlerts(inbox + alerts) }
+    }
+
+    private func ensureOwnToken() async {
+        guard !exchanging, let core, core.config.own.isEmpty, !core.config.token.isEmpty else { return }
+        let config = core.config
+        guard !withoutDeviceTokens.contains(config.server) else { return }
+        exchanging = true
+        defer { exchanging = false }
+        guard let health = await server.health(server: config.server) else { return }
+        guard health.givesDeviceTokens else {
+            withoutDeviceTokens.insert(config.server)
+            return
+        }
+        let own: String
+        do {
+            own = try await server.deviceToken(config, id: config.deviceId, name: store.deviceName)
+        } catch {
+            print("tokens: no token of its own from \(config.server) yet: \(error.localizedDescription)")
+            return
+        }
+        guard !revoking, let current = self.core, current === core, current.config.room == config.room, current.config.own.isEmpty else {
+            print("tokens: the room changed while asking for a token of its own, asking again later")
+            return
+        }
+        let updated = current.config.doCopy(
+            server: current.config.server,
+            token: current.config.token,
+            room: current.config.room,
+            key: current.config.key,
+            deviceId: current.config.deviceId,
+            deviceName: current.config.deviceName,
+            owner: current.config.owner,
+            identity: current.config.identity,
+            source: current.config.source,
+            own: own
+        )
+        let replaced = RoomCore(config: updated, members: current.members)
+        store.config = replaced.config
+        self.core = replaced
+        print("tokens: \(config.server) gave this phone a token of its own")
+        updateRefusal()
+        if listener != nil { connect() }
+    }
+
+    private func removeOwnToken(_ config: RoomConfig) async {
+        guard !config.own.isEmpty else { return }
+        do {
+            let removed = try await server.removeDevice(config, id: config.deviceId)
+            print("tokens: \(removed) own token(s) of this phone deleted")
+        } catch {
+            print("tokens: this phone's own token stays on the server: \(error.localizedDescription)")
+        }
     }
 
     private func retireTokens() async {

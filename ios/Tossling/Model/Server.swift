@@ -65,7 +65,7 @@ final class Server {
                     var components = URLComponents(string: "\(config.server)/\(path)/json")!
                     components.queryItems = [URLQueryItem(name: "since", value: since)]
                     var request = URLRequest(url: components.url!)
-                    authorize(&request, config.token)
+                    authorize(&request, config.authToken)
                     let (bytes, response) = try await exchange(config, request) { try await live.bytes(for: $0) }
                     try check(response, nil)
                     onOpen()
@@ -85,7 +85,7 @@ final class Server {
         var components = URLComponents(string: "\(config.server)/\(topic ?? config.room)/json")!
         components.queryItems = [URLQueryItem(name: "poll", value: "1"), URLQueryItem(name: "since", value: since)]
         var request = URLRequest(url: components.url!)
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         let (data, response) = try await exchange(config, request) { try await session.data(for: $0) }
         try check(response, data)
         return String(decoding: data, as: UTF8.self).split(separator: "\n").compactMap { NtfyModelsKt.parseEvent(line: String($0)) }
@@ -96,7 +96,7 @@ final class Server {
         components.queryItems = [URLQueryItem(name: "poll", value: "1"), URLQueryItem(name: "since", value: "all"), URLQueryItem(name: "id", value: id)]
         var request = URLRequest(url: components.url!)
         request.timeoutInterval = 15
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         let (data, response) = try await exchange(config, request) { try await session.data(for: $0) }
         try check(response, data)
         return String(decoding: data, as: UTF8.self).split(separator: "\n").compactMap { NtfyModelsKt.parseEvent(line: String($0)) }.first { $0.id == id }
@@ -104,7 +104,7 @@ final class Server {
 
     func download(_ config: RoomConfig, url: String) async throws -> Data {
         var request = URLRequest(url: URL(string: url)!)
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         let (data, response) = try await exchange(config, request) { try await session.data(for: $0) }
         try check(response, data)
         return data
@@ -113,7 +113,7 @@ final class Server {
     func downloadFile(_ config: RoomConfig, url: String) async throws -> URL {
         var request = URLRequest(url: URL(string: url)!)
         request.timeoutInterval = 300
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         let (file, response) = try await exchange(config, request) { try await session.download(for: $0) }
         try check(response, nil)
         let kept = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -123,7 +123,7 @@ final class Server {
 
     func subscriptions(_ config: RoomConfig) async throws -> [NtfySubscription] {
         var request = URLRequest(url: URL(string: "\(config.server)/v1/account")!)
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         let (data, response) = try await exchange(config, request) { try await session.data(for: $0) }
         try check(response, data)
         return NtfyModelsKt.parseAccount(text: String(decoding: data, as: UTF8.self))?.subscriptions ?? []
@@ -143,7 +143,7 @@ final class Server {
         var request = URLRequest(url: URL(string: "\(config.server)/v1/account/token")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         let body = Data("{\"label\":\"tossling\",\"expires\":0}".utf8)
         let (data, response) = try await exchange(config, request) { try await session.upload(for: $0, from: body) }
         try check(response, data)
@@ -154,7 +154,7 @@ final class Server {
     }
 
     func deleteToken(_ config: RoomConfig, token: String, authority: String? = nil) async throws {
-        let authority = authority ?? config.token
+        let authority = authority ?? config.authToken
         var request = URLRequest(url: URL(string: "\(config.server)/v1/account/token")!)
         request.httpMethod = "DELETE"
         request.setValue(token, forHTTPHeaderField: "X-Token")
@@ -164,7 +164,7 @@ final class Server {
     }
 
     func discardToken(_ config: RoomConfig, token: String) async {
-        for authority in [token, config.token] {
+        for authority in [token, config.authToken] {
             do {
                 try await deleteToken(config, token: token, authority: authority)
                 return
@@ -176,12 +176,37 @@ final class Server {
         }
     }
 
+    func deviceToken(_ config: RoomConfig, id: String, name: String) async throws -> String {
+        var request = URLRequest(url: URL(string: "\(config.server)/v1/tossling/devices")!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        authorize(&request, config.token)
+        let body = Data(NtfyModelsKt.encodeDeviceRequest(id: id, name: name).utf8)
+        let (data, response) = try await exchange(server: config.server, token: config.token, request) { try await session.upload(for: $0, from: body) }
+        try check(response, data)
+        guard let token = NtfyModelsKt.parseToken(text: String(decoding: data, as: UTF8.self)) else {
+            throw ServerError(code: 0, text: "no token in the answer")
+        }
+        return token
+    }
+
+    func removeDevice(_ config: RoomConfig, id: String) async throws -> Int {
+        var components = URLComponents(string: "\(config.server)/v1/tossling/devices")!
+        components.path += "/\(id)"
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "DELETE"
+        authorize(&request, config.authToken)
+        let (data, response) = try await exchange(config, request) { try await session.data(for: $0) }
+        try check(response, data)
+        return (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["removed"] as? Int ?? 0
+    }
+
     private func api(_ config: RoomConfig, path: String, method: String, body: Data?) async throws -> (Data, URLResponse) {
         for prefix in ["/v1/tossling", "/v1/tossy"] {
             var request = URLRequest(url: URL(string: "\(config.server)\(prefix)/\(path)")!)
             request.httpMethod = method
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            authorize(&request, config.token)
+            authorize(&request, config.authToken)
             let (data, response) = try await exchange(config, request) { request in
                 if let body { try await session.upload(for: request, from: body) } else { try await session.data(for: request) }
             }
@@ -213,15 +238,15 @@ final class Server {
     }
 
     func refusal(_ config: RoomConfig) -> ServerRefusal? {
-        gate.refusal(server: config.server, token: config.token)
+        gate.refusal(server: config.server, token: config.authToken)
     }
 
     func pause(_ config: RoomConfig) -> TimeInterval {
-        gate.pauseLeft(server: config.server, token: config.token)
+        gate.pauseLeft(server: config.server, token: config.authToken)
     }
 
     private func exchange<T>(_ config: RoomConfig, _ request: URLRequest, _ work: (URLRequest) async throws -> (T, URLResponse)) async throws -> (T, URLResponse) {
-        try await exchange(server: config.server, token: config.token, request, work)
+        try await exchange(server: config.server, token: config.authToken, request, work)
     }
 
     private func exchange<T>(server: String, token: String, _ request: URLRequest, _ work: (URLRequest) async throws -> (T, URLResponse)) async throws -> (T, URLResponse) {
@@ -233,7 +258,7 @@ final class Server {
 
     private func request(_ config: RoomConfig, path: String) -> URLRequest {
         var request = URLRequest(url: URL(string: config.server + path)!)
-        authorize(&request, config.token)
+        authorize(&request, config.authToken)
         return request
     }
 
