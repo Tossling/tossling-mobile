@@ -156,10 +156,12 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
 
     fun fileCipher(): ClipCipher = cipher
 
+    fun canRenewToken(id: String): Boolean = remainingAfter(id = id).values.all { RoomKeys.decodeKey(it.pk) != null }
+
     fun revoke(id: String, room: String, key: String, token: String?): List<Outgoing> {
         require(id != config.owner) { "the creator of the room cannot be removed" }
-        val others = members.filterKeys { it != id && it != config.deviceId && !it.startsWith(LEGACY_PREFIX) }
-        val isLegacy = others.values.any { RoomKeys.decodeKey(it.pk) == null }
+        val others = remainingAfter(id = id)
+        val isLegacy = !canRenewToken(id = id)
         val messages = mutableListOf(control(kind = ClipMeta.KICK).copy(to = listOf(id)).sealed())
         if (others.isNotEmpty()) {
             val sealed = RoomKeys.seal(secret = RoomSecret(key = key, room = room, token = token.takeUnless { isLegacy }), recipients = others.mapValues { it.value.pk })
@@ -173,6 +175,8 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
         }
         return messages
     }
+
+    private fun remainingAfter(id: String): Map<String, Member> = members.filterKeys { it != id && it != config.deviceId && !it.startsWith(LEGACY_PREFIX) }
 
     fun switchRoom(room: String, key: String, token: String?, keep: Set<String>) {
         config = config.copy(room = room, key = key, token = token?.takeIf { it.isNotEmpty() } ?: config.token)

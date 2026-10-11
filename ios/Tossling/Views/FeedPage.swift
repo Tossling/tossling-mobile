@@ -92,7 +92,7 @@ struct FeedPage: View {
         }
         .refreshable {
             let ok = await model.refresh()
-            model.say(ok ? String(localized: "Updated") : String(localized: "No connection to the server"), ok ? .done : .error)
+            model.say(ok ? String(localized: "Updated") : model.refusal?.message ?? String(localized: "No connection to the server"), ok ? .done : .error)
         }
         .confirmationDialog(String(localized: "Clear the feed?"), isPresented: $confirmClear, titleVisibility: .visible) {
             Button(String(localized: "Clear"), role: .destructive) { model.clearFeed() }

@@ -8,6 +8,14 @@ struct DevicesView: View {
     var body: some View {
         ScrollPage {
             PageTitle(title: String(localized: "Devices"), subtitle: String(localized: "One room: whatever is copied on any of them, the others see"))
+            if let refusal = model.refusal {
+                GlassGroup {
+                    RefusalNotice(refusal: refusal) { path.append(.pairing) }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 6)
+                }
+                .padding(.top, 24)
+            }
             GlassGroup {
                 ForEach(model.devices) { device in
                     Button { path.append(.device(device.id)) } label: {

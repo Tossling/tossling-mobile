@@ -80,6 +80,7 @@ targets:
       - path: NotificationService
       - path: Tossling/Model/Keychain.swift
       - path: Tossling/Model/Server.swift
+      - path: Tossling/Model/Refusals.swift
       - path: Tossling/Model/Feed.swift
       - path: Tossling/Model/History.swift
       - path: Tossling/Resources/Localizable.xcstrings
@@ -121,6 +122,7 @@ targets:
       - path: ShareExtension
       - path: Tossling/Model/Keychain.swift
       - path: Tossling/Model/Server.swift
+      - path: Tossling/Model/Refusals.swift
       - path: Tossling/Model/History.swift
       - path: Tossling/Model/Feed.swift
       - path: Tossling/Model/Sender.swift

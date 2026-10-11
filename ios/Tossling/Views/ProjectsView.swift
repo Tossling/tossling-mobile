@@ -198,6 +198,8 @@ struct ProjectView: View {
             try await model.removeProject(existing)
             model.say(String(localized: "Project deleted"), .done)
             dismiss()
+        } catch let refused as ServerRefused {
+            model.say(refused.kind.message, .error)
         } catch {
             model.say(String(localized: "No connection to the server"), .error)
         }

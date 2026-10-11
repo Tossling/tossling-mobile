@@ -19,6 +19,12 @@ struct ClipboardPage: View {
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
             }
+            if let refusal = model.refusal {
+                Section {
+                    RefusalNotice(refusal: refusal) { path.append(.pairing) }
+                        .glassRow()
+                }
+            }
             Section {
                 ForEach(model.devices) { device in
                     Button { path.append(.device(device.id)) } label: {
@@ -103,7 +109,7 @@ struct ClipboardPage: View {
         .modifier(Search(enabled: model.clips.count > 6 || !query.isEmpty, query: $query))
         .refreshable {
             let ok = await model.refresh()
-            model.say(ok ? String(localized: "Updated") : String(localized: "No connection to the server"), ok ? .done : .error)
+            model.say(ok ? String(localized: "Updated") : model.refusal?.message ?? String(localized: "No connection to the server"), ok ? .done : .error)
         }
         .quickLookPreview($preview)
         .onAppear { model.probe() }
@@ -158,6 +164,30 @@ struct EmptyState: View {
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 28)
         .padding(.vertical, 36)
+    }
+}
+
+struct RefusalNotice: View {
+
+    let refusal: ServerRefusal
+    let reconnect: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: refusal == .token ? "exclamationmark.circle" : "hourglass")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(refusal == .token ? Palette.dangerInk : Palette.ink2)
+                Text(refusal.message)
+                    .font(Fonts.body)
+                    .foregroundStyle(Palette.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if refusal == .token {
+                CapsuleButton(title: String(localized: "Connect again"), style: .plain, icon: "qrcode.viewfinder", height: 44, action: reconnect)
+            }
+        }
+        .padding(.vertical, 8)
     }
 }
 

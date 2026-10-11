@@ -106,6 +106,19 @@ class RoomCoreTest {
     }
 
     @Test
+    fun aNewTokenOnlyWhenEveryoneLeftCanOpenTheRekey() {
+        val phone = core(id = "phone", name = "iPhone")
+        phone.open(core(id = "pixel", name = "Pixel", source = "android").hello(renewed = true).event(id = "h1"), nowMs = now)
+        val keyed = phone.members
+        val base = phone.config
+        val old = Member(id = "legacy-old", name = "Old", source = "android", seen = now)
+        val broken = Member(id = "watch", name = "Watch", source = "android", seen = now, pk = "not a key")
+        assertTrue(RoomCore(base, keyed + (old.id to old)).canRenewToken(id = "mac"))
+        assertTrue(RoomCore(base, keyed + (broken.id to broken)).canRenewToken(id = "watch"))
+        assertEquals(false, RoomCore(base, keyed + (broken.id to broken)).canRenewToken(id = "pixel"))
+    }
+
+    @Test
     fun theOwnerIgnoresAKick() {
         val mac = core(id = "mac", name = "Studio", owner = "mac", source = "mac")
         val phone = core(id = "phone", name = "iPhone")

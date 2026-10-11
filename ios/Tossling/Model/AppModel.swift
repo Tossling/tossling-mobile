@@ -43,6 +43,7 @@ final class AppModel {
     private(set) var isPaired = false
     private(set) var savedRoom: RoomConfig?
     private(set) var connection = Connection.offline
+    private(set) var refusal: ServerRefusal?
     private(set) var clips: [Clip] = []
     private(set) var devices: [DeviceItem] = []
     private(set) var projects: [Project] = []
@@ -71,6 +72,9 @@ final class AppModel {
             } else {
                 savedRoom = config
             }
+        }
+        NotificationCenter.default.addObserver(forName: .serverRefusal, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in self?.updateRefusal() }
         }
     }
 
@@ -131,6 +135,7 @@ final class AppModel {
             history.save(clips)
         }
         mergeInbox()
+        updateRefusal()
         guard isPaired else { return }
         followPush()
         connect()
@@ -159,6 +164,8 @@ final class AppModel {
         let works: Bool
         do {
             works = try await server.accountWorks(server: paired.config.server, token: paired.config.token)
+        } catch let refused as ServerRefused {
+            throw refused.kind == .busy ? PairingError.busy : PairingError.token
         } catch {
             throw PairingError.network(URL(string: paired.config.server)?.host ?? paired.config.server)
         }
@@ -189,6 +196,8 @@ final class AppModel {
         let works: Bool
         do {
             works = try await server.accountWorks(server: saved.server, token: saved.token)
+        } catch let refused as ServerRefused {
+            throw refused.kind == .busy ? PairingError.busy : PairingError.roomMoved
         } catch {
             throw PairingError.network(URL(string: saved.server)?.host ?? saved.server)
         }
@@ -213,10 +222,18 @@ final class AppModel {
         let prefix = core.config.room.hasPrefix("tossy-") ? "tossy-" : "tossling-"
         let room = RoomCore.companion.createRoom(prefix: prefix)
         let key = ClipCipher.companion.randomKey()
-        let legacy = core.members.values.contains { $0.id != device.id && $0.id != core.config.deviceId && $0.pk.isEmpty }
-        let token = legacy ? nil : try? await server.createToken(core.config)
+        let token = core.canRenewToken(id: device.id) ? try? await server.createToken(core.config) : nil
         let messages = core.revoke(id: device.id, room: room, key: key, token: token)
-        for message in messages { try await server.publish(core.config, message) }
+        do {
+            for message in messages { try await server.publish(core.config, message) }
+        } catch {
+            if let token {
+                let config = core.config
+                let server = server
+                await Task { await server.discardToken(config, token: token) }.value
+            }
+            throw error
+        }
         let oldToken = core.config.token
         core.switchRoom(room: room, key: key, token: token, keep: Set(core.members.keys.filter { $0 != device.id }))
         if token != nil { store.retiredTokens[oldToken] = Date().addingTimeInterval(86400) }
@@ -251,8 +268,10 @@ final class AppModel {
             for event in events { await handle(event, core: core) }
             await syncProjects(force: false)
             await pollProjects()
+            updateRefusal()
             return true
         } catch {
+            updateRefusal()
             return false
         }
     }
@@ -354,6 +373,8 @@ final class AppModel {
         let created: TosslingProject?
         do {
             created = try await server.createProject(core.config, topic: topic, name: name)
+        } catch let refused as ServerRefused {
+            throw refused
         } catch let error as ServerError where error.isAuth {
             throw ProjectError.token
         } catch {
@@ -421,6 +442,7 @@ final class AppModel {
         isPaired = false
         connection = .offline
         devices = []
+        refusal = nil
     }
 
     private func followPush() {
@@ -452,12 +474,10 @@ final class AppModel {
                     }
                     if Task.isCancelled || self.core !== core { return }
                 }
-            } catch let error as ServerError where error.isAuth {
-                retry = max(retry, 30)
             } catch {}
             if Task.isCancelled { return }
             connection = .connecting
-            try? await Task.sleep(for: .seconds(retry))
+            try? await Task.sleep(for: .seconds(max(retry, server.pause(core.config))))
             retry = min(retry * 2, 60)
         }
     }
@@ -604,6 +624,13 @@ final class AppModel {
             do {
                 try await server.deleteToken(core.config, token: token)
                 store.retiredTokens.removeValue(forKey: token)
+            } catch let error as ServerError where error.isGone {
+                store.retiredTokens.removeValue(forKey: token)
+            } catch let error as ServerError where error.code == 409 {
+                print("tokens: the server provisioned this token itself and does not delete it, it stays")
+                store.retiredTokens.removeValue(forKey: token)
+            } catch is ServerRefused {
+                break
             } catch let error as ServerError where (400..<500).contains(error.code) {
                 store.retiredTokens.removeValue(forKey: token)
             } catch {}
@@ -630,7 +657,12 @@ final class AppModel {
         store.aliases[id] ?? fallback
     }
 
+    private func updateRefusal() {
+        refusal = core.flatMap { server.refusal($0.config) }
+    }
+
     private func refreshDevices() {
+        updateRefusal()
         guard let core else {
             devices = []
             return
@@ -690,13 +722,14 @@ enum SendRefusal: LocalizedError {
 }
 
 enum PairingError: LocalizedError {
-    case notACode, token, network(String), roomMoved
+    case notACode, token, network(String), roomMoved, busy
 
     var title: String {
         switch self {
         case .notACode: String(localized: "This is not a Tossling code")
         case .token, .roomMoved: String(localized: "The server did not accept the token")
         case .network: String(localized: "No connection to the server")
+        case .busy: String(localized: "The server asks to wait")
         }
     }
 
@@ -706,6 +739,7 @@ enum PairingError: LocalizedError {
         case .token: String(localized: "The code is outdated or already used. Get a new one on the computer and scan it again.")
         case let .network(host): String(localized: "\(host) does not respond. Check the internet on the phone and that the server is running.")
         case .roomMoved: String(localized: "The room has moved on without this phone. Pair again with the QR code.")
+        case .busy: ServerRefusal.busy.message
         }
     }
 }

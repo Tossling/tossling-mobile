@@ -540,6 +540,16 @@
         }
       }
     },
+    "Connect again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Подключить заново"
+          }
+        }
+      }
+    },
     "Connected to %@": {
       "localizations": {
         "ru": {
@@ -2232,6 +2242,16 @@
         }
       }
     },
+    "The server asks to wait": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер просит подождать"
+          }
+        }
+      }
+    },
     "The server did not accept the token": {
       "localizations": {
         "ru": {
@@ -2258,6 +2278,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Сервер уже удалил то, что прислал %@"
+          }
+        }
+      }
+    },
+    "The server no longer accepts this device's token. Connect it to the room again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сервер больше не принимает токен этого устройства. Подключите его к комнате заново."
           }
         }
       }
@@ -2428,6 +2458,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Слишком большое. Текст до 1 МБ, картинка до 15 МБ, файл до 500 МБ"
+          }
+        }
+      }
+    },
+    "Too many requests from this network, the server asks to wait. Tossling will try again later.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "С этой сети слишком много запросов, сервер просит подождать. Tossling попробует позже."
           }
         }
       }
