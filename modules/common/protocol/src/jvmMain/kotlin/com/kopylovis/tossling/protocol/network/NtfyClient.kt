@@ -101,6 +101,32 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
         }
     }
 
+    suspend fun deviceToken(endpoint: Endpoint, id: String, name: String): String = withContext(Dispatchers.IO) {
+        val body = encodeDeviceRequest(id = id, name = name).toByteArray()
+        val connection = openApi(endpoint = endpoint, path = "devices") {
+            requestMethod = "POST"
+            doOutput = true
+            setRequestProperty("Content-Type", "application/json")
+            setFixedLengthStreamingMode(body.size)
+            outputStream.use { it.write(body) }
+        }
+        try {
+            connection.ensureOk(endpoint = endpoint)
+            parseToken(text = connection.inputStream.bufferedReader().use { it.readText() }) ?: throw NtfyException(code = 0, message = "no token in the answer")
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    suspend fun removeDevice(endpoint: Endpoint, id: String) = withContext(Dispatchers.IO) {
+        val connection = openApi(endpoint = endpoint, path = "devices/$id") { requestMethod = "DELETE" }
+        try {
+            connection.ensureOk(endpoint = endpoint)
+        } finally {
+            connection.disconnect()
+        }
+    }
+
     suspend fun deleteToken(endpoint: Endpoint, token: String) = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/v1/account/token")
         connection.requestMethod = "DELETE"

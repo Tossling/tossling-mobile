@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -134,7 +135,17 @@ class ClipRepository internal constructor(
 
     @Volatile private var lastPingAt = 0L
 
+    private val exchanging = Mutex()
+
+    private val withoutDeviceTokens = mutableSetOf<String>()
+
     init {
+        scope.launch {
+            store.pairings.map { list -> list.filter(::needsOwnToken).map { it.id } }
+                .distinctUntilChanged()
+                .filter { it.isNotEmpty() }
+                .collect { ensureOwnTokens() }
+        }
         scope.launch {
             combine(store.pairings, settings.deviceName) { pairings, name ->
                 val rooms = pairings.filter { it.isRoom && it.host != Endpoint(server = DEMO_ROOM_URL).host }.map { it.copy(members = emptyList(), since = 0) }
@@ -245,8 +256,32 @@ class ClipRepository internal constructor(
     suspend fun leave(pairingId: String) {
         val pairing = store.pairings.value.firstOrNull { it.id == pairingId } ?: return
         if (pairing.isRoom) runCatching { publishControl(pairing = pairing, meta = control(kind = ClipMeta.BYE)) }
+        if (pairing.ownToken.isNotEmpty()) {
+            runCatching { client.removeDevice(endpoint = pairing.endpoint, id = settings.deviceId) }
+                .onFailure { Log.w(TAG, "this phone's own token stays on ${pairing.host}", it) }
+        }
         unpair(id = pairingId)
     }
+
+    suspend fun ensureOwnTokens() = exchanging.withLock {
+        store.pairings.value.filter(::needsOwnToken).forEach { pairing ->
+            if (pairing.server in withoutDeviceTokens) return@forEach
+            val health = runCatching { client.tosslingHealth(endpoint = Endpoint(server = pairing.server)) }.getOrNull() ?: return@forEach
+            if (!health.givesDeviceTokens) {
+                withoutDeviceTokens += pairing.server
+                return@forEach
+            }
+            runCatching { client.deviceToken(endpoint = pairing.endpoint, id = settings.deviceId, name = settings.deviceName.value) }
+                .onSuccess { own ->
+                    store.setOwnToken(pairingId = pairing.id, token = own)
+                    Log.i(TAG, "${pairing.host} gave this phone a token of its own")
+                }
+                .onFailure { Log.w(TAG, "no token of its own from ${pairing.host} yet", it) }
+        }
+    }
+
+    private fun needsOwnToken(pairing: Pairing): Boolean =
+        pairing.isRoom && pairing.ownToken.isEmpty() && pairing.token.isNotEmpty() && pairing.host != Endpoint(server = DEMO_ROOM_URL).host
 
     suspend fun revoke(pairingId: String, deviceId: String) {
         val pairing = store.pairings.value.firstOrNull { it.id == pairingId } ?: return
@@ -282,6 +317,11 @@ class ClipRepository internal constructor(
         }
         switchRoom(pairing = pairing, room = room, key = key, token = token, keep = null, without = deviceId)
         if (token != null) RetireTokenWorker.enqueue(context = context, server = pairing.server, token = token, old = pairing.token)
+        if (pairing.ownToken.isNotEmpty()) {
+            runCatching { client.removeDevice(endpoint = pairing.endpoint, id = deviceId) }
+                .onSuccess { Log.i(TAG, "the removed device's own token is deleted") }
+                .onFailure { Log.w(TAG, "the removed device's own token stays on the server", it) }
+        }
     }
 
     private suspend fun dropToken(server: String, token: String) {
@@ -322,6 +362,7 @@ class ClipRepository internal constructor(
         val now = System.currentTimeMillis()
         if (now - lastPingAt < PING_INTERVAL_MS) return
         lastPingAt = now
+        ensureOwnTokens()
         store.pairings.value.filter { it.isRoom }.forEach { pairing ->
             runCatching { publishControl(pairing = pairing, meta = control(kind = ClipMeta.PING)) }
                 .onSuccess { markLink(id = pairing.id, isOnline = true) }

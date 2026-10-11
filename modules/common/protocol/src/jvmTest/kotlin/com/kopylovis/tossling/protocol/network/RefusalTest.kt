@@ -75,4 +75,19 @@ class RefusalTest {
         socket.close()
         assertEquals(2, requests.size)
     }
+
+    @Test
+    fun aDeviceAsksForATokenOfItsOwn() = runBlocking {
+        val socket = server(status = "200 OK", body = """{"token":"tk_own","label":"tossling-device:a1:Pixel"}""")
+        val token = NtfyClient().deviceToken(endpoint = Endpoint(server = "http://127.0.0.1:${socket.localPort}", token = "tk_room"), id = "a1", name = "Pixel")
+        socket.close()
+        assertEquals("tk_own", token)
+        assertEquals("""POST /v1/tossling/devices HTTP/1.1 {"id":"a1","name":"Pixel"}""", requests.single())
+    }
+
+    @Test
+    fun healthTellsWhetherTheServerGivesDeviceTokens() {
+        assertEquals(true, parseHealth(text = """{"server":"tossling-server","devices":true}""")?.givesDeviceTokens)
+        assertEquals(false, parseHealth(text = """{"server":"tossling-server"}""")?.givesDeviceTokens)
+    }
 }

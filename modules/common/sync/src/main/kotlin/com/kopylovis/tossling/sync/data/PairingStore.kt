@@ -67,6 +67,12 @@ internal class PairingStore(context: Context) {
         writePairings()
     }
 
+    fun setOwnToken(pairingId: String, token: String): Pairing? {
+        _pairings.update { list -> list.map { if (it.id == pairingId) it.copy(ownToken = token) else it } }
+        writePairings()
+        return _pairings.value.firstOrNull { it.id == pairingId }
+    }
+
     fun rekey(pairingId: String, room: String, key: String, token: String?, without: String?): Pairing? {
         val old = _pairings.value.firstOrNull { it.id == pairingId } ?: return null
         val forgetsMac = without != null && without == old.macId

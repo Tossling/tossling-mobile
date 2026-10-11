@@ -26,8 +26,11 @@ data class RoomConfig(
     val owner: String = "",
     val identity: String = "",
     val source: String = "ios",
+    val own: String = "",
 ) {
     val isOwner: Boolean get() = owner.isNotEmpty() && owner == deviceId
+
+    val authToken: String get() = own.ifEmpty { token }
 }
 
 data class Outgoing(

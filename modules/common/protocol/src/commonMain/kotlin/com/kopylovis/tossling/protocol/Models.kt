@@ -26,6 +26,7 @@ data class Pairing(
     @SerialName("o") val owner: String = "",
     val members: List<Member> = emptyList(),
     val since: Long = 0,
+    @SerialName("own") val ownToken: String = "",
 ) {
     val id: String get() = inTopic
 
@@ -35,7 +36,7 @@ data class Pairing(
 
     val host: String get() = server.substringAfter("://").substringBefore("/")
 
-    val endpoint: Endpoint get() = Endpoint(server = server, token = token)
+    val endpoint: Endpoint get() = Endpoint(server = server, token = ownToken.ifEmpty { token })
 }
 
 @Serializable

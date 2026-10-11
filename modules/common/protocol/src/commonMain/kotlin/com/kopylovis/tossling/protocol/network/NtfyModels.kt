@@ -54,6 +54,16 @@ data class NtfyTokenRequest(
     }
 }
 
+@Serializable
+data class TosslingDeviceRequest(
+    val id: String,
+    val name: String,
+)
+
+fun encodeDeviceRequest(id: String, name: String): String = SyncJson.encodeToString(TosslingDeviceRequest.serializer(), TosslingDeviceRequest(id = id, name = name))
+
+fun parseToken(text: String): String? = runCatching { SyncJson.decodeFromString(NtfyToken.serializer(), text) }.getOrNull()?.token?.takeIf { it.isNotEmpty() }
+
 fun encodeTokenRequest(label: String): String = SyncJson.encodeToString(NtfyTokenRequest.serializer(), NtfyTokenRequest(label = label))
 
 @Serializable
@@ -61,7 +71,10 @@ data class TosslingHealth(
     val server: String = "",
     val push: Boolean? = null,
     val url: String = "",
+    val devices: Boolean? = null,
 ) {
+    val givesDeviceTokens: Boolean get() = devices == true
+
     val isOurs: Boolean get() = server == TOSSLING_SERVER || server == TOSSY_SERVER
     val isTossling: Boolean get() = server == TOSSLING_SERVER
 
