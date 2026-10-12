@@ -72,7 +72,7 @@ targets:
         script: |
           cd "$SRCROOT/.."
           export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
-          ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
+          /usr/bin/lockf -k "${TMPDIR:-/tmp}/tossling-kit-gradle.lock" ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
   NotificationService:
     type: app-extension
     platform: iOS
@@ -114,7 +114,7 @@ targets:
         script: |
           cd "$SRCROOT/.."
           export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
-          ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
+          /usr/bin/lockf -k "${TMPDIR:-/tmp}/tossling-kit-gradle.lock" ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
   ShareExtension:
     type: app-extension
     platform: iOS
@@ -164,4 +164,4 @@ targets:
         script: |
           cd "$SRCROOT/.."
           export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
-          ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
+          /usr/bin/lockf -k "${TMPDIR:-/tmp}/tossling-kit-gradle.lock" ./gradlew :modules:common:protocol:embedAndSignAppleFrameworkForXcode --console=plain
