@@ -3,6 +3,11 @@
 Drafts for App Store Connect and Google Play.
 
 Screenshots live outside the repo, in ~/Documents/tossling/store on the release Mac: `ios/` (iPhone 6.9", 1320 x 2868) and `android/` (1080 x 2160).
+Google Play also needs `android/play/icon-512.png` (512 x 512, with alpha) and the feature graphic
+`android/play/feature-graphic-en.jpg` or `feature-graphic-ru.jpg` (1024 x 500).
+
+Category: App Store Utilities, secondary Productivity; Google Play Tools. Age rating: 4+ and Everyone, every
+questionnaire answer is no. Copyright: 2026 Ivan Kopylov. Marketing URL: https://monoroh.com/tossling
 
 Privacy policy: https://monoroh.com/tossling/privacy
 Support: https://github.com/Tossling/tossling-mobile/issues
