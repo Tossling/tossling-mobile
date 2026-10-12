@@ -19,3 +19,5 @@ fastlane/test_output
 
 ios/Tossling.xcodeproj/
 ios/Tossling/GoogleService-Info.plist
+
+/fastlane/.env
