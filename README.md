@@ -2,17 +2,17 @@
   <img src="docs/images/icon.png" width="128" height="128" alt="Tossling">
 </p>
 
-<h1 align="center">Tossling for Android</h1>
+<h1 align="center">Tossling for Android and iOS</h1>
 
 <p align="center">
-  One clipboard for your Android phone and your computers, through your own server.<br>
+  One clipboard for your phone and your computers, through your own server.<br>
   Copy on the computer, paste on the phone, and the other way round. Everything is encrypted on the devices.
 </p>
 
 <p align="center">
   <a href="https://github.com/tossling/tossling-mobile/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/tossling/tossling-mobile?color=3067B8"></a>
   <img alt="Android 13 or newer" src="https://img.shields.io/badge/Android-13%2B-3067B8">
-  <img alt="iOS in progress" src="https://img.shields.io/badge/iOS-in%20progress-8A8F98">
+  <img alt="iOS coming soon" src="https://img.shields.io/badge/iOS-coming%20soon-8A8F98">
   <a href="LICENSE"><img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-3067B8"></a>
 </p>
 
@@ -30,7 +30,7 @@ No computer at hand? Tap Try without a computer on the first screen, or open
 room with your phone for an hour, answers what you send and posts a project notification.
 
 The apps for macOS, Windows and Linux live in
-[tossling/tossling-desktop](https://github.com/tossling/tossling-desktop). An iOS app is in progress.
+[tossling/tossling-desktop](https://github.com/tossling/tossling-desktop). The iOS app is coming to the App Store.
 
 ## What it does
 
@@ -69,7 +69,7 @@ Optional local files, all ignored by git:
 | `tossling.jks` + `keystore_password`, `keystore_alias` in `local.properties` | Signing release builds. Without it the release APK is unsigned. |
 | `firebase_app_id`, `firebase_project`, `firebase_groups` in `local.properties` | Firebase App Distribution, see below. The same values can come from `FIREBASE_APP_ID`, `FIREBASE_PROJECT`, `FIREBASE_GROUPS`. |
 
-## iOS (in progress)
+## iOS
 
 `ios/` is the iPhone and iPad app, native SwiftUI on iOS 17 and newer. On iOS 26 it uses Liquid Glass, on older
 versions the same screens fall back to system materials. Encryption, rooms and messages come from
@@ -125,7 +125,7 @@ What the apps send to each other is described in
 [PROTOCOL.md](https://github.com/tossling/tossling-server/blob/main/docs/PROTOCOL.md) in the server repository.
 `modules/common/protocol` implements it. It is a Kotlin Multiplatform module with no Android code. Messages,
 encryption, rooms and invites live in common code and build for the JVM and for iOS. The Android app, the desktop
-apps for Windows and Linux and the iOS app in progress use it. Encryption goes through
+apps for Windows and Linux and the iOS app use it. Encryption goes through
 [cryptography-kotlin](https://github.com/whyoleg/cryptography-kotlin), which uses CryptoKit on iOS, and through
 `javax.crypto` on the JVM. The server API client is JVM-only for now.
 
