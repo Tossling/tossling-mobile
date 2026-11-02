@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/tossling/tossling-mobile/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/tossling/tossling-mobile?color=3067B8"></a>
   <img alt="Android 13 or newer" src="https://img.shields.io/badge/Android-13%2B-3067B8">
-  <img alt="iOS coming soon" src="https://img.shields.io/badge/iOS-coming%20soon-8A8F98">
+  <a href="https://apps.apple.com/app/id6820647520"><img alt="iOS 17 or newer on the App Store" src="https://img.shields.io/badge/iOS-17%2B%20App%20Store-3067B8"></a>
   <a href="LICENSE"><img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-3067B8"></a>
 </p>
 
@@ -30,7 +30,8 @@ No computer at hand? Tap Try without a computer on the first screen, or open
 room with your phone for an hour, answers what you send and posts a project notification.
 
 The apps for macOS, Windows and Linux live in
-[tossling/tossling-desktop](https://github.com/tossling/tossling-desktop). The iOS app is coming to the App Store.
+[tossling/tossling-desktop](https://github.com/tossling/tossling-desktop). The iOS app is on the
+[App Store](https://apps.apple.com/app/id6820647520).
 
 ## What it does
 
@@ -71,8 +72,8 @@ Optional local files, all ignored by git:
 
 ## iOS
 
-`ios/` is the iPhone and iPad app, native SwiftUI on iOS 17 and newer. On iOS 26 it uses Liquid Glass, on older
-versions the same screens fall back to system materials. Encryption, rooms and messages come from
+`ios/` is the iPhone and iPad app on the [App Store](https://apps.apple.com/app/id6820647520), native SwiftUI on
+iOS 17 and newer. On iOS 26 it uses Liquid Glass, on older versions the same screens fall back to system materials. Encryption, rooms and messages come from
 `modules/common/protocol`, built as the static framework `TosslingKit`. The app itself only talks to the server
 through `URLSession` and keeps the room in the Keychain.
 
