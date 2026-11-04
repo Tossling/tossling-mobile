@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import Observation
 import SwiftUI
@@ -359,6 +360,11 @@ final class AppModel {
         let destination = target.map { Target(id: $0.id, name: $0.name) }
         let where_ = target?.name ?? (others.count > 1 ? String(localized: "all devices") : (others.first?.name ?? String(localized: "the computer")))
         say(String(localized: "Sending to \(where_)"), .busy)
+        switch outgoing {
+        case let .text(text): rememberSent(Data(text.utf8))
+        case let .image(data, _): rememberSent(data)
+        case .file: break
+        }
         do {
             let clip: Clip = switch outgoing {
             case let .text(text): try await sender.text(text, to: destination)
@@ -597,6 +603,7 @@ final class AppModel {
                 } else {
                     return true
                 }
+                if isEcho(Data(text.utf8)) { return true }
                 if meta.sensitive?.boolValue == true {
                     if content.fresh, autoCopy, UIApplication.shared.applicationState == .active {
                         Self.copySecret([UTType.utf8PlainText.identifier: text])
@@ -614,6 +621,7 @@ final class AppModel {
                 let sealed = try await server.download(core.config, url: url)
                 let data = try core.openAttachment(data: sealed)
                 let type = UTType(mimeType: meta.mime) ?? .png
+                if isEcho(data) { return true }
                 if meta.sensitive?.boolValue == true {
                     if content.fresh, autoCopy, UIApplication.shared.applicationState == .active {
                         Self.copySecret([type.identifier: data])
@@ -663,6 +671,19 @@ final class AppModel {
     /// minutes, never in the history.
     private static func copySecret(_ item: [String: Any]) {
         UIPasteboard.general.setItems([item], options: [.localOnly: true, .expirationDate: Date().addingTimeInterval(120)])
+    }
+
+    /// Echo protection (PROTOCOL, Receiving 6): what this phone has just sent, coming back within 60 seconds through
+    /// another device, is not put on the clipboard or into the history again.
+    @ObservationIgnored private var lastSent: (hash: Data, at: Date)?
+
+    private func rememberSent(_ data: Data) {
+        lastSent = (Data(SHA256.hash(data: data)), Date())
+    }
+
+    private func isEcho(_ data: Data) -> Bool {
+        guard let lastSent, Date().timeIntervalSince(lastSent.at) < 60 else { return false }
+        return lastSent.hash == Data(SHA256.hash(data: data))
     }
 
     static func isTransient(_ error: Error) -> Bool {
