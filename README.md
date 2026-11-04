@@ -69,6 +69,7 @@ Optional local files, all ignored by git:
 | `app/google-services.json` | «Instant delivery»: Firebase Cloud Messaging wakes the app when something arrives. Without it new items arrive when the app opens. |
 | `tossling.jks` + `keystore_password`, `keystore_alias` in `local.properties` | Signing release builds. Without it the release APK is unsigned. |
 | `firebase_app_id`, `firebase_project`, `firebase_groups` in `local.properties` | Firebase App Distribution, see below. The same values can come from `FIREBASE_APP_ID`, `FIREBASE_PROJECT`, `FIREBASE_GROUPS`. |
+| `play_json_key` in `local.properties` | Path to the Google Play service account key (Play Console, Settings, API access), for `fastlane play`. Or `PLAY_JSON_KEY`. |
 
 ## iOS
 
@@ -102,6 +103,19 @@ bundle exec fastlane upload notes:"what changed"
 It bumps `app/version-code.txt`, builds a signed release APK, checks the signature and uploads it to
 Firebase App Distribution (`firebase login` once, or a service account in `GOOGLE_APPLICATION_CREDENTIALS`).
 `bundle exec fastlane check` lists the tester groups.
+
+## Google Play
+
+```bash
+bundle exec fastlane play_check        # the API key works
+bundle exec fastlane play              # production, as a draft
+bundle exec fastlane play track:internal status:completed
+```
+
+`play` takes What's new for the current `appversion` from `fastlane/release_notes/<version>.<ru-RU|en-US>.txt`, bumps
+`app/version-code.txt`, builds a signed AAB and uploads it. A production release stays a draft until you press
+release in Play Console. Commit `app/version-code.txt` afterwards. Play keeps the app signing key; `tossling.jks` is
+the upload key.
 
 ## Releases on GitHub
 
