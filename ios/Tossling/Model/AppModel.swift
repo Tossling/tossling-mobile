@@ -597,6 +597,13 @@ final class AppModel {
                 } else {
                     return true
                 }
+                if meta.sensitive?.boolValue == true {
+                    if content.fresh, autoCopy, UIApplication.shared.applicationState == .active {
+                        Self.copySecret([UTType.utf8PlainText.identifier: text])
+                        say(String(localized: "From \(from): ready to paste"), .done)
+                    }
+                    return true
+                }
                 add(Clip(incoming: true, kind: .text, text: text, device: from, event: event))
                 if content.fresh, autoCopy, UIApplication.shared.applicationState == .active {
                     UIPasteboard.general.string = text
@@ -607,6 +614,13 @@ final class AppModel {
                 let sealed = try await server.download(core.config, url: url)
                 let data = try core.openAttachment(data: sealed)
                 let type = UTType(mimeType: meta.mime) ?? .png
+                if meta.sensitive?.boolValue == true {
+                    if content.fresh, autoCopy, UIApplication.shared.applicationState == .active {
+                        Self.copySecret([type.identifier: data])
+                        say(String(localized: "From \(from): ready to paste"), .done)
+                    }
+                    return true
+                }
                 let file = Paths.unique("\(UUID().uuidString).\(type.preferredFilenameExtension ?? "png")", in: Paths.images)
                 try data.write(to: file)
                 add(Clip(incoming: true, kind: .image, file: file.lastPathComponent, size: Int64(data.count), device: from, event: event))
@@ -643,6 +657,12 @@ final class AppModel {
             say(error.localizedDescription, .error)
         }
         return true
+    }
+
+    /// Secret content (`sens`, a password manager's copy on the sender): only on this device and only for two
+    /// minutes, never in the history.
+    private static func copySecret(_ item: [String: Any]) {
+        UIPasteboard.general.setItems([item], options: [.localOnly: true, .expirationDate: Date().addingTimeInterval(120)])
     }
 
     static func isTransient(_ error: Error) -> Bool {

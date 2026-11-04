@@ -7,6 +7,7 @@
     <string name="sync_channel_errors">Ошибки</string>
     <string name="sync_received_title">Скопировано с %1$s</string>
     <string name="sync_received_image">Картинка, можно вставлять</string>
+    <string name="sync_received_secret">Скрытое содержимое, можно вставлять</string>
     <string name="sync_missed_title">Файл %1$s не дошёл</string>
     <string name="sync_missed_text">%1$s отправил его больше 3 часов назад, и сервер его уже удалил. Отправьте ещё раз.</string>
     <string name="sync_open_link">Открыть ссылку</string>

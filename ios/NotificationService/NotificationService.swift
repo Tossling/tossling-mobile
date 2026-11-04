@@ -49,6 +49,10 @@ final class NotificationService: UNNotificationServiceExtension {
         content.title = incoming.from
         content.sound = .default
         content.threadIdentifier = config.room
+        if meta.sensitive?.boolValue == true, meta.kind == "text" || meta.kind == "image" {
+            content.body = String(localized: "Hidden content: open Tossling to get it")
+            return content
+        }
         switch meta.kind {
         case "text":
             if let text = meta.text {
