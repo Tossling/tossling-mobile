@@ -56,7 +56,7 @@ struct Sender {
         defer { try? FileManager.default.removeItem(at: sealed) }
         let mime = UTType(filenameExtension: url.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
         let core = core
-        _ = try await Task.detached { FileCrypto.shared.seal(cipher: core.fileCipher(), from: url.path, to: sealed.path) }.value
+        _ = try await Task.detached { try FileCrypto.shared.seal(cipher: core.fileCipher(), from: url.path, to: sealed.path) }.value
         try await server.publishFile(core.config, message: core.file(name: name, size: size, mime: mime, to: target.map { [$0.id] }).message, file: sealed)
         return Clip(incoming: false, kind: .file, name: name, size: size, device: target?.name ?? "", toAll: target == nil)
     }

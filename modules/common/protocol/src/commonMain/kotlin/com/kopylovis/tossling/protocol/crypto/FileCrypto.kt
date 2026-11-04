@@ -7,6 +7,7 @@ import kotlinx.io.files.SystemFileSystem
 
 object FileCrypto {
 
+    @Throws(Exception::class)
     fun seal(cipher: ClipCipher, from: String, to: String): Long {
         val size = SystemFileSystem.metadataOrNull(Path(from))?.size ?: error("no file at $from")
         SystemFileSystem.source(Path(from)).buffered().use { source ->
@@ -15,6 +16,7 @@ object FileCrypto {
         return ClipCipher.sealedSize(size)
     }
 
+    @Throws(Exception::class)
     fun open(cipher: ClipCipher, from: String, to: String, stream: Boolean): Long =
         SystemFileSystem.source(Path(from)).buffered().use { source ->
             SystemFileSystem.sink(Path(to)).buffered().use { sink ->

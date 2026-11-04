@@ -551,7 +551,8 @@ final class AppModel {
                 if let inline = meta.text {
                     text = inline
                 } else if let url = content.attachmentUrl {
-                    text = String(decoding: core.openAttachment(data: try await server.download(core.config, url: url)), as: UTF8.self)
+                    let sealed = try await server.download(core.config, url: url)
+                    text = String(decoding: try core.openAttachment(data: sealed), as: UTF8.self)
                 } else {
                     return
                 }
@@ -562,7 +563,8 @@ final class AppModel {
                 }
             case "image":
                 guard sendsImages, let url = content.attachmentUrl else { return }
-                let data = core.openAttachment(data: try await server.download(core.config, url: url))
+                let sealed = try await server.download(core.config, url: url)
+                let data = try core.openAttachment(data: sealed)
                 let type = UTType(mimeType: meta.mime) ?? .png
                 let file = Paths.unique("\(UUID().uuidString).\(type.preferredFilenameExtension ?? "png")", in: Paths.images)
                 try data.write(to: file)
@@ -581,7 +583,7 @@ final class AppModel {
                 let stream = meta.format?.intValue == 2
                 let size = try await Task.detached { () throws -> Int64 in
                     do {
-                        return FileCrypto.shared.open(cipher: core.fileCipher(), from: sealed.path, to: target.path, stream: stream)
+                        return try FileCrypto.shared.open(cipher: core.fileCipher(), from: sealed.path, to: target.path, stream: stream)
                     } catch {
                         try? FileManager.default.removeItem(at: target)
                         throw error
