@@ -387,6 +387,10 @@ class ClipRepository internal constructor(
                 markLink(id = pairing.id, isOnline = true)
                 succeeded = true
                 for (event in events.filter { it.event == MESSAGE_EVENT }) {
+                    if (store.isHandled(pairing = pairing, id = event.id)) {
+                        Log.i(TAG, "message ${event.id} was handled already")
+                        continue
+                    }
                     val outcome = try {
                         receive(pairing = pairing, event = event, onTransfer = onTransfer)
                     } catch (error: InterruptedTransfer) {
