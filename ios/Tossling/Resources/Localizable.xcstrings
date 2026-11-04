@@ -1,6 +1,5 @@
 {
   "sourceLanguage": "en",
-  "version": "1.0",
   "strings": {
     "": {
       "shouldTranslate": false
@@ -164,12 +163,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld устройство, компьютеры и телефоны"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -180,6 +173,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld устройств, компьютеры и телефоны"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld устройство, компьютеры и телефоны"
                 }
               },
               "other": {
@@ -236,12 +235,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld проект"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -252,6 +245,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld проектов"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld проект"
                 }
               },
               "other": {
@@ -288,12 +287,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld непрочитанное"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -304,6 +297,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld непрочитанных"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld непрочитанное"
                 }
               },
               "other": {
@@ -1693,12 +1692,6 @@
         "ru": {
           "variations": {
             "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Комната · %lld устройство"
-                }
-              },
               "few": {
                 "stringUnit": {
                   "state": "translated",
@@ -1709,6 +1702,12 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Комната · %lld устройств"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Комната · %lld устройство"
                 }
               },
               "other": {
@@ -2168,6 +2167,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Картинки уже нет"
+          }
+        }
+      }
+    },
+    "The item is too large to receive": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Это слишком большое, чтобы получить"
           }
         }
       }
@@ -2938,5 +2947,6 @@
     "•  ": {
       "shouldTranslate": false
     }
-  }
+  },
+  "version": "1.0"
 }

@@ -54,6 +54,8 @@ sealed interface Incoming {
         val attachmentUrl: String?,
         val fresh: Boolean,
         val time: Long,
+        /** The attachment's size as the server gives it, when it does. */
+        val attachmentSize: Long? = null,
     ) : Incoming
 
     data class Joined(override val eventId: String, val memberId: String, val from: String, val isNew: Boolean, val invite: String?) : Incoming
@@ -153,6 +155,7 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap(), ha
             attachmentUrl = event.attachment?.url?.takeIf { it.isNotEmpty() },
             fresh = contentAge < Freshness.STALE_MS,
             time = event.time,
+            attachmentSize = event.attachment?.size,
         )
     }
 

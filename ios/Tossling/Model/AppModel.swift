@@ -592,7 +592,7 @@ final class AppModel {
                 if let inline = meta.text {
                     text = inline
                 } else if let url = content.attachmentUrl {
-                    let sealed = try await server.download(core.config, url: url)
+                    let sealed = try await download(content, url: url, core: core)
                     text = String(decoding: try core.openAttachment(data: sealed), as: UTF8.self)
                 } else {
                     return true
@@ -611,7 +611,7 @@ final class AppModel {
                 }
             case "image":
                 guard sendsImages, let url = content.attachmentUrl else { return true }
-                let sealed = try await server.download(core.config, url: url)
+                let sealed = try await download(content, url: url, core: core)
                 let data = try core.openAttachment(data: sealed)
                 let type = UTType(mimeType: meta.mime) ?? .png
                 if meta.sensitive?.boolValue == true {
@@ -663,6 +663,13 @@ final class AppModel {
     /// minutes, never in the history.
     private static func copySecret(_ item: [String: Any]) {
         UIPasteboard.general.setItems([item], options: [.localOnly: true, .expirationDate: Date().addingTimeInterval(120)])
+    }
+
+    /// An attachment into memory, refused before the download when the server says it is over the limit for its kind.
+    private func download(_ content: IncomingContent, url: String, core: RoomCore) async throws -> Data {
+        let limit = AttachmentLimits.shared.of(kind: content.meta.kind)
+        if let size = content.attachmentSize?.int64Value, size > limit { throw AttachmentTooLargeError() }
+        return try await server.download(core.config, url: url, maxBytes: limit)
     }
 
     static func isTransient(_ error: Error) -> Bool {
