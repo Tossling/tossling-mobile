@@ -24,7 +24,15 @@ internal class PairingStore(context: Context) {
 
     fun lastId(pairing: Pairing): String = prefs.getString(lastIdKey(pairing.id), null).orEmpty()
 
-    fun saveLastId(pairing: Pairing, id: String) = prefs.edit { putString(lastIdKey(pairing.id), id) }
+    fun isHandled(pairing: Pairing, id: String): Boolean = id in handledIds(pairing)
+
+    fun saveLastId(pairing: Pairing, id: String) = prefs.edit {
+        putString(lastIdKey(pairing.id), id)
+        afterHandling(handled = handledIds(pairing), id = id)?.let { putString(handledKey(pairing.id), it.joinToString(",")) }
+    }
+
+    private fun handledIds(pairing: Pairing): List<String> =
+        prefs.getString(handledKey(pairing.id), null)?.split(',')?.filter { it.isNotEmpty() }.orEmpty()
 
     fun savePairing(pairing: Pairing) {
         val existing = _pairings.value.firstOrNull { it.id == pairing.id }
@@ -32,7 +40,10 @@ internal class PairingStore(context: Context) {
         _pairings.update { list -> list.filterNot { it.id == pairing.id } + merged }
         prefs.edit {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
-            if (existing == null) remove(lastIdKey(pairing.id))
+            if (existing == null) {
+                remove(lastIdKey(pairing.id))
+                remove(handledKey(pairing.id))
+            }
         }
     }
 
@@ -90,6 +101,7 @@ internal class PairingStore(context: Context) {
         prefs.edit {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
             remove(lastIdKey(pairingId))
+            remove(handledKey(pairingId))
         }
         return moved
     }
@@ -101,6 +113,7 @@ internal class PairingStore(context: Context) {
         prefs.edit {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
             remove(lastIdKey(pairingId))
+            remove(handledKey(pairingId))
         }
         return moved
     }
@@ -116,6 +129,7 @@ internal class PairingStore(context: Context) {
         prefs.edit {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
             remove(lastIdKey(id))
+            remove(handledKey(id))
         }
     }
 
@@ -186,11 +200,14 @@ internal class PairingStore(context: Context) {
 
     private fun lastIdKey(id: String): String = "$KEY_LAST_ID_PREFIX$id"
 
+    private fun handledKey(id: String): String = "$KEY_HANDLED_PREFIX$id"
+
     private companion object {
         private const val PREFS = "tossy_sync"
         private const val KEY_PAIRINGS = "pairings"
         private const val KEY_HISTORY = "history"
         private const val KEY_LAST_ID_PREFIX = "last_id."
+        private const val KEY_HANDLED_PREFIX = "handled."
         private const val KEY_LEGACY_PAIRING = "pairing"
         private const val KEY_LEGACY_MAC = "mac_name"
         private const val KEY_LEGACY_LAST_ID = "last_id"
@@ -199,3 +216,12 @@ internal class PairingStore(context: Context) {
         private val HistorySerializer = ListSerializer(ClipItem.serializer())
     }
 }
+
+private const val HANDLED_KEEP = 50
+
+/**
+ * ntfy answers since=<id> with the other messages of that id's second too, so a fetch can bring back events this phone
+ * has already handled. Returns the latest handled ids with this one, or null when it was handled already.
+ */
+internal fun afterHandling(handled: List<String>, id: String, keep: Int = HANDLED_KEEP): List<String>? =
+    if (id in handled) null else (handled + id).takeLast(keep)
