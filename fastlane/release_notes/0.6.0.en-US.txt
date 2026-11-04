@@ -1,0 +1,7 @@
+Security and reliability.
+- Passwords copied on another device stay out of clipboard history and notifications.
+- A device whose key changed is marked, and you are warned before disconnecting anyone.
+- Old messages can no longer be replayed, and long text is no longer lost.
+- An attachment that failed to download because of the network now comes again.
+- On iPhone, room keys no longer go into backups.
+- Fixed iPhone crashes on damaged attachments.
