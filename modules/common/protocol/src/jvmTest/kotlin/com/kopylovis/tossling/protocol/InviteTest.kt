@@ -14,8 +14,13 @@ import java.util.Base64
 
 class InviteTest {
 
-    private val vectors = Json.parseToJsonElement(javaClass.classLoader!!.getResource("vectors.json")!!.readText()).jsonObject
-        .getValue("invite").jsonArray.map { element -> element.jsonObject.mapValues { it.value.jsonPrimitive.content } }
+    private val root = Json.parseToJsonElement(javaClass.classLoader!!.getResource("vectors.json")!!.readText()).jsonObject
+
+    private fun vectors(name: String) = root.getValue(name).jsonArray.map { element -> element.jsonObject.mapValues { it.value.jsonPrimitive.content } }
+
+    private val vectors = vectors("invite")
+
+    private val vectorsV2 = vectors("invite_v2")
 
     @Test
     fun matchesSharedVectors() {
@@ -29,6 +34,31 @@ class InviteTest {
             assertEquals(v.getValue("sealed"), Base64.getEncoder().encodeToString(ClipCipher(key).seal(plain = plain, nonce = Base64.getDecoder().decode(v.getValue("nonce")))))
             assertEquals(SyncJson.decodeFromString(Invite.serializer(), v.getValue("plain")), Invites.open(message = v.getValue("sealed"), key = key))
         }
+    }
+
+    @Test
+    fun matchesSharedVersion2Vectors() {
+        vectorsV2.forEach { v ->
+            val code = v.getValue("code")
+            val key = Base64.getDecoder().decode(v.getValue("key"))
+            assertEquals(v.getValue("normalized"), Invites.normalized(code = code))
+            assertFalse(Invites.isVersion1(code = code))
+            assertEquals(v.getValue("seed"), Base64.getEncoder().encodeToString(Invites.seed(code = code)))
+            assertEquals(listOf(v.getValue("topic"), v.getValue("legacy_topic")), Invites.topics(code = code))
+            assertEquals(v.getValue("topic"), Invites.topic(code = code, prefix = ROOM_PREFIX))
+            assertEquals(v.getValue("key"), Base64.getEncoder().encodeToString(Invites.key(code = code)))
+            assertEquals(v.getValue("sealed"), Base64.getEncoder().encodeToString(ClipCipher(key).seal(plain = v.getValue("plain").toByteArray(), nonce = Base64.getDecoder().decode(v.getValue("nonce")))))
+            assertEquals(SyncJson.decodeFromString(Invite.serializer(), v.getValue("plain")), Invites.open(message = v.getValue("sealed"), key = key))
+        }
+    }
+
+    @Test
+    fun theCodeLengthPicksTheVersion() {
+        assertTrue(Invites.isVersion1(code = "7kq2-m9xd"))
+        assertFalse(Invites.isVersion1(code = "7kq2m-9xdrt"))
+        val v1 = vectors.first()
+        assertEquals(v1.getValue("topic"), Invites.topic(code = v1.getValue("code"), prefix = ROOM_PREFIX))
+        assertNull(Invites.open(message = vectorsV2.first().getValue("sealed"), key = Invites.key(code = "7KQ2-M9XD")))
     }
 
     @Test
@@ -57,11 +87,13 @@ class InviteTest {
     }
 
     @Test
-    fun newCodesUseTheAlphabetInTwoHalves() {
+    fun newCodesAreVersion2InTwoHalves() {
         repeat(times = 50) {
             val code = Invites.newCode()
-            assertTrue(code, Regex("^[${Invites.ALPHABET}]{4}-[${Invites.ALPHABET}]{4}$").matches(code))
+            assertTrue(code, Regex("^[${Invites.ALPHABET}]{5}-[${Invites.ALPHABET}]{5}$").matches(code))
+            assertEquals(Invites.CODE_LENGTH, Invites.normalized(code = code).length)
         }
         assertEquals("7KQ2M9XD", Invites.normalized(code = " 7kq2-m9xd\n"))
+        assertEquals("7KQ2M9XDRT", Invites.normalized(code = " 7kq2m-9xdrt\n"))
     }
 }

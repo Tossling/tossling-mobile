@@ -49,6 +49,19 @@ class SharedVectorsTest {
     }
 
     @Test
+    fun inviteV2() {
+        vectors("invite_v2").forEach { v ->
+            val code = v.getValue("code")
+            assertEquals(v.getValue("normalized"), Invites.normalized(code = code))
+            assertEquals(v.getValue("seed"), Base64.encode(Invites.seed(code = code)))
+            assertEquals(listOf(v.getValue("topic"), v.getValue("legacy_topic")), Invites.topics(code = code))
+            assertEquals(v.getValue("key"), Base64.encode(Invites.key(code = code)))
+            assertEquals(v.getValue("sealed"), Base64.encode(ClipCipher(v.bytes("key")).seal(plain = v.getValue("plain").encodeToByteArray(), nonce = v.bytes("nonce"))))
+            assertEquals(SyncJson.decodeFromString(Invite.serializer(), v.getValue("plain")), Invites.open(message = v.getValue("sealed"), key = v.bytes("key")))
+        }
+    }
+
+    @Test
     fun rekey() {
         vectors("rekey").forEach { v ->
             val recipient = DeviceIdentity(privateKey = v.bytes("recipient_private"))
