@@ -8,4 +8,5 @@ val Outgoing.bodyData: NSData? get() = body?.toData()
 
 fun RoomCore.image(data: NSData, mime: String, to: List<String>?): Outgoing = image(bytes = data.toByteArray(), mime = mime, to = to)
 
+@Throws(Exception::class)
 fun RoomCore.openAttachment(data: NSData): NSData = openAttachment(sealed = data.toByteArray()).toData()

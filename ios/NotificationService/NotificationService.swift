@@ -53,8 +53,9 @@ final class NotificationService: UNNotificationServiceExtension {
         case "text":
             if let text = meta.text {
                 content.body = String(text.prefix(1000))
-            } else if let url = incoming.attachmentUrl, let data = try? await Server.shared.download(config, url: url) {
-                content.body = String(String(decoding: core.openAttachment(data: data), as: UTF8.self).prefix(1000))
+            } else if let url = incoming.attachmentUrl, let data = try? await Server.shared.download(config, url: url),
+                      let plain = try? core.openAttachment(data: data) {
+                content.body = String(String(decoding: plain, as: UTF8.self).prefix(1000))
             } else {
                 content.body = String(localized: "Text")
             }

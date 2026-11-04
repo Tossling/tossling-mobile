@@ -136,6 +136,7 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
         )
     }
 
+    @Throws(Exception::class)
     fun openAttachment(sealed: ByteArray): ByteArray = cipher.open(sealed = sealed)
 
     fun hello(to: List<String>? = null, renewed: Boolean = false, invite: String? = null): Outgoing =
