@@ -606,9 +606,11 @@ class ClipRepository internal constructor(
         val data = try {
             url?.let { cipher.open(sealed = client.download(endpoint = pairing.endpoint, url = it)) }
         } catch (error: NtfyException) {
-            if (error.code != HTTP_NOT_FOUND && error.code != HTTP_GONE) throw error
+            if (error.code != HTTP_NOT_FOUND && error.code != HTTP_GONE) throw InterruptedTransfer(cause = error)
             if (meta.kind == ClipMeta.FILE) notifications.showMissed(name = safeName(meta.fileName ?: "file"), device = device)
             return Outcome.SKIPPED
+        } catch (error: IOException) {
+            throw InterruptedTransfer(cause = error)
         }
         val item = when (meta.kind) {
             ClipMeta.TEXT -> {

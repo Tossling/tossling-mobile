@@ -289,7 +289,7 @@ final class AppModel {
         guard let core else { return false }
         do {
             let events = try await server.poll(core.config, since: store.lastEventId.isEmpty ? "15m" : store.lastEventId)
-            for event in events { await handle(event, core: core) }
+            for event in events { try await handle(event, core: core) }
             await syncProjects(force: false)
             await pollProjects()
             updateRefusal()
@@ -490,12 +490,12 @@ final class AppModel {
                 let since = store.lastEventId.isEmpty ? "15m" : store.lastEventId
                 let topics = [core.config.room] + projects.map(\.topic)
                 for try await event in server.events(core.config, topics: topics, since: since, onOpen: { Task { @MainActor in self.connection = .online } }) {
-                    retry = 1
                     if event.topic == core.config.room || event.topic.isEmpty {
-                        await handle(event, core: core)
+                        try await handle(event, core: core)
                     } else if event.event == "message" {
                         receiveAlert(event)
                     }
+                    retry = 1
                     if Task.isCancelled || self.core !== core { return }
                 }
             } catch {}
@@ -506,12 +506,18 @@ final class AppModel {
         }
     }
 
-    private func handle(_ event: NtfyEvent, core: RoomCore) async {
+    private func handle(_ event: NtfyEvent, core: RoomCore) async throws {
         let incoming = core.open(event: event, nowMs: Self.nowMs)
+        if let content = incoming as? IncomingContent {
+            guard await receive(content, core: core) else {
+                store.members = core.members
+                throw Unreceived()
+            }
+        }
         store.lastEventId = incoming.eventId
         switch incoming {
-        case let content as IncomingContent:
-            await receive(content, core: core)
+        case is IncomingContent:
+            break
         case let pinged as IncomingPinged:
             if let reply = pinged.reply { try? await server.publish(core.config, reply) }
         case let joined as IncomingJoined:
@@ -539,10 +545,12 @@ final class AppModel {
         refreshDevices()
     }
 
-    private func receive(_ content: IncomingContent, core: RoomCore) async {
+    /// False when the item could not be fetched for now (no network, the app went to the background), so the
+    /// event stays unhandled and comes again after the reconnect.
+    private func receive(_ content: IncomingContent, core: RoomCore) async -> Bool {
         let meta = content.meta
         let event = content.eventId
-        guard !clips.contains(where: { $0.event == event }) else { return }
+        guard !clips.contains(where: { $0.event == event }) else { return true }
         let from = name(of: content.memberId, fallback: content.from)
         do {
             switch meta.kind {
@@ -554,7 +562,7 @@ final class AppModel {
                     let sealed = try await server.download(core.config, url: url)
                     text = String(decoding: try core.openAttachment(data: sealed), as: UTF8.self)
                 } else {
-                    return
+                    return true
                 }
                 add(Clip(incoming: true, kind: .text, text: text, device: from, event: event))
                 if content.fresh, autoCopy, UIApplication.shared.applicationState == .active {
@@ -562,7 +570,7 @@ final class AppModel {
                     say(String(localized: "From \(from): ready to paste"), .done)
                 }
             case "image":
-                guard sendsImages, let url = content.attachmentUrl else { return }
+                guard sendsImages, let url = content.attachmentUrl else { return true }
                 let sealed = try await server.download(core.config, url: url)
                 let data = try core.openAttachment(data: sealed)
                 let type = UTType(mimeType: meta.mime) ?? .png
@@ -574,7 +582,7 @@ final class AppModel {
                     say(String(localized: "From \(from): ready to paste"), .done)
                 }
             case "file":
-                guard let url = content.attachmentUrl else { return }
+                guard let url = content.attachmentUrl else { return true }
                 let name = meta.fileName ?? "file"
                 say(String(localized: "Receiving \(name)"), .busy)
                 let sealed = try await server.downloadFile(core.config, url: url)
@@ -596,9 +604,18 @@ final class AppModel {
             }
         } catch let error as ServerError where error.isGone {
             say(String(localized: "The server has already deleted what \(from) sent"), .error)
+        } catch where Self.isTransient(error) {
+            return false
         } catch {
             say(error.localizedDescription, .error)
         }
+        return true
+    }
+
+    static func isTransient(_ error: Error) -> Bool {
+        if error is CancellationError || error is URLError { return true }
+        if let error = error as? ServerError { return error.code == 429 || error.code >= 500 }
+        return false
     }
 
     private func receiveAlert(_ event: NtfyEvent) {
@@ -841,3 +858,6 @@ enum ProjectError: LocalizedError {
         }
     }
 }
+
+/// An item that could not be fetched for now: the listener reconnects from the last handled event and gets it again.
+private struct Unreceived: Error {}
