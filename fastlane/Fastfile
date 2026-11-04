@@ -25,7 +25,8 @@ end
 desc "Verify Firebase access and list App Distribution tester groups"
 lane :check do
   UI.user_error!("Set FIREBASE_PROJECT or firebase_project in local.properties") unless PROJECT
-  sh("firebase appdistribution:groups:list --project #{PROJECT}")
+  # Without the proxy variables, as in deploy/distribute-android.sh: firebase-tools fails through its proxy agent on Node 26.
+  sh("env -u HTTPS_PROXY -u https_proxy -u HTTP_PROXY -u http_proxy -u ALL_PROXY -u all_proxy firebase appdistribution:groups:list --project #{PROJECT}")
 end
 
 desc "Build a release APK and send it to Firebase App Distribution testers"
