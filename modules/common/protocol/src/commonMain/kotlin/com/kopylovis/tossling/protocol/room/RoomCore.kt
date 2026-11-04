@@ -148,7 +148,11 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
     fun text(text: String, to: List<String>? = null): Outgoing {
         val base = content(kind = ClipMeta.TEXT, mime = ClipMeta.TEXT_MIME, to = to)
         val bytes = text.encodeToByteArray()
-        return if (bytes.size <= INLINE_LIMIT) base.copy(text = text).sealed() else base.sealed(body = cipher.seal(plain = bytes))
+        if (bytes.size <= INLINE_LIMIT) {
+            val inline = base.copy(text = text).sealed()
+            if (inline.message.length <= MESSAGE_LIMIT) return inline
+        }
+        return base.sealed(body = cipher.seal(plain = bytes))
     }
 
     fun image(bytes: ByteArray, mime: String, to: List<String>? = null): Outgoing =
@@ -230,6 +234,11 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
         const val STALE_SECONDS = 15 * 60
         const val FILE_STALE_SECONDS = 3 * 60 * 60
         const val INLINE_LIMIT = 2_400
+
+        // ntfy keeps a body of up to 4,096 bytes as the message and turns a longer one into an attachment that no
+        // receiver can open. Escaping, encryption and Base64 can take 2,400 bytes of text past that, so the sealed
+        // envelope decides.
+        const val MESSAGE_LIMIT = 4_096
         const val ROOM_BYTES = 12
         const val TOKEN_LABEL = "tossling"
         private const val MESSAGE_EVENT = "message"

@@ -56,6 +56,22 @@ class RoomCoreTest {
     }
 
     @Test
+    fun textThatGrowsPastTheMessageLimitGoesAsAnAttachment() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        val phone = core(id = "phone", name = "iPhone")
+        val plain = phone.text("x".repeat(RoomCore.INLINE_LIMIT))
+        assertNull(plain.body)
+        assertTrue(plain.message.length <= RoomCore.MESSAGE_LIMIT)
+        for (text in listOf("\"".repeat(RoomCore.INLINE_LIMIT), "a\tb\n".repeat(RoomCore.INLINE_LIMIT / 4))) {
+            val sent = phone.text(text)
+            assertTrue(sent.message.length <= RoomCore.MESSAGE_LIMIT)
+            val content = assertIs<Incoming.Content>(mac.open(sent.event(url = "https://s/file/a"), nowMs = now))
+            assertNull(content.meta.text)
+            assertEquals(text, mac.openAttachment(assertNotNull(sent.body)).decodeToString())
+        }
+    }
+
+    @Test
     fun skipsItsOwnMessagesOthersAddressesAndStaleContent() {
         val phone = core(id = "phone", name = "iPhone")
         val mac = core(id = "mac", name = "Studio", source = "mac")
