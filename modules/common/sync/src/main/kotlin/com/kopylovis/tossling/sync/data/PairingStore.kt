@@ -3,6 +3,7 @@ package com.kopylovis.tossling.sync.data
 import android.content.Context
 import androidx.core.content.edit
 import com.kopylovis.tossling.protocol.ClipItem
+import com.kopylovis.tossling.protocol.HandledMessages
 import com.kopylovis.tossling.protocol.Member
 import com.kopylovis.tossling.protocol.Pairing
 import com.kopylovis.tossling.protocol.SyncJson
@@ -31,6 +32,16 @@ internal class PairingStore(context: Context) {
         afterHandling(handled = handledIds(pairing), id = id)?.let { putString(handledKey(pairing.id), it.joinToString(",")) }
     }
 
+    /** True when a message with this `mid` was handled in this room in the last 3 hours: a replay. */
+    fun isHandledMessage(pairing: Pairing, mid: String, now: Long): Boolean = handledMessages(pairing).contains(mid = mid, nowMs = now)
+
+    fun saveHandledMessage(pairing: Pairing, mid: String, now: Long) {
+        val handled = handledMessages(pairing).apply { add(mid = mid, nowMs = now) }
+        prefs.edit { putString(midsKey(pairing.id), handled.encode()) }
+    }
+
+    private fun handledMessages(pairing: Pairing): HandledMessages = HandledMessages.decode(text = prefs.getString(midsKey(pairing.id), null).orEmpty())
+
     private fun handledIds(pairing: Pairing): List<String> =
         prefs.getString(handledKey(pairing.id), null)?.split(',')?.filter { it.isNotEmpty() }.orEmpty()
 
@@ -43,6 +54,7 @@ internal class PairingStore(context: Context) {
             if (existing == null) {
                 remove(lastIdKey(pairing.id))
                 remove(handledKey(pairing.id))
+                remove(midsKey(pairing.id))
             }
         }
     }
@@ -102,6 +114,7 @@ internal class PairingStore(context: Context) {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
             remove(lastIdKey(pairingId))
             remove(handledKey(pairingId))
+            remove(midsKey(pairingId))
         }
         return moved
     }
@@ -114,6 +127,7 @@ internal class PairingStore(context: Context) {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
             remove(lastIdKey(pairingId))
             remove(handledKey(pairingId))
+            remove(midsKey(pairingId))
         }
         return moved
     }
@@ -130,6 +144,7 @@ internal class PairingStore(context: Context) {
             putString(KEY_PAIRINGS, SyncJson.encodeToString(PairingsSerializer, _pairings.value))
             remove(lastIdKey(id))
             remove(handledKey(id))
+            remove(midsKey(id))
         }
     }
 
@@ -202,12 +217,15 @@ internal class PairingStore(context: Context) {
 
     private fun handledKey(id: String): String = "$KEY_HANDLED_PREFIX$id"
 
+    private fun midsKey(id: String): String = "$KEY_MIDS_PREFIX$id"
+
     private companion object {
         private const val PREFS = "tossy_sync"
         private const val KEY_PAIRINGS = "pairings"
         private const val KEY_HISTORY = "history"
         private const val KEY_LAST_ID_PREFIX = "last_id."
         private const val KEY_HANDLED_PREFIX = "handled."
+        private const val KEY_MIDS_PREFIX = "mids."
         private const val KEY_LEGACY_PAIRING = "pairing"
         private const val KEY_LEGACY_MAC = "mac_name"
         private const val KEY_LEGACY_LAST_ID = "last_id"

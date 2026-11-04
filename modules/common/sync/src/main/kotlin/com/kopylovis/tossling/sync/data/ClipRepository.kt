@@ -10,6 +10,7 @@ import com.kopylovis.tossling.protocol.ClipMeta
 import com.kopylovis.tossling.protocol.DEMO_ROOM_URL
 import com.kopylovis.tossling.protocol.DeviceKind
 import com.kopylovis.tossling.protocol.Endpoint
+import com.kopylovis.tossling.protocol.Freshness
 import com.kopylovis.tossling.protocol.LinkStatus
 import com.kopylovis.tossling.protocol.MacDevice
 import com.kopylovis.tossling.protocol.Member
@@ -29,6 +30,7 @@ import com.kopylovis.tossling.protocol.crypto.RoomSecret
 import com.kopylovis.tossling.protocol.crypto.openStream
 import com.kopylovis.tossling.protocol.crypto.sealStream
 import com.kopylovis.tossling.protocol.demoRoomCode
+import com.kopylovis.tossling.protocol.stamped
 import com.kopylovis.tossling.protocol.network.NtfyClient
 import com.kopylovis.tossling.protocol.network.NtfyEvent
 import com.kopylovis.tossling.protocol.network.NtfyException
@@ -546,13 +548,28 @@ class ClipRepository internal constructor(
     }
 
     private suspend fun receive(pairing: Pairing, event: NtfyEvent, onTransfer: (Transfer) -> Unit): Outcome {
-        val age = System.currentTimeMillis() / 1000 - event.time
-        val isStale = age > STALE_SECONDS
         val cipher = cipherFor(pairing)
         val sealedMeta = event.message ?: return Outcome.SKIPPED
         val meta = SyncJson.decodeFromString(ClipMeta.serializer(), cipher.openText(text = sealedMeta).decodeToString())
         if (meta.sender.isNotEmpty() && meta.sender == settings.deviceId) return Outcome.SKIPPED
         if (meta.to?.contains(settings.deviceId) == false) return Outcome.SKIPPED
+        val mid = meta.messageId
+        if (mid != null && store.isHandledMessage(pairing = pairing, mid = mid, now = System.currentTimeMillis())) {
+            Log.i(TAG, "message $mid was handled already, a replay")
+            return Outcome.SKIPPED
+        }
+        val outcome = handle(pairing = pairing, event = event, meta = meta, onTransfer = onTransfer)
+        // Recorded only once handled: an item that could not be fetched for now throws and comes again.
+        if (mid != null && outcome != Outcome.LEFT) store.saveHandledMessage(pairing = pairing, mid = mid, now = System.currentTimeMillis())
+        return outcome
+    }
+
+    private suspend fun handle(pairing: Pairing, event: NtfyEvent, meta: ClipMeta, onTransfer: (Transfer) -> Unit): Outcome {
+        val cipher = cipherFor(pairing)
+        val age = System.currentTimeMillis() / 1000 - event.time
+        val isStale = age > STALE_SECONDS
+        val contentAge = Freshness.ageMs(eventTime = event.time, sentAt = meta.sentAt, nowMs = System.currentTimeMillis())
+        val isStaleContent = contentAge >= Freshness.STALE_MS
         if (pairing.isRoom) {
             val memberId = meta.sender.ifEmpty { "$LEGACY_PREFIX${meta.source}-${meta.device}" }
             when (meta.kind) {
@@ -578,7 +595,7 @@ class ClipRepository internal constructor(
                 }
             }
             val now = System.currentTimeMillis()
-            val isNew = store.saveMember(pairingId = pairing.id, member = Member(id = memberId, name = meta.device.ifEmpty { "?" }, source = meta.source, seen = minOf(now, event.time * 1000), pk = meta.publicKey?.takeIf { RoomKeys.decodeKey(it) != null }.orEmpty()), renewed = meta.renewed == true && meta.kind == ClipMeta.HELLO)
+            val isNew = store.saveMember(pairingId = pairing.id, member = Member(id = memberId, name = meta.device.ifEmpty { "?" }, source = meta.source, seen = minOf(now, event.time * 1000), pk = meta.publicKey?.takeIf { RoomKeys.decodeKey(it) != null }.orEmpty()), renewed = meta.renewed == true && meta.kind == ClipMeta.HELLO && !isStaleContent)
             if (isNew && !isStale && meta.kind == ClipMeta.HELLO && now - pairing.since > SETTLE_MS) {
                 val name = meta.device.ifEmpty { "?" }
                 notifications.showJoined(name = name)
@@ -600,7 +617,7 @@ class ClipRepository internal constructor(
         }
         val device = meta.device.ifEmpty { pairing.macName }
         val url = event.attachment?.url?.takeIf { it.isNotEmpty() }
-        if (meta.kind == ClipMeta.FILE && age > FILE_STALE_SECONDS) {
+        if (meta.kind == ClipMeta.FILE && contentAge >= Freshness.FILE_STALE_MS) {
             notifications.showMissed(name = safeName(meta.fileName ?: "file"), device = device)
             return Outcome.SKIPPED
         }
@@ -620,7 +637,7 @@ class ClipRepository internal constructor(
             ClipMeta.TEXT -> {
                 val text = meta.text ?: data?.decodeToString() ?: return Outcome.SKIPPED
                 if (isEcho(bytes = text.toByteArray())) return Outcome.SKIPPED
-                if (!isStale) bridge.writeText(text = text)
+                if (!isStaleContent) bridge.writeText(text = text)
                 val full = if (text.length > PREVIEW_LENGTH) File(bridge.clipsDir, "${event.id}.txt").apply { writeText(text) } else null
                 ClipItem(id = event.id, incoming = true, kind = ClipKind.TEXT, text = text.take(PREVIEW_LENGTH), file = full?.absolutePath, macId = pairing.id, device = device, time = event.time * 1000)
             }
@@ -637,14 +654,14 @@ class ClipRepository internal constructor(
                 val bytes = data ?: return Outcome.SKIPPED
                 if (isEcho(bytes = bytes)) return Outcome.SKIPPED
                 val file = File(bridge.clipsDir, "${event.id}.${bridge.extensionFor(meta.mime)}").apply { writeBytes(bytes) }
-                if (!isStale) bridge.writeImage(file = file, mime = meta.mime)
+                if (!isStaleContent) bridge.writeImage(file = file, mime = meta.mime)
                 ClipItem(id = event.id, incoming = true, kind = ClipKind.IMAGE, file = file.absolutePath, mime = meta.mime, macId = pairing.id, device = device, time = event.time * 1000)
             }
 
             else -> return Outcome.SKIPPED
         }
         remember(item = item)
-        if (isStale && item.kind != ClipKind.FILE) return Outcome.SKIPPED
+        if (isStaleContent && item.kind != ClipKind.FILE) return Outcome.SKIPPED
         notifications.showReceived(item = item)
         return Outcome.APPLIED
     }
@@ -828,7 +845,8 @@ class ClipRepository internal constructor(
 
     private fun cipherFor(pairing: Pairing): ClipCipher = ClipCipher.fromBase64(key = pairing.key)
 
-    private fun encode(meta: ClipMeta): ByteArray = SyncJson.encodeToString(ClipMeta.serializer(), meta).toByteArray()
+    /** Every message goes out with the time it was sealed and an id of its own, so receivers can tell a replay. */
+    private fun encode(meta: ClipMeta): ByteArray = SyncJson.encodeToString(ClipMeta.serializer(), meta.stamped(nowMs = System.currentTimeMillis())).toByteArray()
 
     private enum class Outcome { APPLIED, SKIPPED, LEFT }
 
@@ -860,7 +878,6 @@ class ClipRepository internal constructor(
         private const val ROOM_BYTES = 12
         private const val FIRST_SINCE = "15m"
         private const val STALE_SECONDS = 15 * 60
-        private const val FILE_STALE_SECONDS = 3 * 60 * 60
         private const val INLINE_LIMIT = 2_400
         private const val MESSAGE_LIMIT = 4_096
         private const val PREVIEW_LENGTH = 2_000

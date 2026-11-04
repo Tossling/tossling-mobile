@@ -38,6 +38,14 @@ final class Store {
 
     private var lastEventURL: URL { Paths.support.appendingPathComponent("last-event") }
 
+    /// The ids (`mid`) of the messages handled in the last 3 hours, as RoomCore encodes them: a replay is skipped.
+    var handledMessages: String {
+        get { (try? String(contentsOf: handledMessagesURL, encoding: .utf8)) ?? "" }
+        set { try? newValue.write(to: handledMessagesURL, atomically: true, encoding: .utf8) }
+    }
+
+    private var handledMessagesURL: URL { Paths.support.appendingPathComponent("handled-messages") }
+
     var deviceName: String {
         get { defaults.string(forKey: "device-name") ?? Self.defaultName }
         set { defaults.set(newValue, forKey: "device-name") }
@@ -85,6 +93,7 @@ final class Store {
         defaults.removeObject(forKey: "members")
         defaults.removeObject(forKey: "aliases")
         lastEventId = ""
+        handledMessages = ""
     }
 
     private static var defaultName: String {

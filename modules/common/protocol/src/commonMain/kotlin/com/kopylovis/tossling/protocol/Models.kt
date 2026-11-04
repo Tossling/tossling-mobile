@@ -128,6 +128,9 @@ data class ClipMeta(
     @SerialName("keys") val keys: Map<String, String>? = null,
     @SerialName("re") val renewed: Boolean? = null,
     @SerialName("inv") val invite: String? = null,
+    @SerialName("ts") val sentAt: Long? = null,
+    @SerialName("mid") val messageId: String? = null,
+    @SerialName("sens") val sensitive: Boolean? = null,
 ) {
     companion object {
         const val TEXT = "text"

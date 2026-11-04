@@ -22,9 +22,9 @@ class RoomCoreTest {
     private val key = ClipCipher.randomKey()
     private val room = "tossling-0123456789abcdef01234567"
 
-    private fun core(id: String, name: String, owner: String = "mac", source: String = "ios") = RoomCore(
+    private fun core(id: String, name: String, owner: String = "mac", source: String = "ios", sealedAt: Long = now) = RoomCore(
         RoomConfig(server = "https://s", token = "t", room = room, key = key, deviceId = id, deviceName = name, owner = owner, identity = RoomCore.createIdentity(), source = source),
-    )
+    ).also { it.clock = { sealedAt } }
 
     private fun Outgoing.event(id: String = "e1", ageSeconds: Long = 0, url: String? = null) =
         NtfyEvent(id = id, time = now / 1000 - ageSeconds, event = "message", topic = room, message = message, attachment = url?.let { NtfyAttachment(url = it) })
@@ -161,5 +161,80 @@ class RoomCoreTest {
         mac.open(core(id = "phone", name = "iPhone").hello().event(), nowMs = now)
         assertEquals(mac.members, RoomCore.decodeMembers(mac.encodeMembers()))
         assertNotEquals(RoomCore.createDeviceId(), RoomCore.createDeviceId())
+    }
+
+    @Test
+    fun outgoingMessagesCarryTheTimeAndAnIdOfTheirOwn() {
+        val phone = core(id = "phone", name = "iPhone")
+        val cipher = ClipCipher.fromBase64(key = key)
+        val metas = listOf(phone.text("a"), phone.text("a"), phone.hello(), phone.ping(), phone.bye())
+            .map { SyncJson.decodeFromString(ClipMeta.serializer(), cipher.openText(text = it.message).decodeToString()) }
+        metas.forEach { meta ->
+            assertEquals(now, meta.sentAt)
+            assertTrue(Regex("^[0-9a-f]{16}$").matches(meta.messageId.orEmpty()), meta.messageId)
+        }
+        assertEquals(metas.size, metas.map { it.messageId }.toSet().size)
+        val raw = cipher.openText(text = phone.text("a").message).decodeToString()
+        assertTrue(raw.contains("\"ts\":$now") && raw.contains("\"mid\":"), raw)
+    }
+
+    @Test
+    fun aReplayedEnvelopeIsSkippedEvenUnderANewEventId() {
+        val phone = core(id = "phone", name = "iPhone")
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        val sent = mac.text("once")
+        assertIs<Incoming.Content>(phone.open(sent.event(id = "e1"), nowMs = now))
+        assertIs<Incoming.Skipped>(phone.open(sent.event(id = "e2"), nowMs = now + 60_000))
+        val restarted = RoomCore(phone.config, phone.members, handled = phone.encodeHandled())
+        assertIs<Incoming.Skipped>(restarted.open(sent.event(id = "e3"), nowMs = now + 60_000))
+        assertIs<Incoming.Content>(restarted.open(mac.text("once").event(id = "e4"), nowMs = now + 60_000))
+    }
+
+    @Test
+    fun anItemToFetchAgainIsNotTakenForAReplay() {
+        val phone = core(id = "phone", name = "iPhone")
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        val sent = mac.image(bytes = byteArrayOf(1), mime = "image/png")
+        val first = assertIs<Incoming.Content>(phone.open(sent.event(id = "e1", url = "https://s/file/a"), nowMs = now))
+        phone.retryLater(first)
+        assertIs<Incoming.Content>(phone.open(sent.event(id = "e1", url = "https://s/file/a"), nowMs = now))
+    }
+
+    @Test
+    fun contentSealedLongAgoIsStaleEvenWhenTheEventIsNew() {
+        val phone = core(id = "phone", name = "iPhone")
+        val old = core(id = "mac", name = "Studio", source = "mac", sealedAt = now - 16 * 60_000)
+        assertIs<Incoming.Skipped>(phone.open(old.text("replayed").event(id = "e1"), nowMs = now))
+        val file = old.file(name = "a.pdf", size = 3, mime = "application/pdf").event(id = "e2", url = "u")
+        assertIs<Incoming.Content>(phone.open(file, nowMs = now))
+        val gone = core(id = "mac", name = "Studio", source = "mac", sealedAt = now - 4 * 3600_000L)
+        assertIs<Incoming.FileGone>(phone.open(gone.file(name = "a.pdf", size = 3, mime = "application/pdf").event(id = "e3", url = "u"), nowMs = now))
+        val ahead = core(id = "mac", name = "Studio", source = "mac", sealedAt = now + 6 * 60_000)
+        assertIs<Incoming.Skipped>(phone.open(ahead.text("from the future").event(id = "e4"), nowMs = now))
+        val skewed = core(id = "mac", name = "Studio", source = "mac", sealedAt = now + 4 * 60_000)
+        assertTrue(assertIs<Incoming.Content>(phone.open(skewed.text("a clock a little ahead").event(id = "e5"), nowMs = now)).fresh)
+    }
+
+    @Test
+    fun aMessageWithoutTsGoesByTheEventTime() {
+        val phone = core(id = "phone", name = "iPhone")
+        val cipher = ClipCipher.fromBase64(key = key)
+        fun legacy(text: String) = Outgoing(message = cipher.sealToText(plain = """{"k":"text","m":"text/plain","src":"mac","n":"Old Mac","id":"mac","v":"$text"}""".encodeToByteArray()), body = null)
+        assertTrue(assertIs<Incoming.Content>(phone.open(legacy("new").event(id = "e1", ageSeconds = 60), nowMs = now)).fresh)
+        assertIs<Incoming.Skipped>(phone.open(legacy("old").event(id = "e2", ageSeconds = 16 * 60), nowMs = now))
+        assertIs<Incoming.Content>(phone.open(legacy("new").event(id = "e3", ageSeconds = 60), nowMs = now))
+    }
+
+    @Test
+    fun onlyAFreshRenewedHelloChangesAKey() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        mac.open(core(id = "phone", name = "iPhone").hello(renewed = true).event(id = "h1"), nowMs = now)
+        val first = mac.members.getValue("phone").pk
+        val stale = core(id = "phone", name = "iPhone", sealedAt = now - 20 * 60_000).hello(renewed = true)
+        mac.open(stale.event(id = "h2"), nowMs = now)
+        assertEquals(first, mac.members.getValue("phone").pk)
+        val fresh = core(id = "phone", name = "iPhone").hello(renewed = true)
+        mac.open(fresh.event(id = "h3"), nowMs = now)
+        assertNotEquals(first, mac.members.getValue("phone").pk)
     }
 }
