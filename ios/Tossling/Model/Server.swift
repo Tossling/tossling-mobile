@@ -1,6 +1,10 @@
 import Foundation
 import TosslingKit
 
+struct AttachmentTooLargeError: LocalizedError {
+    var errorDescription: String? { String(localized: "The item is too large to receive") }
+}
+
 struct ServerError: LocalizedError {
     let code: Int
     let text: String
@@ -102,12 +106,15 @@ final class Server {
         return String(decoding: data, as: UTF8.self).split(separator: "\n").compactMap { NtfyModelsKt.parseEvent(line: String($0)) }.first { $0.id == id }
     }
 
-    func download(_ config: RoomConfig, url: String) async throws -> Data {
+    /// The whole attachment in memory, at most `maxBytes` of it (see AttachmentLimits): a bigger one is an error, not
+    /// retried. Callers check the size the event gives first, so this only catches a server that gave none or lied.
+    func download(_ config: RoomConfig, url: String, maxBytes: Int64 = .max) async throws -> Data {
         let (request, own) = try attachmentRequest(config, url)
         let (data, response) = own
             ? try await exchange(config, request) { try await session.data(for: $0) }
             : try await session.data(for: request)
         try check(response, data)
+        guard Int64(data.count) <= maxBytes else { throw AttachmentTooLargeError() }
         return data
     }
 

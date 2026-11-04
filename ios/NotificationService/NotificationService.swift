@@ -57,7 +57,8 @@ final class NotificationService: UNNotificationServiceExtension {
         case "text":
             if let text = meta.text {
                 content.body = String(text.prefix(1000))
-            } else if let url = incoming.attachmentUrl, let data = try? await Server.shared.download(config, url: url),
+            } else if let url = incoming.attachmentUrl, fitsPreview(incoming, AttachmentLimits.shared.PREVIEW_TEXT),
+                      let data = try? await Server.shared.download(config, url: url, maxBytes: AttachmentLimits.shared.PREVIEW_TEXT),
                       let plain = try? core.openAttachment(data: data) {
                 content.body = String(String(decoding: plain, as: UTF8.self).prefix(1000))
             } else {
@@ -65,7 +66,9 @@ final class NotificationService: UNNotificationServiceExtension {
             }
         case "image":
             content.body = String(localized: "Image")
-            if let url = incoming.attachmentUrl, let data = try? await Server.shared.download(config, url: url) {
+            // The extension has about 24 MB of memory and holds the image several times over: big ones get no preview.
+            if let url = incoming.attachmentUrl, fitsPreview(incoming, AttachmentLimits.shared.PREVIEW_IMAGE),
+               let data = try? await Server.shared.download(config, url: url, maxBytes: AttachmentLimits.shared.PREVIEW_IMAGE) {
                 let type = UTType(mimeType: meta.mime) ?? .png
                 let file = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).\(type.preferredFilenameExtension ?? "png")")
                 if (try? core.openAttachment(data: data).write(to: file)) != nil,
@@ -127,4 +130,10 @@ final class NotificationService: UNNotificationServiceExtension {
         #endif
         return content
     }
+}
+
+/// A preview is downloaded only when the server gives the attachment's size and it is within the limit.
+private func fitsPreview(_ incoming: IncomingContent, _ limit: Int64) -> Bool {
+    guard let size = incoming.attachmentSize?.int64Value else { return false }
+    return size <= limit
 }

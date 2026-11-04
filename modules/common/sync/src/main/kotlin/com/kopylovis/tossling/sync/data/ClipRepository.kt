@@ -6,6 +6,7 @@ import android.util.Log
 import com.kopylovis.tossling.core.presentation.tr
 import com.kopylovis.tossling.protocol.ClipItem
 import com.kopylovis.tossling.protocol.ClipKind
+import com.kopylovis.tossling.protocol.AttachmentLimits
 import com.kopylovis.tossling.protocol.ClipMeta
 import com.kopylovis.tossling.protocol.DEMO_ROOM_URL
 import com.kopylovis.tossling.protocol.DeviceKind
@@ -649,8 +650,14 @@ class ClipRepository internal constructor(
         if (meta.kind == ClipMeta.FILE && meta.format == ClipCipher.STREAM_FORMAT) {
             return receiveStream(pairing = pairing, event = event, meta = meta, url = url ?: return Outcome.SKIPPED, device = device, onTransfer = onTransfer)
         }
+        val limit = AttachmentLimits.of(kind = meta.kind)
+        if (url != null && AttachmentLimits.exceeds(size = event.attachment?.size, limit = limit)) {
+            Log.w(TAG, "message ${event.id}: the attachment is ${event.attachment?.size} bytes, more than $limit, not downloaded")
+            if (meta.kind == ClipMeta.FILE) notifications.showMissed(name = safeName(meta.fileName ?: "file"), device = device)
+            return Outcome.SKIPPED
+        }
         val data = try {
-            url?.let { cipher.open(sealed = client.download(endpoint = pairing.endpoint, url = it)) }
+            url?.let { cipher.open(sealed = client.download(endpoint = pairing.endpoint, url = it, maxBytes = limit)) }
         } catch (error: NtfyException) {
             if (error.code != HTTP_NOT_FOUND && error.code != HTTP_GONE) throw InterruptedTransfer(cause = error)
             if (meta.kind == ClipMeta.FILE) notifications.showMissed(name = safeName(meta.fileName ?: "file"), device = device)

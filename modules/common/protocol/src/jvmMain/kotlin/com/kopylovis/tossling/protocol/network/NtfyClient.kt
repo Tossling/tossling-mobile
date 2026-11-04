@@ -1,5 +1,6 @@
 package com.kopylovis.tossling.protocol.network
 
+import com.kopylovis.tossling.protocol.AttachmentTooLarge
 import com.kopylovis.tossling.protocol.Endpoint
 import com.kopylovis.tossling.protocol.SyncJson
 import kotlinx.coroutines.CompletableDeferred
@@ -77,14 +78,31 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
         lines.filter { it.isNotBlank() }.map { SyncJson.decodeFromString(NtfyEvent.serializer(), it) }
     }
 
-    suspend fun download(endpoint: Endpoint, url: String): ByteArray = withContext(Dispatchers.IO) {
+    /** Reads the whole attachment into memory, at most [maxBytes] of it: a bigger one throws [AttachmentTooLarge]. */
+    suspend fun download(endpoint: Endpoint, url: String, maxBytes: Long = Long.MAX_VALUE): ByteArray = withContext(Dispatchers.IO) {
         val own = endpoint.takeIf { isSameOrigin(server = it.server, url = url) }
         val connection = openAttachment(endpoint = endpoint, own = own, url = url)
         connection.readTimeout = DOWNLOAD_TIMEOUT_MS
-        connection.ensureOk(endpoint = own)
-        val bytes = connection.inputStream.use { it.readBytes() }
-        connection.disconnect()
-        bytes
+        try {
+            connection.ensureOk(endpoint = own)
+            if (connection.contentLengthLong > maxBytes) throw AttachmentTooLarge(limit = maxBytes)
+            connection.inputStream.use { input -> readAtMost(input = input, maxBytes = maxBytes) }
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    private fun readAtMost(input: InputStream, maxBytes: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(64 * 1024)
+        var total = 0L
+        while (true) {
+            val read = input.read(buffer)
+            if (read < 0) return out.toByteArray()
+            total += read
+            if (total > maxBytes) throw AttachmentTooLarge(limit = maxBytes)
+            out.write(buffer, 0, read)
+        }
     }
 
     suspend fun createToken(endpoint: Endpoint, label: String): String = withContext(Dispatchers.IO) {
