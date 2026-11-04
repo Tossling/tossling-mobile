@@ -29,10 +29,13 @@ enum Keychain {
         guard let value else { return }
         var item = query
         item[kSecValueData as String] = Data(value.utf8)
-        item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+        // ThisDeviceOnly keeps the room key, tokens, identity and device id out of backups: restored onto another
+        // iPhone they made two phones with one device id, which skip each other's messages and take each other's token.
+        item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         SecItemAdd(item as CFDictionary, nil)
     }
 
+    /// Runs at every launch: writes each item again, into the shared group and with the accessibility above.
     static func moveToSharedGroup() {
         for account in accounts {
             if let value = read(account) { write(account, value) }
