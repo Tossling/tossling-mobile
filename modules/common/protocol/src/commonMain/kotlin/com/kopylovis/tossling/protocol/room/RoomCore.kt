@@ -195,27 +195,42 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap(), ha
 
     fun fileCipher(): ClipCipher = cipher
 
-    fun canRenewToken(id: String): Boolean = remainingAfter(id = id).values.all { RoomKeys.decodeKey(it.pk) != null }
+    fun canRenewToken(id: String): Boolean = withoutKey(id = id).isEmpty()
 
+    /**
+     * The devices that would stay in the room after removing [id] but have no key of their own yet: the removal is
+     * refused until they say hello with one, or the new room key would have to go out under the old one.
+     */
+    fun withoutKey(id: String): List<Member> = Removal.withoutKey(members = members.values, removed = id, self = config.deviceId)
+
+    /** The devices that would stay in the room after removing [id] and whose key changed: the user is warned first. */
+    fun keyChangedAmong(id: String): List<Member> = Removal.keyChanged(members = members.values, removed = id, self = config.deviceId)
+
+    /** The user accepted the member's current key: the "key changed" mark goes away. */
+    fun acceptKey(id: String) {
+        val member = members[id] ?: return
+        members = members + (id to member.copy(keyChanged = 0))
+    }
+
+    /**
+     * The `kick` and `rekey` that move everyone but [id] to [room]. Throws [MissingKeys] when a remaining device has no
+     * key: check [withoutKey] before issuing a new token. The user should have confirmed [keyChangedAmong] already.
+     */
+    @Throws(Exception::class)
     fun revoke(id: String, room: String, key: String, token: String?): List<Outgoing> {
         require(id != config.owner) { "the creator of the room cannot be removed" }
+        val missing = withoutKey(id = id)
+        if (missing.isNotEmpty()) throw MissingKeys(members = missing)
         val others = remainingAfter(id = id)
-        val isLegacy = !canRenewToken(id = id)
         val messages = mutableListOf(control(kind = ClipMeta.KICK).copy(to = listOf(id)).sealed())
         if (others.isNotEmpty()) {
-            val sealed = RoomKeys.seal(secret = RoomSecret(key = key, room = room, token = token.takeUnless { isLegacy }), recipients = others.mapValues { it.value.pk })
-            messages += control(kind = ClipMeta.REKEY).copy(
-                to = others.keys.toList(),
-                ephemeral = sealed.ephemeral,
-                keys = sealed.keys,
-                room = room.takeIf { isLegacy },
-                key = key.takeIf { isLegacy },
-            ).sealed()
+            val sealed = RoomKeys.seal(secret = RoomSecret(key = key, room = room, token = token), recipients = others.mapValues { it.value.pk })
+            messages += control(kind = ClipMeta.REKEY).copy(to = others.keys.toList(), ephemeral = sealed.ephemeral, keys = sealed.keys).sealed()
         }
         return messages
     }
 
-    private fun remainingAfter(id: String): Map<String, Member> = members.filterKeys { it != id && it != config.deviceId && !it.startsWith(LEGACY_PREFIX) }
+    private fun remainingAfter(id: String): Map<String, Member> = Removal.remaining(members = members.values, removed = id, self = config.deviceId).associateBy { it.id }
 
     fun switchRoom(room: String, key: String, token: String?, keep: Set<String>) {
         config = config.copy(room = room, key = key, token = token?.takeIf { it.isNotEmpty() } ?: config.token)
@@ -244,7 +259,9 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap(), ha
         val seen = minOf(nowMs, time * 1000)
         val known = members[id]
         val pk = if (known == null || known.pk.isEmpty() || renewed) offered else known.pk
-        members = members + (id to Member(id = id, name = meta.device.ifEmpty { "?" }, source = meta.source, seen = seen, since = known?.since ?: seen, alias = known?.alias.orEmpty(), pk = pk))
+        val changed = known != null && known.pk.isNotEmpty() && pk != known.pk
+        val keyChanged = if (changed) nowMs else known?.keyChanged ?: 0
+        members = members + (id to Member(id = id, name = meta.device.ifEmpty { "?" }, source = meta.source, seen = seen, since = known?.since ?: seen, alias = known?.alias.orEmpty(), pk = pk, keyChanged = keyChanged))
         return known == null
     }
 
@@ -293,4 +310,25 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap(), ha
 
         fun createIdentity(): String = Base64.encode(DeviceIdentity.generate().privateKey)
     }
+}
+
+/** The removal is refused: these remaining devices have no key of their own yet and have to be opened or updated. */
+class MissingKeys(val members: List<Member>) : Exception("no key yet: ${members.joinToString(separator = ", ") { it.title }}")
+
+/**
+ * The checks before removing a device, on the devices that stay: every member except this one, the removed one and
+ * old devices without an id (they cannot be addressed and never get a sealed key).
+ */
+object Removal {
+
+    fun remaining(members: Collection<Member>, removed: String, self: String): List<Member> =
+        members.filter { it.id != removed && it.id != self && !it.id.startsWith(RoomCore.LEGACY_PREFIX) }
+
+    /** Remaining devices without a usable key: the removal is refused and names them. */
+    fun withoutKey(members: Collection<Member>, removed: String, self: String): List<Member> =
+        remaining(members = members, removed = removed, self = self).filter { RoomKeys.decodeKey(it.pk) == null }.sortedBy { it.title.lowercase() }
+
+    /** Remaining devices marked "key changed": the user is warned, naming them, and goes on only after confirming. */
+    fun keyChanged(members: Collection<Member>, removed: String, self: String): List<Member> =
+        remaining(members = members, removed = removed, self = self).filter { it.keyChanged > 0 }.sortedBy { it.title.lowercase() }
 }

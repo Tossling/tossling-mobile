@@ -59,14 +59,18 @@ internal class PairingStore(context: Context) {
         }
     }
 
-    fun saveMember(pairingId: String, member: Member, renewed: Boolean = false): Boolean {
+    /**
+     * [renewed]: the member's key may change (a fresh `re` hello); [trusted]: the key comes from a QR code the user
+     * scanned, so a change is not marked.
+     */
+    fun saveMember(pairingId: String, member: Member, renewed: Boolean = false, trusted: Boolean = false, now: Long = System.currentTimeMillis()): Boolean {
         var isNew = false
         _pairings.update { list ->
             list.map { pairing ->
                 if (pairing.id != pairingId) return@map pairing
                 val known = pairing.members.firstOrNull { it.id == member.id }
                 isNew = known == null
-                val merged = if (known == null) member else member.copy(since = known.since, alias = known.alias, seen = maxOf(member.seen, known.seen), pk = if (renewed && member.pk.isNotEmpty()) member.pk else known.pk.ifEmpty { member.pk })
+                val merged = mergeMember(known = known, member = member, renewed = renewed, trusted = trusted, now = now)
                 pairing.copy(members = pairing.members.filterNot { it.id == member.id } + merged)
             }
         }
@@ -77,6 +81,15 @@ internal class PairingStore(context: Context) {
     fun removeMember(pairingId: String, memberId: String) {
         _pairings.update { list ->
             list.map { pairing -> if (pairing.id != pairingId) pairing else pairing.copy(members = pairing.members.filterNot { it.id == memberId }) }
+        }
+        writePairings()
+    }
+
+    fun acceptKey(pairingId: String, memberId: String) {
+        _pairings.update { list ->
+            list.map { pairing ->
+                if (pairing.id != pairingId) pairing else pairing.copy(members = pairing.members.map { if (it.id == memberId) it.copy(keyChanged = 0) else it })
+            }
         }
         writePairings()
     }
@@ -243,3 +256,18 @@ private const val HANDLED_KEEP = 50
  */
 internal fun afterHandling(handled: List<String>, id: String, keep: Int = HANDLED_KEEP): List<String>? =
     if (id in handled) null else (handled + id).takeLast(keep)
+
+/**
+ * A member as seen again. The first key stays until a [renewed] hello brings another one: that one is taken, but the
+ * member is marked "key changed" unless the key is [trusted] (a scanned QR code).
+ */
+internal fun mergeMember(known: Member?, member: Member, renewed: Boolean, trusted: Boolean, now: Long): Member {
+    if (known == null) return member.copy(keyChanged = 0)
+    val pk = if (renewed && member.pk.isNotEmpty()) member.pk else known.pk.ifEmpty { member.pk }
+    val keyChanged = when {
+        trusted -> 0
+        known.pk.isNotEmpty() && pk != known.pk -> now
+        else -> known.keyChanged
+    }
+    return member.copy(since = known.since, alias = known.alias, seen = maxOf(member.seen, known.seen), pk = pk, keyChanged = keyChanged)
+}

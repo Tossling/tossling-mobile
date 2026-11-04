@@ -22,7 +22,8 @@ struct DevicesView: View {
                         DeviceRow(name: device.name, computer: device.computer, online: device.online,
                                   status: device.online ? String(localized: "online") : When.seenAgo(device.seen),
                                   selfLabel: device.isSelf ? String(localized: "this device") : nil,
-                                  ownName: device.hasAlias ? device.ownName : nil)
+                                  ownName: device.hasAlias ? device.ownName : nil,
+                                  warning: device.keyChanged != nil ? String(localized: "key changed") : nil)
                     }
                     .pressable(scale: 0.98)
                     Hairline(inset: 74)
@@ -46,6 +47,7 @@ struct DeviceView: View {
     @Binding var path: [Route]
     @State private var name = ""
     @State private var confirm = false
+    @State private var keyChanged: [String] = []
     @FocusState private var editing: Bool
 
     var body: some View {
@@ -58,6 +60,9 @@ struct DeviceView: View {
                     if device.hasAlias { Text(device.ownName).font(Fonts.hint).foregroundStyle(Palette.ink2) }
                     if device.isSelf || device.isOwner {
                         Text(device.isSelf ? String(localized: "This device") : String(localized: "Room creator")).font(Fonts.hint).foregroundStyle(Palette.ink2)
+                    }
+                    if device.keyChanged != nil {
+                        Text(String(localized: "key changed")).font(Fonts.onest(13, .medium)).foregroundStyle(Palette.dangerInk)
                     }
                     StatusLine(online: device.online, text: device.online ? String(localized: "online") : When.seenAgo(device.seen))
                         .padding(.horizontal, 12)
@@ -83,12 +88,22 @@ struct DeviceView: View {
                     }
                 }
                 .padding(.top, 24)
+                if let changed = device.keyChanged {
+                    Text(String(localized: "This device came with a new key on \(When.long(changed)). That is expected after it was reinstalled or paired again. If not, someone in the room may be posing as it: remove it and check its key before you trust it again."))
+                        .font(Fonts.footnote)
+                        .foregroundStyle(Palette.dangerInk)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 6)
+                        .padding(.top, 10)
+                    CapsuleButton(title: String(localized: "Accept the new key"), style: .glass) { model.acceptKey(device) }
+                        .padding(.top, 12)
+                }
                 FootNote(text: device.isSelf ? String(localized: "Every device in the room sees this name.") : String(localized: "This name is shown on this phone only. Leave it empty to go back to the device's own name."))
                 if device.isOwner, !device.isSelf {
                     FootNote(text: String(localized: "The room was created on this computer, so it can't be removed from the room. If you no longer want its clipboard, leave the room on the main screen."))
                 }
                 if !device.isSelf, !device.isOwner {
-                    CapsuleButton(title: device.computer ? String(localized: "Disconnect this computer") : String(localized: "Disconnect this device"), style: .plain, ink: Palette.dangerInk) { confirm = true }
+                    CapsuleButton(title: device.computer ? String(localized: "Disconnect this computer") : String(localized: "Disconnect this device"), style: .plain, ink: Palette.dangerInk) { ask(device) }
                         .padding(.top, 24)
                 }
             }
@@ -99,9 +114,23 @@ struct DeviceView: View {
             .confirmationDialog(String(localized: "Disconnect \(device.name)?"), isPresented: $confirm, titleVisibility: .visible) {
                 Button(String(localized: "Disconnect and revoke the key"), role: .destructive) { Task { await revoke(device) } }
             } message: {
-                Text("The device loses access to the room: the others move to a new key. Everyone else keeps working.")
+                if keyChanged.isEmpty {
+                    Text("The device loses access to the room: the others move to a new key. Everyone else keeps working.")
+                } else {
+                    Text(String(localized: "The key of \(keyChanged.joined(separator: ", ")) changed lately, and the new room key will go to it too. Go on only if you know why it changed.") + "\n\n" + String(localized: "The device loses access to the room: the others move to a new key. Everyone else keeps working."))
+                }
             }
         }
+    }
+
+    private func ask(_ device: DeviceItem) {
+        let check = model.removalCheck(device)
+        guard check.withoutKey.isEmpty else {
+            model.say(RoomError.noKey(check.withoutKey).localizedDescription, .error)
+            return
+        }
+        keyChanged = check.keyChanged
+        confirm = true
     }
 
     private func commit(_ device: DeviceItem) {

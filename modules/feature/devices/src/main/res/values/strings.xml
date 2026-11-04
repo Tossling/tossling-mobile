@@ -44,4 +44,9 @@
     <string name="devices_owner_note">The room was created on this computer, so it can\'t be removed from the room. If you no longer want its clipboard, leave the room on the main screen.</string>
     <string name="devices_sheet_owner_title">Leave the room?</string>
     <string name="devices_sheet_owner">This computer created the room and can\'t be removed. The phone removes the room key and stops getting the clipboard from every device in it.</string>
+    <string name="devices_key_changed">key changed</string>
+    <string name="devices_key_changed_note">This device came with a new key on %1$s. That is expected after it was reinstalled or paired again. If not, someone in the room may be posing as it: remove it and check its key before you trust it again.</string>
+    <string name="devices_accept_key">Accept the new key</string>
+    <string name="devices_key_accepted">Key accepted</string>
+    <string name="devices_sheet_key_changed">The key of %1$s changed lately, and the new room key will go to it too. Go on only if you know why it changed.</string>
 </resources>

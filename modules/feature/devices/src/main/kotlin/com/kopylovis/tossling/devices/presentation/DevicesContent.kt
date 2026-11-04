@@ -36,6 +36,7 @@ internal fun DevicesContent(
                     status = if (device.isOnline) stringResource(R.string.devices_online) else seenAgo(time = device.seen),
                     ownName = device.shownOwnName,
                     selfLabel = if (device.isSelf) stringResource(R.string.devices_self) else null,
+                    warning = if (device.isKeyChanged) stringResource(R.string.devices_key_changed) else null,
                     onClick = { component.onDeviceClicked(device = device) },
                 )
             }

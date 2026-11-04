@@ -36,6 +36,7 @@ import com.kopylovis.tossling.protocol.network.NtfyEvent
 import com.kopylovis.tossling.protocol.network.NtfyException
 import com.kopylovis.tossling.protocol.network.RefusalGate
 import com.kopylovis.tossling.protocol.network.ServerRefusal
+import com.kopylovis.tossling.protocol.room.Removal
 import com.kopylovis.tossling.sync.clipboard.ClipboardBridge
 import com.kopylovis.tossling.sync.clipboard.Outgoing
 import com.kopylovis.tossling.sync.entry.ClipWidget
@@ -225,7 +226,7 @@ class ClipRepository internal constructor(
         }
         store.savePairing(pairing = pairing.copy(since = System.currentTimeMillis()))
         if (pairing.isRoom && pairing.macId.isNotEmpty()) {
-            store.saveMember(pairingId = pairing.id, member = Member(id = pairing.macId, name = pairing.macName.ifEmpty { "Mac" }, source = SOURCE_MAC, seen = System.currentTimeMillis(), pk = pairing.macKey), renewed = true)
+            store.saveMember(pairingId = pairing.id, member = Member(id = pairing.macId, name = pairing.macName.ifEmpty { "Mac" }, source = SOURCE_MAC, seen = System.currentTimeMillis(), pk = pairing.macKey), renewed = true, trusted = true)
         }
         if (settings.isInstant.value) push.subscribe(topic = pairing.inTopic)
         publishControl(pairing = pairing, meta = control(kind = ClipMeta.HELLO).copy(renewed = true))
@@ -292,25 +293,19 @@ class ClipRepository internal constructor(
             return
         }
         if (deviceId == pairing.ownerId) throw IllegalStateException(tr("The room creator can't be removed", "Создателя комнаты нельзя отключить"))
-        val remaining = pairing.members.filter { it.id != deviceId && it.id != settings.deviceId && !it.id.startsWith(LEGACY_PREFIX) }
+        val missing = Removal.withoutKey(members = pairing.members, removed = deviceId, self = settings.deviceId)
+        if (missing.isNotEmpty()) throw IllegalStateException(missingKeyMessage(names = missing.map { it.title }))
+        val remaining = Removal.remaining(members = pairing.members, removed = deviceId, self = settings.deviceId)
         val room = "${roomPrefix(endpoint = pairing.endpoint)}${hex(bytes = ROOM_BYTES)}"
         val key = Base64.getEncoder().encodeToString(ByteArray(ClipCipher.KEY_SIZE).also(random::nextBytes))
-        val isLegacy = remaining.any { RoomKeys.decodeKey(it.pk) == null }
-        if (isLegacy) Log.w(TAG, "some devices have no key yet, the new room key goes out under the old one")
-        val token = if (isLegacy || pairing.token.isEmpty()) null else runCatching { client.createToken(endpoint = pairing.endpoint, label = TOKEN_LABEL) }
+        val token = if (pairing.token.isEmpty()) null else runCatching { client.createToken(endpoint = pairing.endpoint, label = TOKEN_LABEL) }
             .onFailure { Log.w(TAG, "kept the old token", it) }
             .getOrNull()
         try {
             publishControl(pairing = pairing, meta = control(kind = ClipMeta.KICK).copy(to = listOf(deviceId)))
             if (remaining.isNotEmpty()) {
                 val sealed = RoomKeys.seal(secret = RoomSecret(room = room, key = key, token = token), recipients = remaining.associate { it.id to it.pk })
-                val rekey = control(kind = ClipMeta.REKEY).copy(
-                    to = remaining.map { it.id },
-                    ephemeral = sealed.ephemeral,
-                    keys = sealed.keys,
-                    room = room.takeIf { isLegacy },
-                    key = key.takeIf { isLegacy },
-                )
+                val rekey = control(kind = ClipMeta.REKEY).copy(to = remaining.map { it.id }, ephemeral = sealed.ephemeral, keys = sealed.keys)
                 publishControl(pairing = pairing, meta = rekey)
             }
         } catch (error: Throwable) {
@@ -325,6 +320,29 @@ class ClipRepository internal constructor(
                 .onFailure { Log.w(TAG, "the removed device's own token stays on the server", it) }
         }
     }
+
+    /**
+     * What has to be settled before [deviceId] is removed: devices without a key refuse the removal, devices whose key
+     * changed need the user's confirmation. Names as this phone shows them.
+     */
+    fun removalCheck(pairingId: String, deviceId: String): RemovalCheck {
+        val pairing = store.pairings.value.firstOrNull { it.id == pairingId } ?: return RemovalCheck()
+        if (!pairing.isRoom) return RemovalCheck()
+        return RemovalCheck(
+            withoutKey = Removal.withoutKey(members = pairing.members, removed = deviceId, self = settings.deviceId).map { it.title },
+            keyChanged = Removal.keyChanged(members = pairing.members, removed = deviceId, self = settings.deviceId).map { it.title },
+        )
+    }
+
+    fun missingKeyMessage(names: List<String>): String {
+        val list = names.joinToString(separator = ", ")
+        return tr(
+            "No key yet from $list: open Tossling there or update it, then try again. Without that key the new room key can't be sent safely.",
+            "Нет ключа от устройства $list: откройте на нём Tossling или обновите его и попробуйте снова. Без этого ключа новый ключ комнаты не передать безопасно.",
+        )
+    }
+
+    fun acceptKey(pairingId: String, deviceId: String) = store.acceptKey(pairingId = pairingId, memberId = deviceId)
 
     private suspend fun dropToken(server: String, token: String) {
         runCatching { client.deleteToken(endpoint = Endpoint(server = server, token = token), token = token) }
@@ -780,6 +798,7 @@ class ClipRepository internal constructor(
                     isOwner = member.id == pairing.ownerId,
                     ownName = member.name,
                     hasAlias = member.alias.isNotEmpty() && member.alias != member.name,
+                    keyChanged = member.keyChanged,
                 )
             }
         } else {
@@ -894,3 +913,9 @@ class ClipRepository internal constructor(
         private const val HTTP_GONE = 410
     }
 }
+
+/** Before a removal: devices without a key (the removal is refused) and devices whose key changed (warn first). */
+data class RemovalCheck(
+    val withoutKey: List<String> = emptyList(),
+    val keyChanged: List<String> = emptyList(),
+)

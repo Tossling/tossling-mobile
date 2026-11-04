@@ -370,6 +370,16 @@
         }
       }
     },
+    "Accept the new key": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Принять новый ключ"
+          }
+        }
+      }
+    },
     "Add a computer": {
       "localizations": {
         "ru": {
@@ -960,6 +970,16 @@
         }
       }
     },
+    "Key accepted": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ключ принят"
+          }
+        }
+      }
+    },
     "Last contact": {
       "localizations": {
         "ru": {
@@ -1166,6 +1186,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Нет связи с сервером"
+          }
+        }
+      }
+    },
+    "No key yet from %@: open Tossling there or update it, then try again. Without that key the new room key can't be sent safely.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет ключа от устройства %@: откройте на нём Tossling или обновите его и попробуйте снова. Без этого ключа новый ключ комнаты не передать безопасно."
           }
         }
       }
@@ -2132,6 +2162,16 @@
         }
       }
     },
+    "The key of %@ changed lately, and the new room key will go to it too. Go on only if you know why it changed.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "У %@ недавно сменился ключ, и новый ключ комнаты уйдёт и ему. Продолжайте, только если знаете, почему он сменился."
+          }
+        }
+      }
+    },
     "The key stayed on this phone after Tossling was removed. Return as the same device, no QR code needed.": {
       "localizations": {
         "ru": {
@@ -2308,6 +2348,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Это устройство"
+          }
+        }
+      }
+    },
+    "This device came with a new key on %@. That is expected after it was reinstalled or paired again. If not, someone in the room may be posing as it: remove it and check its key before you trust it again.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устройство пришло с новым ключом %@. Так бывает после переустановки или повторного подключения. Если этого не было, кто-то в комнате может выдавать себя за него: отключите его и проверьте ключ, прежде чем снова доверять."
           }
         }
       }
@@ -2671,6 +2721,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "важно"
+          }
+        }
+      }
+    },
+    "key changed": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ключ сменился"
           }
         }
       }

@@ -399,6 +399,7 @@ struct DeviceRow: View {
     let status: String
     var selfLabel: String?
     var ownName: String?
+    var warning: String?
 
     var body: some View {
         HStack(spacing: 14) {
@@ -410,6 +411,7 @@ struct DeviceRow: View {
                 }
                 if let ownName { Text(ownName).font(Fonts.onest(12)).foregroundStyle(Palette.ink2) }
                 StatusLine(online: online, text: status)
+                if let warning { Text(warning).font(Fonts.onest(12, .medium)).foregroundStyle(Palette.dangerInk).lineLimit(1) }
             }
             Spacer(minLength: 8)
             Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.ink2)

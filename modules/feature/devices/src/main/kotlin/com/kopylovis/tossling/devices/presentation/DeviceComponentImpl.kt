@@ -20,12 +20,13 @@ internal class DeviceComponentImpl(
     private val globalNavigator: GlobalNavigator by inject()
     private val draft = MutableStateFlow<String?>(null)
     private val isSheetVisible = MutableStateFlow(false)
+    private val keyChanged = MutableStateFlow<List<String>>(emptyList())
     private var isLeaving = false
 
     override val state: Value<DeviceScreenState> =
-        combine(repository.devices, draft, isSheetVisible) { devices, name, sheet ->
+        combine(repository.devices, draft, isSheetVisible, keyChanged) { devices, name, sheet, changed ->
             val device = devices.firstOrNull { it.pairingId == pairingId && it.id == deviceId }
-            DeviceScreenState(device = device, name = name ?: device?.name.orEmpty(), isSheetVisible = sheet)
+            DeviceScreenState(device = device, name = name ?: device?.name.orEmpty(), isSheetVisible = sheet, keyChanged = changed)
         }.asValue()
 
     init {
@@ -54,7 +55,20 @@ internal class DeviceComponentImpl(
     }
 
     override fun onDisconnectClicked() {
+        val device = state.value.device ?: return
+        val removes = device.isRoom && !device.isSelf && !device.isOwner
+        val check = if (removes) repository.removalCheck(pairingId = pairingId, deviceId = deviceId) else null
+        if (check != null && check.withoutKey.isNotEmpty()) {
+            messenger.error(repository.missingKeyMessage(names = check.withoutKey))
+            return
+        }
+        keyChanged.value = check?.keyChanged.orEmpty()
         isSheetVisible.value = true
+    }
+
+    override fun onAcceptKeyClicked() {
+        repository.acceptKey(pairingId = pairingId, deviceId = deviceId)
+        messenger.done(tr("Key accepted", "Ключ принят"))
     }
 
     override fun onDisconnectConfirmed() {
