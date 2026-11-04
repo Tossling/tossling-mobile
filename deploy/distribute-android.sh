@@ -84,7 +84,12 @@ fi
 echo "=== Uploading to Firebase App Distribution ==="
 # An empty array under `set -u` counts as unbound in bash 3.2 (the macOS default), hence the
 # `${arr[@]+…}` form: it expands to zero arguments instead of an error.
-firebase appdistribution:distribute "$APK_PATH" \
+# Without the proxy variables: with HTTPS_PROXY set, firebase-tools switches to its own undici ProxyAgent, which
+# fails on Node 26 with "invalid onError method" and reports it as "Failed to make request". Google answers directly.
+# FIREBASE_KEEP_PROXY=1 keeps them for a network that really needs the proxy.
+FIREBASE=(firebase)
+[ -n "${FIREBASE_KEEP_PROXY:-}" ] || FIREBASE=(env -u HTTPS_PROXY -u https_proxy -u HTTP_PROXY -u http_proxy -u ALL_PROXY -u all_proxy firebase)
+"${FIREBASE[@]}" appdistribution:distribute "$APK_PATH" \
     --app "$APP_ID" \
     --project "$PROJECT" \
     --groups "$TESTER_GROUPS" \
