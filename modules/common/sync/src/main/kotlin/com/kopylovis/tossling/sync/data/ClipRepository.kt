@@ -448,7 +448,8 @@ class ClipRepository internal constructor(
                 val meta = base.copy(to = to)
                 val cipher = cipherFor(pairing)
                 try {
-                    val message = cipher.sealToText(plain = encode(meta))
+                    val inlineMessage = if (inline) cipher.sealToText(plain = encode(meta)).takeIf { it.length <= MESSAGE_LIMIT } else null
+                    val message = inlineMessage ?: cipher.sealToText(plain = encode(meta.copy(text = null)))
                     if (isStream) {
                         client.publishStream(endpoint = pairing.endpoint, topic = pairing.outTopic, message = message, length = ClipCipher.sealedSize(size)) { output ->
                             val file = outgoing.file.inputStream().buffered(STREAM_BUFFER)
@@ -461,7 +462,7 @@ class ClipRepository internal constructor(
                             }
                         }
                     } else {
-                        client.publish(endpoint = pairing.endpoint, topic = pairing.outTopic, message = message, body = if (inline) null else bytes?.let(cipher::seal))
+                        client.publish(endpoint = pairing.endpoint, topic = pairing.outTopic, message = message, body = if (inlineMessage != null) null else bytes?.let(cipher::seal))
                     }
                     markLink(id = pairing.id, isOnline = true)
                     delivered += pairing
@@ -855,6 +856,7 @@ class ClipRepository internal constructor(
         private const val STALE_SECONDS = 15 * 60
         private const val FILE_STALE_SECONDS = 3 * 60 * 60
         private const val INLINE_LIMIT = 2_400
+        private const val MESSAGE_LIMIT = 4_096
         private const val PREVIEW_LENGTH = 2_000
         private const val ECHO_WINDOW_MS = 60_000L
         private const val ONLINE_MS = 5 * 60_000L
