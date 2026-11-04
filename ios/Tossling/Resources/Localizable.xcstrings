@@ -880,6 +880,16 @@
         }
       }
     },
+    "Hidden content: open Tossling to get it": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрытое содержимое: откройте Tossling, чтобы получить его"
+          }
+        }
+      }
+    },
     "Image": {
       "localizations": {
         "ru": {

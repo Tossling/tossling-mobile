@@ -7,6 +7,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
@@ -22,6 +23,8 @@ data class Outgoing(
     val mime: String,
     val file: File,
     val name: String? = null,
+    /** The system marks it as secret (a password manager's copy): it goes out with `sens`. */
+    val sensitive: Boolean = false,
 )
 
 class TooLargeException : Exception()
@@ -34,13 +37,18 @@ class ClipboardBridge(private val context: Context) {
 
     private val outgoingDir: File get() = File(context.cacheDir, OUTGOING_DIR).apply { mkdirs() }
 
-    internal fun writeText(text: String) {
-        clipboard.setPrimaryClip(ClipData.newPlainText(LABEL, text))
+    /** [sensitive]: keep it out of clipboard previews and history (EXTRA_IS_SENSITIVE). */
+    internal fun writeText(text: String, sensitive: Boolean = false) {
+        clipboard.setPrimaryClip(ClipData.newPlainText(LABEL, text).markedSensitive(sensitive = sensitive))
     }
 
-    internal fun writeImage(file: File, mime: String) {
+    internal fun writeImage(file: File, mime: String, sensitive: Boolean = false) {
         val uri = shareUri(file = file)
-        clipboard.setPrimaryClip(ClipData(LABEL, arrayOf(mime), ClipData.Item(uri)))
+        clipboard.setPrimaryClip(ClipData(LABEL, arrayOf(mime), ClipData.Item(uri)).markedSensitive(sensitive = sensitive))
+    }
+
+    private fun ClipData.markedSensitive(sensitive: Boolean): ClipData = apply {
+        if (sensitive) description.extras = PersistableBundle().apply { putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true) }
     }
 
     fun readClipboard(): Outgoing? {
@@ -48,11 +56,14 @@ class ClipboardBridge(private val context: Context) {
         if (clip.itemCount == 0) return null
         val item = clip.getItemAt(0)
         val uri = item.uri
+        val sensitive = clip.description.extras?.getBoolean(ClipDescription.EXTRA_IS_SENSITIVE) == true
         val mime = uri?.let { context.contentResolver.getType(it) } ?: clip.description.getMimeType(0)
-        if (uri != null && mime != null && !mime.startsWith("text/")) return fromUri(uri = uri, mime = mime)
+        if (uri != null && mime != null && !mime.startsWith("text/")) {
+            return fromUri(uri = uri, mime = mime)?.let { if (it.kind == ClipKind.IMAGE) it.copy(sensitive = sensitive) else it }
+        }
         val text = item.coerceToText(context)?.toString().orEmpty()
         if (text.isEmpty()) return null
-        return fromText(text = text)
+        return fromText(text = text).copy(sensitive = sensitive)
     }
 
     fun fromText(text: String): Outgoing {

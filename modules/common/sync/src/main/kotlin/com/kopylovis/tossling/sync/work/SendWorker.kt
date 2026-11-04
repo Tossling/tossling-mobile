@@ -41,6 +41,7 @@ internal class SendWorker(
             mime = inputData.getString(KEY_MIME) ?: "text/plain",
             file = file,
             name = inputData.getString(KEY_NAME),
+            sensitive = inputData.getBoolean(KEY_SENSITIVE, false),
         )
         val targets = inputData.getStringArray(KEY_TARGETS)?.toSet()
         val cancel = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
@@ -79,6 +80,7 @@ internal class SendWorker(
         private const val KEY_MIME = "mime"
         private const val KEY_NAME = "name"
         private const val KEY_TARGETS = "targets"
+        private const val KEY_SENSITIVE = "sensitive"
         private const val MAX_ATTEMPTS = 3
 
         fun cancel(context: Context) {
@@ -96,6 +98,7 @@ internal class SendWorker(
                         KEY_MIME to outgoing.mime,
                         KEY_NAME to outgoing.name,
                         KEY_TARGETS to targets?.toTypedArray(),
+                        KEY_SENSITIVE to outgoing.sensitive,
                     ),
                 )
                 .build()

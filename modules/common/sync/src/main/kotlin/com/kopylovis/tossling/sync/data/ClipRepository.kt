@@ -448,6 +448,8 @@ class ClipRepository internal constructor(
         val bytes = if (isStream) null else outgoing.file.readBytes()
         val isText = outgoing.kind == ClipKind.TEXT
         val inline = isText && bytes != null && bytes.size <= INLINE_LIMIT
+        // Only what the user sends on purpose comes here, so a clip the system marks as secret goes with `sens`.
+        val isSecret = outgoing.sensitive && outgoing.kind != ClipKind.FILE
         val base = ClipMeta(
             kind = when (outgoing.kind) {
                 ClipKind.TEXT -> ClipMeta.TEXT
@@ -461,6 +463,7 @@ class ClipRepository internal constructor(
             sender = settings.deviceId,
             format = if (isStream) ClipCipher.STREAM_FORMAT else null,
             size = if (isStream) size else null,
+            sensitive = isSecret.takeIf { it },
         )
         val context = currentCoroutineContext()
         val reporter = TransferReporter(onTransfer = { _transfer.value = it; onTransfer(it) }, base = Transfer(name = outgoing.name ?: "file", incoming = false, device = targetNames(targets), done = 0, total = size * routes.size))
@@ -514,6 +517,10 @@ class ClipRepository internal constructor(
             ClipKind.IMAGE -> "$id.${bridge.extensionFor(outgoing.mime)}"
         }
         val fullText = if (isText) bytes?.decodeToString() else null
+        if (isSecret) {
+            outgoing.file.delete()
+            return ClipItem(id = id, incoming = false, kind = outgoing.kind, mime = outgoing.mime, size = size, macId = targets?.singleOrNull(), device = reached.joinToString(separator = ", ") { it.name }, toAll = others > 1 && reached.size >= others, time = System.currentTimeMillis())
+        }
         val keeps = if (isText) (fullText?.length ?: 0) > PREVIEW_LENGTH else size <= KEEP_LIMIT
         val kept = if (keeps) File(bridge.clipsDir, keptName).also { outgoing.file.copyTo(it, overwrite = true) } else null
         outgoing.file.delete()
@@ -651,6 +658,9 @@ class ClipRepository internal constructor(
         } catch (error: IOException) {
             throw InterruptedTransfer(cause = error)
         }
+        if (meta.sensitive == true && (meta.kind == ClipMeta.TEXT || meta.kind == ClipMeta.IMAGE)) {
+            return receiveSecret(meta = meta, data = data, device = device, isStale = isStaleContent)
+        }
         val item = when (meta.kind) {
             ClipMeta.TEXT -> {
                 val text = meta.text ?: data?.decodeToString() ?: return Outcome.SKIPPED
@@ -681,6 +691,35 @@ class ClipRepository internal constructor(
         remember(item = item)
         if (isStaleContent && item.kind != ClipKind.FILE) return Outcome.SKIPPED
         notifications.showReceived(item = item)
+        return Outcome.APPLIED
+    }
+
+    /**
+     * Secret content (a password manager's copy on the sender): onto the clipboard marked sensitive, so previews and
+     * clipboard history leave it out, but never into this app's history, and the notification does not show it.
+     */
+    private fun receiveSecret(meta: ClipMeta, data: ByteArray?, device: String, isStale: Boolean): Outcome {
+        if (isStale) return Outcome.SKIPPED
+        when (meta.kind) {
+            ClipMeta.TEXT -> {
+                val text = meta.text ?: data?.decodeToString() ?: return Outcome.SKIPPED
+                if (isEcho(bytes = text.toByteArray())) return Outcome.SKIPPED
+                bridge.writeText(text = text, sensitive = true)
+            }
+
+            ClipMeta.IMAGE -> {
+                if (!settings.sendsImages.value) return Outcome.SKIPPED
+                val bytes = data ?: return Outcome.SKIPPED
+                if (isEcho(bytes = bytes)) return Outcome.SKIPPED
+                // The clipboard needs a file to point at; one secret image at a time, the previous one goes.
+                bridge.clipsDir.listFiles { file -> file.name.startsWith(SECRET_IMAGE) }?.forEach { it.delete() }
+                val file = File(bridge.clipsDir, "$SECRET_IMAGE.${bridge.extensionFor(meta.mime)}").apply { writeBytes(bytes) }
+                bridge.writeImage(file = file, mime = meta.mime, sensitive = true)
+            }
+
+            else -> return Outcome.SKIPPED
+        }
+        notifications.showReceivedSecret(device = device)
         return Outcome.APPLIED
     }
 
@@ -890,6 +929,7 @@ class ClipRepository internal constructor(
 
     private companion object {
         private const val TAG = "ClipRepository"
+        private const val SECRET_IMAGE = "secret-image"
         private const val MESSAGE_EVENT = "message"
         private const val SOURCE_MAC = "mac"
         private const val LEGACY_PREFIX = "legacy-"

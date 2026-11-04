@@ -57,6 +57,17 @@ internal class SyncNotifications(private val context: Context) {
         )
     }
 
+    /** Secret content (`sens`): who sent it, never what. */
+    fun showReceivedSecret(device: String) {
+        val notification = base(channel = CHANNEL_RECEIVED)
+            .setContentTitle(context.getString(R.string.sync_received_title, device.ifEmpty { "Mac" }))
+            .setContentText(context.getString(R.string.sync_received_secret))
+            .setSilent(true)
+            .setTimeoutAfter(RECEIVED_TIMEOUT_MS)
+            .build()
+        post(id = ID_RECEIVED, notification = notification)
+    }
+
     fun showReceived(item: ClipItem) {
         val from = item.device.ifEmpty { "Mac" }
         val builder = base(channel = CHANNEL_RECEIVED)

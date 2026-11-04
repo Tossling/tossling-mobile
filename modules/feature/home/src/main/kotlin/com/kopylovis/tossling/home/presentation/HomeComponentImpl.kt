@@ -225,10 +225,11 @@ internal class HomeComponentImpl(
     }
 
     private fun preview(outgoing: Outgoing): String =
-        when (outgoing.kind) {
-            ClipKind.TEXT -> runCatching { outgoing.file.readText().take(PREVIEW_CHARS) }.getOrDefault("").lineSequence().firstOrNull().orEmpty()
-            ClipKind.IMAGE -> tr("image", "картинка")
-            ClipKind.FILE -> outgoing.name ?: tr("file", "файл")
+        when {
+            outgoing.sensitive -> tr("hidden content", "скрытое содержимое")
+            outgoing.kind == ClipKind.TEXT -> runCatching { outgoing.file.readText().take(PREVIEW_CHARS) }.getOrDefault("").lineSequence().firstOrNull().orEmpty()
+            outgoing.kind == ClipKind.IMAGE -> tr("image", "картинка")
+            else -> outgoing.name ?: tr("file", "файл")
         }
 
     private fun dropPending() {
