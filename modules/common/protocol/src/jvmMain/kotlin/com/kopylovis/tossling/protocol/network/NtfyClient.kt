@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.net.URLEncoder
 
@@ -56,10 +57,11 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
     }
 
     suspend fun downloadTo(endpoint: Endpoint, url: String, read: (InputStream) -> Unit) = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = endpoint, url = url)
+        val own = endpoint.takeIf { isSameOrigin(server = it.server, url = url) }
+        val connection = openAttachment(endpoint = endpoint, own = own, url = url)
         connection.readTimeout = STREAM_TIMEOUT_MS
         try {
-            connection.ensureOk(endpoint = endpoint)
+            connection.ensureOk(endpoint = own)
             connection.inputStream.buffered(STREAM_BUFFER).use(read)
         } finally {
             connection.disconnect()
@@ -76,9 +78,10 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
     }
 
     suspend fun download(endpoint: Endpoint, url: String): ByteArray = withContext(Dispatchers.IO) {
-        val connection = open(endpoint = endpoint, url = url)
+        val own = endpoint.takeIf { isSameOrigin(server = it.server, url = url) }
+        val connection = openAttachment(endpoint = endpoint, own = own, url = url)
         connection.readTimeout = DOWNLOAD_TIMEOUT_MS
-        connection.ensureOk(endpoint = endpoint)
+        connection.ensureOk(endpoint = own)
         val bytes = connection.inputStream.use { it.readBytes() }
         connection.disconnect()
         bytes
@@ -293,6 +296,11 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
         }
     }
 
+    // An attachment URL comes with the event, outside the envelope, so anyone who can publish to the topic picks it.
+    // Only the room's own server gets the token and counts for its refusal gate; ntfy serves files without one.
+    private fun openAttachment(endpoint: Endpoint, own: Endpoint?, url: String): HttpURLConnection =
+        if (own != null) open(endpoint = own, url = url) else open(endpoint = Endpoint(server = endpoint.server), url = url, isGated = false)
+
     private fun heldBack(refusal: Refusal): NtfyException {
         val code = when (refusal.kind) {
             ServerRefusal.TOKEN -> HttpURLConnection.HTTP_UNAUTHORIZED
@@ -313,7 +321,15 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
         throw NtfyException(code = code, message = "HTTP $code $text".trim())
     }
 
-    private companion object {
+    internal companion object {
+        internal fun isSameOrigin(server: String, url: String): Boolean = runCatching {
+            val a = URI(server)
+            val b = URI(url)
+            a.scheme.equals(b.scheme, ignoreCase = true) && a.host.equals(b.host, ignoreCase = true) && port(a) == port(b)
+        }.getOrDefault(false)
+
+        private fun port(uri: URI): Int = if (uri.port != -1) uri.port else if (uri.scheme.equals("https", ignoreCase = true)) 443 else 80
+
         private const val CONNECT_TIMEOUT_MS = 15_000
         private const val READ_TIMEOUT_MS = 60_000
         private const val DOWNLOAD_TIMEOUT_MS = 120_000
