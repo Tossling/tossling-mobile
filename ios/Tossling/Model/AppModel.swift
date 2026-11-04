@@ -16,6 +16,8 @@ struct DeviceItem: Identifiable, Hashable {
     let isSelf: Bool
     let isOwner: Bool
     let hasAlias: Bool
+    /// When a re hello brought this device a key other than the one this phone knew; nil when not marked.
+    var keyChanged: Date? = nil
 }
 
 enum Payload {
@@ -228,16 +230,44 @@ final class AppModel {
         forget()
     }
 
+    /// Names, as this phone shows them, of the devices that stay after removing `device` and have no key yet (the
+    /// removal is refused) or whose key changed (the user is warned first).
+    func removalCheck(_ device: DeviceItem) -> (withoutKey: [String], keyChanged: [String]) {
+        guard let core else { return ([], []) }
+        let aliases = store.aliases
+        return (core.withoutKey(id: device.id).map { aliases[$0.id] ?? $0.name }, core.keyChangedAmong(id: device.id).map { aliases[$0.id] ?? $0.name })
+    }
+
+    func acceptKey(_ device: DeviceItem) {
+        guard let core else { return }
+        core.acceptKey(id: device.id)
+        store.members = core.members
+        refreshDevices()
+        say(String(localized: "Key accepted"), .done)
+    }
+
     func revoke(_ device: DeviceItem) async throws {
         guard let core else { return }
         guard device.id != core.config.owner else { throw RoomError.creator }
+        let missing = removalCheck(device).withoutKey
+        guard missing.isEmpty else { throw RoomError.noKey(missing) }
         revoking = true
         defer { revoking = false }
         let prefix = core.config.room.hasPrefix("tossy-") ? "tossy-" : "tossling-"
         let room = RoomCore.companion.createRoom(prefix: prefix)
         let key = ClipCipher.companion.randomKey()
-        let token = core.canRenewToken(id: device.id) ? try? await server.createToken(core.config) : nil
-        let messages = core.revoke(id: device.id, room: room, key: key, token: token)
+        let token = try? await server.createToken(core.config)
+        let messages: [Outgoing]
+        do {
+            messages = try core.revoke(id: device.id, room: room, key: key, token: token)
+        } catch {
+            if let token {
+                let config = core.config
+                let server = server
+                await Task { await server.discardToken(config, token: token) }.value
+            }
+            throw error
+        }
         do {
             for message in messages { try await server.publish(core.config, message) }
         } catch {
@@ -779,7 +809,8 @@ final class AppModel {
                 since: member.since > 0 ? Date(timeIntervalSince1970: TimeInterval(member.since) / 1000) : nil,
                 isSelf: false,
                 isOwner: member.id == core.config.owner,
-                hasAlias: aliases[member.id] != nil
+                hasAlias: aliases[member.id] != nil,
+                keyChanged: member.keyChanged > 0 ? Date(timeIntervalSince1970: TimeInterval(member.keyChanged) / 1000) : nil
             )
         }
         devices = (members + [me]).sorted { lhs, rhs in
@@ -843,9 +874,14 @@ enum PairingError: LocalizedError {
 }
 
 enum RoomError: LocalizedError {
-    case creator
+    case creator, noKey([String])
 
-    var errorDescription: String? { String(localized: "The room creator can't be removed") }
+    var errorDescription: String? {
+        switch self {
+        case .creator: String(localized: "The room creator can't be removed")
+        case let .noKey(names): String(localized: "No key yet from \(names.joined(separator: ", ")): open Tossling there or update it, then try again. Without that key the new room key can't be sent safely.")
+        }
+    }
 }
 
 enum ProjectError: LocalizedError {

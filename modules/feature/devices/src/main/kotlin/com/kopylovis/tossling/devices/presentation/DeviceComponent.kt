@@ -8,6 +8,7 @@ internal data class DeviceScreenState(
     val device: RoomDevice? = null,
     val name: String = "",
     val isSheetVisible: Boolean = false,
+    val keyChanged: List<String> = emptyList(),
 )
 
 internal interface DeviceComponent : CommonComponent {
@@ -25,4 +26,6 @@ internal interface DeviceComponent : CommonComponent {
     fun onDisconnectConfirmed()
 
     fun onSheetDismissed()
+
+    fun onAcceptKeyClicked()
 }

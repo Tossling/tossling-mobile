@@ -56,6 +56,11 @@ data class Member(
     val since: Long = seen,
     val alias: String = "",
     val pk: String = "",
+    /**
+     * When a `re` hello replaced the key this device already knew for the member, in ms; 0 when the key is the first
+     * one seen or the user accepted the new one. Any member can send such a hello in another device's name.
+     */
+    val keyChanged: Long = 0,
 ) {
     val isComputer: Boolean get() = source in COMPUTER_SOURCES
 
@@ -78,7 +83,10 @@ data class RoomDevice(
     val isOwner: Boolean = false,
     val ownName: String = name,
     val hasAlias: Boolean = false,
+    val keyChanged: Long = 0,
 ) {
+    val isKeyChanged: Boolean get() = keyChanged > 0
+
     val shownOwnName: String? get() = ownName.takeIf { hasAlias }
 }
 

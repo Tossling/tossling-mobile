@@ -44,4 +44,9 @@
     <string name="devices_owner_note">Комнату создали на этом компьютере, поэтому отключить его нельзя. Если его буфер больше не нужен, выйди из комнаты на главном экране.</string>
     <string name="devices_sheet_owner_title">Выйти из комнаты?</string>
     <string name="devices_sheet_owner">Этот компьютер создал комнату, его нельзя отключить. Телефон удалит ключ комнаты и перестанет получать буфер от всех её устройств.</string>
+    <string name="devices_key_changed">ключ сменился</string>
+    <string name="devices_key_changed_note">Устройство пришло с новым ключом %1$s. Так бывает после переустановки или повторного подключения. Если этого не было, кто-то в комнате может выдавать себя за него: отключите его и проверьте ключ, прежде чем снова доверять.</string>
+    <string name="devices_accept_key">Принять новый ключ</string>
+    <string name="devices_key_accepted">Ключ принят</string>
+    <string name="devices_sheet_key_changed">У %1$s недавно сменился ключ, и новый ключ комнаты уйдёт и ему. Продолжайте, только если знаете, почему он сменился.</string>
 </resources>

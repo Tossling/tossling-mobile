@@ -62,14 +62,17 @@ internal fun DeviceContent(
                     visible = state.isSheetVisible,
                     icon = TosslingIcons.KeyOff,
                     title = if (device.isOwner && !device.isSelf) stringResource(R.string.devices_sheet_owner_title) else stringResource(R.string.devices_sheet_title, device.name),
-                    text = stringResource(
-                        when {
-                            !device.isRoom -> R.string.devices_sheet_legacy
-                            device.isSelf -> R.string.devices_sheet_self
-                            device.isOwner -> R.string.devices_sheet_owner
-                            else -> R.string.devices_sheet_other
-                        },
-                    ),
+                    text = listOfNotNull(
+                        state.keyChanged.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.devices_sheet_key_changed, it.joinToString(separator = ", ")) },
+                        stringResource(
+                            when {
+                                !device.isRoom -> R.string.devices_sheet_legacy
+                                device.isSelf -> R.string.devices_sheet_self
+                                device.isOwner -> R.string.devices_sheet_owner
+                                else -> R.string.devices_sheet_other
+                            },
+                        ),
+                    ).joinToString(separator = "\n\n"),
                     confirm = stringResource(
                         when {
                             !device.isRoom -> R.string.devices_sheet_legacy_confirm
@@ -109,6 +112,22 @@ internal fun DeviceContent(
                 Hairline(start = 16f.dp)
                 ValueRow(label = stringResource(R.string.devices_since), value = longDate(time = device.since))
             }
+        }
+        if (device.isKeyChanged) {
+            Text(
+                text = stringResource(R.string.devices_key_changed_note, longDate(time = device.keyChanged)),
+                style = Tossling.type.footnote,
+                color = Tossling.palette.dangerInk,
+                modifier = Modifier.padding(start = 6f.dp, end = 6f.dp, top = 10f.dp),
+            )
+            CapsuleButton(
+                text = stringResource(R.string.devices_accept_key),
+                onClick = component::onAcceptKeyClicked,
+                style = CapsuleStyle.GLASS,
+                modifier = Modifier
+                    .padding(top = 12f.dp)
+                    .fillMaxWidth(),
+            )
         }
         FootNote(text = stringResource(if (device.isSelf) R.string.devices_name_shared else R.string.devices_name_local))
         if (device.isOwner && !device.isSelf) FootNote(text = stringResource(R.string.devices_owner_note))
@@ -156,6 +175,9 @@ private fun DeviceHeader(device: RoomDevice) {
             Text(text = stringResource(R.string.devices_self_title), style = Tossling.type.hint, color = palette.ink2)
         } else if (device.isOwner) {
             Text(text = stringResource(R.string.devices_owner_title), style = Tossling.type.hint, color = palette.ink2)
+        }
+        if (device.isKeyChanged) {
+            Text(text = stringResource(R.string.devices_key_changed), style = Tossling.type.hint.copy(fontWeight = FontWeight.Medium), color = palette.dangerInk)
         }
         val ink = animateStatusColor(target = if (device.isOnline) palette.accentInk else palette.ink2)
         val fill = animateStatusColor(target = if (device.isOnline) palette.accentSoft else palette.glassWeak)

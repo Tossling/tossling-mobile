@@ -103,6 +103,7 @@ fun DeviceRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     ownName: String? = null,
+    warning: String? = null,
 ) {
     val palette = Tossling.palette
     Row(
@@ -143,6 +144,15 @@ fun DeviceRow(
                 )
             }
             StatusLine(isOnline = isOnline, text = status)
+            warning?.let {
+                Text(
+                    text = it,
+                    style = Tossling.type.footnote.copy(fontSize = 12.sp, fontWeight = FontWeight.Medium),
+                    color = palette.dangerInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         Icon(imageVector = TosslingIcons.ChevronRight, contentDescription = null, tint = palette.ink2, modifier = Modifier.size(16f.dp))
     }

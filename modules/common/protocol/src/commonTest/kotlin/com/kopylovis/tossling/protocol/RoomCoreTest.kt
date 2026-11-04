@@ -4,12 +4,14 @@ import com.kopylovis.tossling.protocol.crypto.ClipCipher
 import com.kopylovis.tossling.protocol.network.NtfyAttachment
 import com.kopylovis.tossling.protocol.network.NtfyEvent
 import com.kopylovis.tossling.protocol.room.Incoming
+import com.kopylovis.tossling.protocol.room.MissingKeys
 import com.kopylovis.tossling.protocol.room.Outgoing
 import com.kopylovis.tossling.protocol.room.PairingCode
 import com.kopylovis.tossling.protocol.room.RoomConfig
 import com.kopylovis.tossling.protocol.room.RoomCore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
@@ -236,5 +238,78 @@ class RoomCoreTest {
         val fresh = core(id = "phone", name = "iPhone").hello(renewed = true)
         mac.open(fresh.event(id = "h3"), nowMs = now)
         assertNotEquals(first, mac.members.getValue("phone").pk)
+    }
+
+    @Test
+    fun aDifferentKeyInAFreshRenewedHelloIsTakenButMarked() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        val phone = core(id = "phone", name = "iPhone")
+        mac.open(phone.hello(renewed = true).event(id = "h1"), nowMs = now)
+        mac.open(phone.hello(renewed = true).event(id = "h2"), nowMs = now)
+        assertEquals(0L, mac.members.getValue("phone").keyChanged)
+        val first = mac.members.getValue("phone").pk
+        val impostor = core(id = "phone", name = "iPhone")
+        mac.open(impostor.hello(renewed = true).event(id = "h3"), nowMs = now + 1_000)
+        val marked = mac.members.getValue("phone")
+        assertEquals(now + 1_000, marked.keyChanged)
+        assertNotEquals(first, marked.pk)
+        assertEquals(marked, RoomCore.decodeMembers(mac.encodeMembers()).getValue("phone"))
+        mac.open(impostor.hello().event(id = "h4"), nowMs = now + 2_000)
+        assertEquals(now + 1_000, mac.members.getValue("phone").keyChanged)
+        mac.acceptKey(id = "phone")
+        assertEquals(0L, mac.members.getValue("phone").keyChanged)
+        assertEquals(marked.pk, mac.members.getValue("phone").pk)
+    }
+
+    @Test
+    fun theFirstKeyIsNotAChange() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        val keyless = RoomCore(mac.config, mapOf("phone" to Member(id = "phone", name = "iPhone", source = "ios", seen = now)))
+        keyless.clock = { now }
+        keyless.open(core(id = "phone", name = "iPhone").hello(renewed = true).event(id = "h1"), nowMs = now)
+        assertTrue(keyless.members.getValue("phone").pk.isNotEmpty())
+        assertEquals(0L, keyless.members.getValue("phone").keyChanged)
+    }
+
+    @Test
+    fun aRemovalIsRefusedWhileARemainingDeviceHasNoKey() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        mac.open(core(id = "pixel", name = "Pixel", source = "android").hello(renewed = true).event(id = "h1"), nowMs = now)
+        val old = Member(id = "watch", name = "Old Phone", source = "android", seen = now)
+        val legacy = Member(id = "legacy-android-Older", name = "Older", source = "android", seen = now)
+        val room = RoomCore(mac.config, mac.members + (old.id to old) + (legacy.id to legacy))
+        assertEquals(listOf("watch"), room.withoutKey(id = "pixel").map { it.id })
+        val refused = assertFailsWith<MissingKeys> { room.revoke(id = "pixel", room = "tossling-new", key = ClipCipher.randomKey(), token = "t2") }
+        assertEquals(listOf("watch"), refused.members.map { it.id })
+        assertTrue(refused.message.orEmpty().contains("Old Phone"))
+        assertTrue(room.withoutKey(id = "watch").isEmpty())
+        assertEquals(2, room.revoke(id = "watch", room = "tossling-new", key = ClipCipher.randomKey(), token = "t2").size)
+    }
+
+    @Test
+    fun aRemovalNamesTheDevicesWhoseKeyChanged() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        mac.open(core(id = "phone", name = "iPhone").hello(renewed = true).event(id = "h1"), nowMs = now)
+        mac.open(core(id = "pixel", name = "Pixel", source = "android").hello(renewed = true).event(id = "h2"), nowMs = now)
+        mac.open(core(id = "phone", name = "iPhone").hello(renewed = true).event(id = "h3"), nowMs = now)
+        assertEquals(listOf("phone"), mac.keyChangedAmong(id = "pixel").map { it.id })
+        assertTrue(mac.keyChangedAmong(id = "phone").isEmpty())
+    }
+
+    @Test
+    fun aRekeyCarriesTheNewRoomOnlySealedButAnOldClearOneStillWorks() {
+        val mac = core(id = "mac", name = "Studio", source = "mac")
+        val phone = core(id = "phone", name = "iPhone")
+        mac.open(phone.hello(renewed = true).event(id = "h1"), nowMs = now)
+        mac.open(core(id = "pixel", name = "Pixel", source = "android").hello(renewed = true).event(id = "h2"), nowMs = now)
+        val rekey = mac.revoke(id = "pixel", room = "tossling-new", key = ClipCipher.randomKey(), token = "t2")[1]
+        val meta = SyncJson.decodeFromString(ClipMeta.serializer(), ClipCipher.fromBase64(key = key).openText(text = rekey.message).decodeToString())
+        assertNull(meta.room)
+        assertNull(meta.key)
+        val newKey = ClipCipher.randomKey()
+        val clear = ClipCipher.fromBase64(key = key).sealToText(plain = """{"k":"rekey","m":"text/plain","src":"mac","n":"Old Mac","id":"oldmac","to":["phone"],"r":"tossling-clear","key":"$newKey"}""".encodeToByteArray())
+        val rekeyed = assertIs<Incoming.Rekeyed>(phone.open(Outgoing(message = clear, body = null).event(id = "r"), nowMs = now))
+        assertEquals("tossling-clear", rekeyed.config.room)
+        assertEquals(newKey, rekeyed.config.key)
     }
 }
