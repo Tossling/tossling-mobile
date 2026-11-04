@@ -103,18 +103,20 @@ final class Server {
     }
 
     func download(_ config: RoomConfig, url: String) async throws -> Data {
-        var request = URLRequest(url: URL(string: url)!)
-        authorize(&request, config.authToken)
-        let (data, response) = try await exchange(config, request) { try await session.data(for: $0) }
+        let (request, own) = try attachmentRequest(config, url)
+        let (data, response) = own
+            ? try await exchange(config, request) { try await session.data(for: $0) }
+            : try await session.data(for: request)
         try check(response, data)
         return data
     }
 
     func downloadFile(_ config: RoomConfig, url: String) async throws -> URL {
-        var request = URLRequest(url: URL(string: url)!)
+        var (request, own) = try attachmentRequest(config, url)
         request.timeoutInterval = 300
-        authorize(&request, config.authToken)
-        let (file, response) = try await exchange(config, request) { try await session.download(for: $0) }
+        let (file, response) = own
+            ? try await exchange(config, request) { try await session.download(for: $0) }
+            : try await session.download(for: request)
         try check(response, nil)
         let kept = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.moveItem(at: file, to: kept)
@@ -260,6 +262,23 @@ final class Server {
         var request = URLRequest(url: URL(string: config.server + path)!)
         authorize(&request, config.authToken)
         return request
+    }
+
+    /// An attachment URL comes with the event, outside the envelope, so anyone who can publish to the topic picks it.
+    /// Only the room's own server gets the token and counts for the refusal gate; ntfy serves files without one.
+    private func attachmentRequest(_ config: RoomConfig, _ url: String) throws -> (URLRequest, Bool) {
+        guard let target = URL(string: url) else { throw ServerError(code: 400, text: "the attachment URL is not valid") }
+        var request = URLRequest(url: target)
+        let own = Self.isSameOrigin(server: config.server, url: target)
+        if own { authorize(&request, config.authToken) }
+        return (request, own)
+    }
+
+    static func isSameOrigin(server: String, url: URL) -> Bool {
+        guard let base = URL(string: server), let scheme = base.scheme?.lowercased(), scheme == url.scheme?.lowercased(),
+              let host = base.host?.lowercased(), host == url.host?.lowercased() else { return false }
+        let port = { (u: URL) in u.port ?? (scheme == "https" ? 443 : 80) }
+        return port(base) == port(url)
     }
 
     private func authorize(_ request: inout URLRequest, _ token: String) {
