@@ -1,4 +1,7 @@
 require "tempfile"
+require "tmpdir"
+require "fileutils"
+require "shellwords"
 
 # Hand Android builds to testers through Firebase App Distribution.
 #
@@ -6,6 +9,9 @@ require "tempfile"
 #   fastlane upload notes:"what changed"     with release notes for testers
 #   fastlane check                           verify Firebase access and the tester group
 #   fastlane ios_beta                        archive the iOS app and upload it to TestFlight
+#   fastlane play                            build an AAB and upload it to Google Play as a draft release
+#   fastlane play track:internal status:completed   another track, released at once
+#   fastlane play_check                      verify the Google Play API key
 
 ANDROID_SCRIPT = "deploy/distribute-android.sh"
 IOS_SCRIPT = "deploy/testflight-ios.sh"
@@ -48,4 +54,76 @@ end
 desc "Archive the iOS app and upload it to App Store Connect for TestFlight"
 lane :ios_beta do
   sh("../#{IOS_SCRIPT}")
+end
+
+# Google Play. The service account key (Play Console, Settings, API access) comes from PLAY_JSON_KEY or
+# play_json_key in local.properties and stays out of git. Releases go up as drafts by default: the upload
+# checks everything, and the release itself is a button in Play Console.
+PLAY_LOCALES = %w[ru-RU en-US].freeze
+
+def play_json_key
+  path = ENV["PLAY_JSON_KEY"] || local_property("play_json_key")
+  UI.user_error!("Set PLAY_JSON_KEY or play_json_key in local.properties to the Play service account JSON") unless path
+  path = File.expand_path(path)
+  UI.user_error!("No Play service account key at #{path}") unless File.exist?(path)
+  path
+end
+
+def app_version
+  File.read(File.expand_path("../gradle/libs.versions.toml", __dir__))[/^appversion = "(.*)"/, 1]
+end
+
+desc "Verify the Google Play API key"
+lane :play_check do
+  validate_play_store_json_key(json_key: play_json_key)
+end
+
+desc "Build a release AAB and upload it to Google Play (production draft unless track:/status: say otherwise)"
+lane :play do |options|
+  key = play_json_key
+  track = options[:track] || "production"
+  status = options[:status] || "draft"
+  root = File.expand_path("..", __dir__)
+  version = app_version
+  notes = PLAY_LOCALES.to_h { |locale| [locale, File.join(root, "fastlane/release_notes/#{version}.#{locale}.txt")] }
+  missing = notes.values.reject { |path| File.exist?(path) }
+  UI.user_error!("No What's new for #{version}: #{missing.join(", ")}") unless missing.empty?
+
+  # The build number grows before every upload, as in deploy/distribute-android.sh, and goes back when the
+  # upload fails, so failed runs do not eat numbers. Play refuses a versionCode it has seen before.
+  code_file = File.join(root, "app/version-code.txt")
+  current = File.read(code_file).to_i
+  code = current + 1
+  File.write(code_file, "#{code}\n")
+  begin
+    sh("cd #{root.shellescape} && ./gradlew :app:bundleRelease --console=plain -q")
+    aab = File.join(root, "app/build/outputs/bundle/release/app-release.aab")
+    UI.user_error!("No #{aab} after the build") unless File.exist?(aab)
+    sh("jarsigner -verify #{aab.shellescape} > /dev/null") # unsigned: check tossling.jks and keystore_* in local.properties
+
+    # supply reads What's new from <metadata>/<locale>/changelogs/<versionCode>.txt.
+    Dir.mktmpdir("tossling-play") do |metadata|
+      notes.each do |locale, path|
+        dir = File.join(metadata, locale, "changelogs")
+        FileUtils.mkdir_p(dir)
+        FileUtils.cp(path, File.join(dir, "#{code}.txt"))
+      end
+      upload_to_play_store(
+        json_key: key,
+        package_name: "com.kopylovis.tossling",
+        track: track,
+        release_status: status,
+        aab: aab,
+        metadata_path: metadata,
+        skip_upload_metadata: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true,
+        skip_upload_apk: true
+      )
+    end
+  rescue StandardError
+    File.write(code_file, "#{current}\n")
+    raise
+  end
+  UI.success("Tossling #{version} (#{code}) is on #{track} as #{status}. Commit app/version-code.txt.")
 end
