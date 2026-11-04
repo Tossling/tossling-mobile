@@ -69,7 +69,7 @@ final class AppModel {
         alerts = FeedStore.alerts()
         if let config = store.config {
             if store.hasStarted {
-                core = RoomCore(config: config, members: store.members)
+                core = RoomCore(config: config, members: store.members, handled: store.handledMessages)
                 isPaired = true
                 refreshDevices()
             } else {
@@ -176,7 +176,7 @@ final class AppModel {
         guard works else { throw PairingError.token }
         let old = core
         if let old { try? await server.publish(old.config, old.bye()) }
-        let core = RoomCore(config: paired.config, members: paired.members)
+        let core = RoomCore(config: paired.config, members: paired.members, handled: "")
         try await server.publish(core.config, core.hello(to: nil, renewed: true, invite: nil))
         if let old { await removeOwnToken(old.config) }
         listener?.cancel()
@@ -184,6 +184,7 @@ final class AppModel {
         store.config = core.config
         store.members = core.members
         store.lastEventId = ""
+        store.handledMessages = ""
         store.hasStarted = true
         savedRoom = nil
         self.core = core
@@ -210,7 +211,7 @@ final class AppModel {
             throw PairingError.network(URL(string: saved.server)?.host ?? saved.server)
         }
         guard works else { throw PairingError.roomMoved }
-        let core = RoomCore(config: saved, members: store.members)
+        let core = RoomCore(config: saved, members: store.members, handled: store.handledMessages)
         try? await server.publish(core.config, core.hello(to: nil, renewed: true, invite: nil))
         store.hasStarted = true
         savedRoom = nil
@@ -510,11 +511,13 @@ final class AppModel {
         let incoming = core.open(event: event, nowMs: Self.nowMs)
         if let content = incoming as? IncomingContent {
             guard await receive(content, core: core) else {
+                core.retryLater(content: content)
                 store.members = core.members
                 throw Unreceived()
             }
         }
         store.lastEventId = incoming.eventId
+        store.handledMessages = core.encodeHandled()
         switch incoming {
         case is IncomingContent:
             break
@@ -695,7 +698,7 @@ final class AppModel {
             source: current.config.source,
             own: own
         )
-        let replaced = RoomCore(config: updated, members: current.members)
+        let replaced = RoomCore(config: updated, members: current.members, handled: current.encodeHandled())
         store.config = replaced.config
         self.core = replaced
         print("tokens: \(config.server) gave this phone a token of its own")

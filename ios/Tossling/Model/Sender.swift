@@ -31,7 +31,7 @@ struct Sender {
 
     init() throws {
         guard let raw = Keychain.read("room"), let config = RoomCore.companion.decodeConfig(text: raw) else { throw SendError.notPaired }
-        core = RoomCore(config: config, members: [:])
+        core = RoomCore(config: config, members: [:], handled: "")
     }
 
     func text(_ text: String, to target: Target? = nil) async throws -> Clip {

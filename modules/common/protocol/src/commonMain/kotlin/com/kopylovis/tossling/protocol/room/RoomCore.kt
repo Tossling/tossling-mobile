@@ -1,8 +1,11 @@
 package com.kopylovis.tossling.protocol.room
 
 import com.kopylovis.tossling.protocol.ClipMeta
+import com.kopylovis.tossling.protocol.Freshness
+import com.kopylovis.tossling.protocol.HandledMessages
 import com.kopylovis.tossling.protocol.Member
 import com.kopylovis.tossling.protocol.SyncJson
+import com.kopylovis.tossling.protocol.stamped
 import com.kopylovis.tossling.protocol.crypto.ClipCipher
 import com.kopylovis.tossling.protocol.crypto.DeviceIdentity
 import com.kopylovis.tossling.protocol.crypto.Primitives
@@ -14,6 +17,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlin.io.encoding.Base64
+import kotlin.time.Clock
 
 @Serializable
 data class RoomConfig(
@@ -69,13 +73,22 @@ sealed interface Incoming {
     data class Skipped(override val eventId: String, val reason: String) : Incoming
 }
 
-class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
+/**
+ * [handled] is what [encodeHandled] gave before: the `mid`s handled in the last 3 hours, so a replayed message is
+ * skipped after a restart too.
+ */
+class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap(), handled: String = "") {
 
     var config: RoomConfig = config
         private set
 
     var members: Map<String, Member> = members
         private set
+
+    private val handled = HandledMessages.decode(text = handled)
+
+    /** Milliseconds now; tests replace it to seal messages at another time. */
+    internal var clock: () -> Long = { Clock.System.now().toEpochMilliseconds() }
 
     private val cipher: ClipCipher get() = ClipCipher.fromBase64(key = config.key)
 
@@ -101,15 +114,22 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
             ?: return Incoming.Skipped(id, "does not open with this room key")
         if (meta.sender.isNotEmpty() && meta.sender == config.deviceId) return Incoming.Skipped(id, "sent by this device")
         if (meta.to?.contains(config.deviceId) == false) return Incoming.Skipped(id, "for other devices")
+        val mid = meta.messageId
+        if (mid != null) {
+            if (handled.contains(mid = mid, nowMs = nowMs)) return Incoming.Skipped(id, "message $mid was handled already")
+            handled.add(mid = mid, nowMs = nowMs)
+        }
         val age = nowMs / 1000 - event.time
+        val contentAge = Freshness.ageMs(eventTime = event.time, sentAt = meta.sentAt, nowMs = nowMs)
         val memberId = memberId(meta)
         val from = meta.device.ifEmpty { "?" }
         val kind = meta.kind
         if (age >= STALE_SECONDS && kind !in LATE_KINDS) return Incoming.Skipped(id, "too old")
-        if (kind == ClipMeta.FILE && age >= FILE_STALE_SECONDS) return Incoming.FileGone(id, from = from, name = meta.fileName ?: "file")
+        if (kind in CONTENT_KINDS && kind != ClipMeta.FILE && contentAge >= Freshness.STALE_MS) return Incoming.Skipped(id, "too old")
+        if (kind == ClipMeta.FILE && contentAge >= Freshness.FILE_STALE_MS) return Incoming.FileGone(id, from = from, name = meta.fileName ?: "file")
         when (kind) {
             ClipMeta.PING -> {
-                remember(meta = meta, time = event.time, nowMs = nowMs)
+                remember(meta = meta, time = event.time, nowMs = nowMs, fresh = contentAge < Freshness.STALE_MS)
                 val reply = meta.sender.takeIf { it.isNotEmpty() }?.let { hello(to = listOf(it)) }
                 return Incoming.Pinged(id, memberId = memberId, reply = reply)
             }
@@ -122,7 +142,7 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
             ClipMeta.REKEY -> return rekey(eventId = id, meta = meta, from = from)
             ClipMeta.KICK -> return Incoming.Kicked(id, from = from, ignored = config.isOwner)
         }
-        val isNew = remember(meta = meta, time = event.time, nowMs = nowMs)
+        val isNew = remember(meta = meta, time = event.time, nowMs = nowMs, fresh = contentAge < Freshness.STALE_MS)
         if (kind == ClipMeta.HELLO) return Incoming.Joined(id, memberId = memberId, from = from, isNew = isNew, invite = meta.invite)
         if (kind !in CONTENT_KINDS) return Incoming.Skipped(id, "kind $kind")
         return Incoming.Content(
@@ -131,10 +151,21 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
             memberId = memberId,
             from = from,
             attachmentUrl = event.attachment?.url?.takeIf { it.isNotEmpty() },
-            fresh = age < STALE_SECONDS,
+            fresh = contentAge < Freshness.STALE_MS,
             time = event.time,
         )
     }
+
+    /**
+     * Forgets that [content] was handled, for an item that could not be fetched for now: when its event comes again
+     * after a reconnect, it is not skipped as a replay.
+     */
+    fun retryLater(content: Incoming.Content) {
+        content.meta.messageId?.let(handled::remove)
+    }
+
+    /** The `mid`s handled lately, to save next to the last event id and pass back to the constructor. */
+    fun encodeHandled(): String = handled.encode()
 
     @Throws(Exception::class)
     fun openAttachment(sealed: ByteArray): ByteArray = cipher.open(sealed = sealed)
@@ -205,10 +236,11 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
         return Incoming.Rekeyed(eventId, from = from, config = config)
     }
 
-    private fun remember(meta: ClipMeta, time: Long, nowMs: Long): Boolean {
+    private fun remember(meta: ClipMeta, time: Long, nowMs: Long, fresh: Boolean): Boolean {
         val id = memberId(meta)
         val offered = meta.publicKey?.takeIf { RoomKeys.decodeKey(it) != null }.orEmpty()
-        val renewed = meta.renewed == true && meta.kind == ClipMeta.HELLO && offered.isNotEmpty()
+        // A replayed `re` hello must not bring back an old key: only a fresh one (by `ts` too) replaces it.
+        val renewed = meta.renewed == true && meta.kind == ClipMeta.HELLO && offered.isNotEmpty() && fresh
         val seen = minOf(nowMs, time * 1000)
         val known = members[id]
         val pk = if (known == null || known.pk.isEmpty() || renewed) offered else known.pk
@@ -223,7 +255,7 @@ class RoomCore(config: RoomConfig, members: Map<String, Member> = emptyMap()) {
         ClipMeta(kind = kind, mime = mime, source = config.source, device = config.deviceName, sender = config.deviceId, to = to)
 
     private fun ClipMeta.sealed(body: ByteArray? = null): Outgoing =
-        Outgoing(message = cipher.sealToText(plain = SyncJson.encodeToString(ClipMeta.serializer(), this).encodeToByteArray()), body = body)
+        Outgoing(message = cipher.sealToText(plain = SyncJson.encodeToString(ClipMeta.serializer(), stamped(nowMs = clock())).encodeToByteArray()), body = body)
 
     private fun decode(plain: ByteArray): ClipMeta = SyncJson.decodeFromString(ClipMeta.serializer(), plain.decodeToString())
 

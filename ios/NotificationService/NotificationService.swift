@@ -42,7 +42,7 @@ final class NotificationService: UNNotificationServiceExtension {
         } catch {
             return problem(error.localizedDescription)
         }
-        let core = RoomCore(config: config, members: [:])
+        let core = RoomCore(config: config, members: [:], handled: "")
         guard let incoming = core.open(event: event, nowMs: Int64(Date().timeIntervalSince1970 * 1000)) as? IncomingContent else { return hidden }
         let meta = incoming.meta
         let content = UNMutableNotificationContent()
