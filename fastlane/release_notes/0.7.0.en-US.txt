@@ -1,0 +1,6 @@
+Progress for big files.
+- While a file goes out you see the percent and the size, and you can pause, continue or cancel it.
+- On Android the progress sits in the main notification list with a status bar icon; the buttons are in the notification and on the home screen.
+- On iPhone the upload keeps going when you close the share sheet or leave the app.
+- On iPhone you can send a file from the app with the paperclip button; on iOS 26 the progress shows on the Lock Screen.
+- After a pause the file is sent again from the start.
