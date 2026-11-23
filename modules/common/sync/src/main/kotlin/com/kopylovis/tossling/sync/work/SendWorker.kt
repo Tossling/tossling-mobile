@@ -1,6 +1,5 @@
 package com.kopylovis.tossling.sync.work
 
-import android.app.PendingIntent
 import android.content.Context
 import android.util.Log
 import androidx.work.Constraints
@@ -22,6 +21,7 @@ import kotlinx.coroutines.CancellationException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
+import java.util.UUID
 
 internal class SendWorker(
     context: Context,
@@ -30,8 +30,11 @@ internal class SendWorker(
 
     private val repository: ClipRepository by inject()
     private val notifications: SyncNotifications by inject()
+    private val control: SendControl by inject()
+    private val paused: PausedSends by inject()
 
     @Volatile private var isPromoted = false
+    @Volatile private var lastTransfer: Transfer? = null
 
     override suspend fun doWork(): Result {
         val file = File(inputData.getString(KEY_PATH) ?: return Result.failure())
@@ -44,10 +47,19 @@ internal class SendWorker(
             sensitive = inputData.getBoolean(KEY_SENSITIVE, false),
         )
         val targets = inputData.getStringArray(KEY_TARGETS)?.toSet()
-        val cancel = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
+        control.start(id = id)
         try {
-            val item = repository.send(outgoing = outgoing, targets = targets) { transfer -> showProgress(transfer = transfer, cancel = cancel) }
+            val item = repository.send(outgoing = outgoing, targets = targets, gate = control) { transfer -> showProgress(transfer = transfer) }
             if (item.kind == ClipKind.FILE) notifications.showSent(name = item.name ?: "file", device = if (item.toAll) "" else item.device)
+            return Result.success()
+        } catch (stopped: SendStopped) {
+            // Success, not failure: the next file in the queue starts right away.
+            if (stopped.isPaused) {
+                val kept = paused.add(outgoing = outgoing, targets = targets, device = lastTransfer?.device.orEmpty())
+                notifications.showPaused(paused = kept)
+            } else {
+                file.delete()
+            }
             return Result.success()
         } catch (error: CancellationException) {
             file.delete()
@@ -59,17 +71,20 @@ internal class SendWorker(
             notifications.clearTransfer()
             notifications.showSendFailed(reason = error.message.orEmpty())
             return Result.failure()
+        } finally {
+            control.finish(id = id)
         }
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo = notifications.foregroundInfo()
 
-    private fun showProgress(transfer: Transfer, cancel: PendingIntent) {
+    private fun showProgress(transfer: Transfer) {
+        lastTransfer = transfer
         if (!isPromoted) {
             isPromoted = true
-            runCatching { setForegroundAsync(notifications.transferInfo(transfer = transfer, cancel = cancel)) }
+            runCatching { setForegroundAsync(notifications.transferInfo(transfer = transfer, work = id)) }
         }
-        notifications.showTransfer(transfer = transfer, cancel = cancel)
+        notifications.showTransfer(transfer = transfer, work = id)
     }
 
     companion object {
@@ -85,6 +100,10 @@ internal class SendWorker(
 
         fun cancel(context: Context) {
             WorkManager.getInstance(context).cancelUniqueWork(NAME)
+        }
+
+        fun cancel(context: Context, id: UUID) {
+            WorkManager.getInstance(context).cancelWorkById(id)
         }
 
         fun enqueue(context: Context, outgoing: Outgoing, targets: Set<String>? = null) {

@@ -72,6 +72,10 @@ object TosslingIcons {
 
     val ArrowUp: ImageVector by lazy { stroked(name = "arrow_up", viewport = 14f, width = 1.8f, "M7 12V2M3 6l4-4 4 4") }
 
+    val Pause: ImageVector by lazy { stroked(name = "pause", viewport = 14f, width = 2f, "M4.5 2.5v9M9.5 2.5v9") }
+
+    val Play: ImageVector by lazy { stroked(name = "play", viewport = 14f, width = 1.8f, "M4 2.5l7.5 4.5-7.5 4.5z") }
+
     val Clipboard: ImageVector by lazy {
         stroked(name = "clipboard", viewport = 24f, width = 1.7f, rect(6f, 5f, 12f, 15f, 2.5f), "M9.5 3.5h5v3h-5z")
     }

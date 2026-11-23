@@ -14,6 +14,8 @@ import com.kopylovis.tossling.sync.data.SyncSettings
 import com.kopylovis.tossling.sync.entry.ClipSender
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import com.kopylovis.tossling.sync.push.PushRegistrar
+import com.kopylovis.tossling.sync.work.PausedSends
+import com.kopylovis.tossling.sync.work.SendControl
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -26,6 +28,8 @@ val syncModule = module {
     singleOf(constructor = ::PushRegistrar)
     singleOf(constructor = ::RoomBackup)
     singleOf(constructor = ::ClipRepository)
+    singleOf(constructor = ::SendControl)
+    singleOf(constructor = ::PausedSends)
     singleOf(constructor = ::ClipSender)
     singleOf(constructor = ::ProjectIcons)
     singleOf(constructor = ::AlertStore)

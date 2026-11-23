@@ -40,8 +40,20 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
         connection.disconnect()
     }
 
-    suspend fun publishStream(endpoint: Endpoint, topic: String, message: String, length: Long, write: (OutputStream) -> Unit) = withContext(Dispatchers.IO) {
+    /**
+     * [onAbort] gets a way to drop the upload from another thread: a write stuck on a stalled network does not
+     * return by itself, disconnecting makes it throw.
+     */
+    suspend fun publishStream(
+        endpoint: Endpoint,
+        topic: String,
+        message: String,
+        length: Long,
+        onAbort: ((() -> Unit)?) -> Unit = {},
+        write: (OutputStream) -> Unit,
+    ) = withContext(Dispatchers.IO) {
         val connection = open(endpoint = endpoint, url = "${endpoint.server}/$topic")
+        onAbort { connection.disconnect() }
         connection.requestMethod = "PUT"
         connection.doOutput = true
         connection.readTimeout = STREAM_TIMEOUT_MS
@@ -53,6 +65,7 @@ class NtfyClient(val gate: RefusalGate = RefusalGate(now = System::currentTimeMi
             connection.outputStream.use(write)
             connection.ensureOk(endpoint = endpoint)
         } finally {
+            onAbort(null)
             connection.disconnect()
         }
     }

@@ -15,7 +15,13 @@ import com.kopylovis.tossling.sync.clipboard.TooLargeException
 import com.kopylovis.tossling.sync.data.ClipRepository
 import com.kopylovis.tossling.sync.data.SyncSettings
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
+import com.kopylovis.tossling.sync.work.PausedSend
+import com.kopylovis.tossling.sync.work.PausedSends
+import com.kopylovis.tossling.sync.work.SendControl
 import com.kopylovis.tossling.sync.work.SendWorker
+import kotlinx.coroutines.flow.StateFlow
+import java.io.File
+import java.util.UUID
 
 sealed interface Prepared {
     data class Ready(val outgoing: Outgoing) : Prepared
@@ -28,7 +34,12 @@ class ClipSender internal constructor(
     private val repository: ClipRepository,
     private val settings: SyncSettings,
     private val notifications: SyncNotifications,
+    private val control: SendControl,
+    private val pausedSends: PausedSends,
 ) {
+
+    /** Files the user paused, oldest first. */
+    val paused: StateFlow<List<PausedSend>> = pausedSends.items
 
     fun sendClipboard(): Boolean = send { bridge.readClipboard() }
 
@@ -57,8 +68,34 @@ class ClipSender internal constructor(
         SendWorker.enqueue(context = context, outgoing = outgoing, targets = targets)
     }
 
-    fun cancelSending() {
-        SendWorker.cancel(context = context)
+    /** Stops the upload with this work id, or the current one, and keeps the file for Continue. */
+    fun pauseSending(work: UUID? = null) {
+        control.request(id = work ?: control.active, value = SendControl.Request.PAUSE)
+    }
+
+    /** Drops the upload with this work id, or the current one. The files queued after it still go. */
+    fun cancelSending(work: UUID? = null) {
+        if (control.request(id = work ?: control.active, value = SendControl.Request.CANCEL)) return
+        // Not uploading this second (waiting for the network or a retry): WorkManager drops it and the files queued after it.
+        notifications.clearTransfer()
+        if (work != null) SendWorker.cancel(context = context, id = work) else SendWorker.cancel(context = context)
+    }
+
+    /** Sends a paused file again, from the first byte. */
+    fun resume(id: String) {
+        val paused = pausedSends.take(id = id) ?: return
+        notifications.clearPaused(id = id)
+        val outgoing = paused.outgoing()
+        if (!outgoing.file.exists()) {
+            toast(R.string.sync_paused_gone)
+            return
+        }
+        enqueue(outgoing = outgoing, targets = paused.targets?.toSet())
+    }
+
+    fun discard(id: String) {
+        notifications.clearPaused(id = id)
+        pausedSends.take(id = id)?.let { File(it.path).delete() }
     }
 
     fun prepareClipboard(): Prepared = prepare { bridge.readClipboard() }

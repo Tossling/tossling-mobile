@@ -47,6 +47,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -138,6 +139,7 @@ import com.kopylovis.tossling.protocol.DeviceKind
 import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.protocol.network.ServerRefusal
+import com.kopylovis.tossling.sync.work.PausedSend
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
@@ -256,8 +258,21 @@ internal fun HomeContent(
                 }
                 state.transfer?.let { transfer ->
                     item(key = "transfer") {
-                        TransferCard(transfer = transfer, onCancel = component::onTransferCancelled, modifier = Modifier.padding(top = 12f.dp))
+                        TransferCard(
+                            transfer = transfer,
+                            onPause = component::onTransferPaused,
+                            onCancel = component::onTransferCancelled,
+                            modifier = Modifier.padding(top = 12f.dp),
+                        )
                     }
+                }
+                items(items = state.paused, key = { "paused-${it.id}" }) { paused ->
+                    PausedCard(
+                        paused = paused,
+                        onResume = { component.onPausedResumed(paused = paused) },
+                        onDiscard = { component.onPausedDiscarded(paused = paused) },
+                        modifier = Modifier.padding(top = 12f.dp),
+                    )
                 }
                 item(key = "recent") {
                     Row(
@@ -656,7 +671,7 @@ private fun TileHint(onClick: () -> Unit, onClose: () -> Unit, modifier: Modifie
 }
 
 @Composable
-private fun TransferCard(transfer: Transfer, onCancel: () -> Unit, modifier: Modifier = Modifier) {
+private fun TransferCard(transfer: Transfer, onPause: () -> Unit, onCancel: () -> Unit, modifier: Modifier = Modifier) {
     val palette = Tossling.palette
     val context = LocalContext.current
     val progress by animateFloatAsState(targetValue = transfer.percent / 100f, label = "transfer")
@@ -709,8 +724,41 @@ private fun TransferCard(transfer: Transfer, onCancel: () -> Unit, modifier: Mod
             )
         }
         if (!transfer.incoming) {
+            GlassIconButton(icon = TosslingIcons.Pause, contentDescription = stringResource(R.string.home_transfer_pause), onClick = onPause, iconSize = 14f.dp, bare = true, tint = palette.ink2)
             GlassIconButton(icon = TosslingIcons.Close, contentDescription = stringResource(R.string.home_transfer_cancel), onClick = onCancel, iconSize = 14f.dp, bare = true, tint = palette.ink2)
         }
+    }
+}
+
+@Composable
+private fun PausedCard(paused: PausedSend, onResume: () -> Unit, onDiscard: () -> Unit, modifier: Modifier = Modifier) {
+    val palette = Tossling.palette
+    val context = LocalContext.current
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .glass(shape = RoundedCornerShape(22f.dp), level = GlassLevel.WEAK, blur = 20f.dp, withShadow = false)
+            .padding(start = 16f.dp, end = 8f.dp, top = 12f.dp, bottom = 12f.dp),
+        horizontalArrangement = Arrangement.spacedBy(12f.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(imageVector = TosslingIcons.Pause, contentDescription = null, tint = palette.ink2, modifier = Modifier.size(20f.dp))
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4f.dp)) {
+            Text(
+                text = stringResource(R.string.home_transfer_send, paused.name ?: "file"),
+                style = Tossling.type.body.copy(fontWeight = FontWeight.Medium),
+                color = palette.ink,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(R.string.home_transfer_paused, Formatter.formatShortFileSize(context, paused.size)),
+                style = Tossling.type.footnote,
+                color = palette.ink2,
+            )
+        }
+        GlassIconButton(icon = TosslingIcons.Play, contentDescription = stringResource(R.string.home_transfer_resume), onClick = onResume, iconSize = 14f.dp, bare = true, tint = palette.accentInk)
+        GlassIconButton(icon = TosslingIcons.Close, contentDescription = stringResource(R.string.home_transfer_cancel), onClick = onDiscard, iconSize = 14f.dp, bare = true, tint = palette.ink2)
     }
 }
 

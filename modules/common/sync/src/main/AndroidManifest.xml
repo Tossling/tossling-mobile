@@ -112,6 +112,10 @@
             android:name=".entry.AlertActionReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name=".entry.TransferActionReceiver"
+            android:exported="false" />
+
         <activity
             android:name=".entry.AlertLinkActivity"
             android:excludeFromRecents="true"
