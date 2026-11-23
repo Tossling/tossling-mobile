@@ -44,7 +44,7 @@ internal class FetchWorker(
     private fun showProgress(transfer: Transfer) {
         if (!isPromoted) {
             isPromoted = true
-            runCatching { setForegroundAsync(notifications.transferInfo(transfer = transfer, cancel = null)) }
+            runCatching { setForegroundAsync(notifications.transferInfo(transfer = transfer, work = null)) }
         }
         notifications.showTransfer(transfer = transfer)
     }

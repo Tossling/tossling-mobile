@@ -48,6 +48,9 @@
     <string name="home_transfer_receive">Receiving “%1$s”</string>
     <string name="home_transfer_progress">%1$d%% · %2$s of %3$s</string>
     <string name="home_transfer_cancel">Cancel</string>
+    <string name="home_transfer_pause">Pause</string>
+    <string name="home_transfer_resume">Continue</string>
+    <string name="home_transfer_paused">Paused · %1$s · starts over</string>
     <string name="home_preview_copy">Copy</string>
     <string name="home_preview_share">Share</string>
     <string name="home_preview_close">Close</string>

@@ -6,6 +6,7 @@ import com.kopylovis.tossling.protocol.ClipItem
 import com.kopylovis.tossling.protocol.RoomDevice
 import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.protocol.network.ServerRefusal
+import com.kopylovis.tossling.sync.work.PausedSend
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -23,6 +24,7 @@ internal data class HomeScreenState(
     val history: ImmutableList<ClipItem> = persistentListOf(),
     val pick: PickState? = null,
     val transfer: Transfer? = null,
+    val paused: ImmutableList<PausedSend> = persistentListOf(),
     val preview: ClipItem? = null,
     val query: String = "",
     val leaving: String? = null,
@@ -60,6 +62,12 @@ internal interface HomeComponent : CommonComponent {
     fun onTileHintClosed()
 
     fun onTransferCancelled()
+
+    fun onTransferPaused()
+
+    fun onPausedResumed(paused: PausedSend)
+
+    fun onPausedDiscarded(paused: PausedSend)
 
     fun onPreviewCopied()
 

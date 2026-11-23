@@ -48,6 +48,12 @@
     <string name="sync_transfer_receive">Receiving “%1$s” from %2$s</string>
     <string name="sync_transfer_progress">%1$d%% · %2$s of %3$s</string>
     <string name="sync_transfer_cancel">Cancel</string>
+    <string name="sync_transfer_pause">Pause</string>
+    <string name="sync_transfer_resume">Continue</string>
+    <string name="sync_paused_title">%1$s is paused</string>
+    <string name="sync_paused_title_to">%1$s to %2$s is paused</string>
+    <string name="sync_paused_text">%1$s. Continue sends the file again from the start.</string>
+    <string name="sync_paused_gone">The paused file is gone, send it again</string>
     <string name="sync_sent_title">Sent “%1$s”</string>
     <string name="sync_sent_to">To %1$s</string>
     <string name="sync_sent_all">To every device in the room</string>

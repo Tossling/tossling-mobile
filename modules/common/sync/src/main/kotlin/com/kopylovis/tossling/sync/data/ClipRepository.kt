@@ -44,6 +44,8 @@ import com.kopylovis.tossling.sync.entry.ClipWidget
 import com.kopylovis.tossling.sync.notifications.SyncNotifications
 import com.kopylovis.tossling.sync.push.PushRegistrar
 import com.kopylovis.tossling.sync.work.RetireTokenWorker
+import com.kopylovis.tossling.sync.work.SendStopped
+import com.kopylovis.tossling.sync.work.UploadGate
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -433,7 +435,13 @@ class ClipRepository internal constructor(
         applied
     }
 
-    suspend fun send(outgoing: Outgoing, targets: Set<String>? = null, onTransfer: (Transfer) -> Unit = { notifications.showTransfer(transfer = it) }): ClipItem {
+    /** [gate] can pause or cancel a file while it uploads, see [UploadGate]. */
+    suspend fun send(
+        outgoing: Outgoing,
+        targets: Set<String>? = null,
+        gate: UploadGate? = null,
+        onTransfer: (Transfer) -> Unit = { notifications.showTransfer(transfer = it) },
+    ): ClipItem {
         val routes = store.pairings.value.mapNotNull { pairing ->
             val ids = recipientsOf(pairing = pairing)
             val chosen = if (targets == null) null else ids.filter { it in targets }
@@ -479,12 +487,19 @@ class ClipRepository internal constructor(
                     val inlineMessage = if (inline) cipher.sealToText(plain = encode(meta)).takeIf { it.length <= MESSAGE_LIMIT } else null
                     val message = inlineMessage ?: cipher.sealToText(plain = encode(meta.copy(text = null)))
                     if (isStream) {
-                        client.publishStream(endpoint = pairing.endpoint, topic = pairing.outTopic, message = message, length = ClipCipher.sealedSize(size)) { output ->
+                        client.publishStream(
+                            endpoint = pairing.endpoint,
+                            topic = pairing.outTopic,
+                            message = message,
+                            length = ClipCipher.sealedSize(size),
+                            onAbort = { abort -> gate?.attach(abort = abort) },
+                        ) { output ->
                             val file = outgoing.file.inputStream().buffered(STREAM_BUFFER)
                             val input = if (index == 0) DigestInputStream(file, hash) else file
                             input.use {
                                 cipher.sealStream(input = it, output = output, size = size) { done ->
                                     context.ensureActive()
+                                    gate?.check()
                                     reporter.report(done = size * index + done)
                                 }
                             }
@@ -496,7 +511,11 @@ class ClipRepository internal constructor(
                     delivered += pairing
                 } catch (error: CancellationException) {
                     throw error
+                } catch (error: SendStopped) {
+                    throw error
                 } catch (error: Exception) {
+                    // Pause and Cancel break the connection, so the error they cause is theirs, not the network's.
+                    gate?.check()
                     markLink(id = pairing.id, isOnline = false)
                     failure = error
                 }

@@ -52,6 +52,12 @@
     <string name="sync_transfer_receive">Получаю «%1$s» с %2$s</string>
     <string name="sync_transfer_progress">%1$d %% · %2$s из %3$s</string>
     <string name="sync_transfer_cancel">Отменить</string>
+    <string name="sync_transfer_pause">Пауза</string>
+    <string name="sync_transfer_resume">Продолжить</string>
+    <string name="sync_paused_title">%1$s на паузе</string>
+    <string name="sync_paused_title_to">%1$s для %2$s на паузе</string>
+    <string name="sync_paused_text">%1$s. Если продолжить, файл уйдет заново с начала.</string>
+    <string name="sync_paused_gone">Файла на паузе больше нет, отправьте его еще раз</string>
     <string name="sync_sent_title">Отправлено «%1$s»</string>
     <string name="sync_sent_to">На %1$s</string>
     <string name="sync_sent_all">Всем устройствам в комнате</string>

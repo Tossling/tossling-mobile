@@ -22,12 +22,18 @@ import com.kopylovis.tossling.protocol.ClipItem
 import com.kopylovis.tossling.protocol.ClipKind
 import com.kopylovis.tossling.protocol.Transfer
 import com.kopylovis.tossling.sync.R
+import com.kopylovis.tossling.sync.entry.TosslingIntents
+import com.kopylovis.tossling.sync.entry.TransferActionReceiver
+import com.kopylovis.tossling.sync.work.PausedSend
+import java.util.UUID
 
 internal class SyncNotifications(private val context: Context) {
 
     private val manager = NotificationManagerCompat.from(context)
 
     fun createChannels() {
+        // A channel keeps its importance once created, so the louder one needs a new id.
+        manager.deleteNotificationChannel(CHANNEL_TRANSFER_OLD)
         manager.createNotificationChannelsCompat(
             listOf(
                 NotificationChannelCompat.Builder(CHANNEL_RECEIVED, NotificationManagerCompat.IMPORTANCE_LOW)
@@ -45,8 +51,11 @@ internal class SyncNotifications(private val context: Context) {
                     .setName(context.getString(R.string.sync_channel_room))
                     .setShowBadge(false)
                     .build(),
-                NotificationChannelCompat.Builder(CHANNEL_TRANSFER, NotificationManagerCompat.IMPORTANCE_LOW)
+                // Default, not low: a low channel folds the progress into the collapsed Silent group with no status bar icon.
+                NotificationChannelCompat.Builder(CHANNEL_TRANSFER, NotificationManagerCompat.IMPORTANCE_DEFAULT)
                     .setName(context.getString(R.string.sync_channel_transfer))
+                    .setSound(null, null)
+                    .setVibrationEnabled(false)
                     .setShowBadge(false)
                     .build(),
                 NotificationChannelCompat.Builder(CHANNEL_LIVE, NotificationManagerCompat.IMPORTANCE_MIN)
@@ -158,12 +167,13 @@ internal class SyncNotifications(private val context: Context) {
         }
     }
 
-    fun showTransfer(transfer: Transfer, cancel: PendingIntent? = null) {
-        post(id = ID_TRANSFER, notification = transferNotification(transfer = transfer, cancel = cancel))
+    /** [work] is the upload's WorkManager id: with it the notification gets Pause and Cancel. */
+    fun showTransfer(transfer: Transfer, work: UUID? = null) {
+        post(id = ID_TRANSFER, notification = transferNotification(transfer = transfer, work = work))
     }
 
-    fun transferInfo(transfer: Transfer, cancel: PendingIntent?): ForegroundInfo {
-        val notification = transferNotification(transfer = transfer, cancel = cancel)
+    fun transferInfo(transfer: Transfer, work: UUID?): ForegroundInfo {
+        val notification = transferNotification(transfer = transfer, work = work)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(ID_TRANSFER, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         } else {
@@ -173,6 +183,27 @@ internal class SyncNotifications(private val context: Context) {
 
     fun clearTransfer() {
         manager.cancel(ID_TRANSFER)
+    }
+
+    fun showPaused(paused: PausedSend) {
+        val name = paused.name ?: "file"
+        val title = if (paused.device.isEmpty()) context.getString(R.string.sync_paused_title, name) else context.getString(R.string.sync_paused_title_to, name, paused.device)
+        val text = context.getString(R.string.sync_paused_text, Formatter.formatShortFileSize(context, paused.size))
+        val notification = base(channel = CHANNEL_TRANSFER)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setAutoCancel(false)
+            .setSilent(true)
+            .setGroup(GROUP_TRANSFER)
+            .addAction(0, context.getString(R.string.sync_transfer_resume), transferAction(action = TosslingIntents.ACTION_RESUME_SEND, extra = TosslingIntents.EXTRA_PAUSED, value = paused.id))
+            .addAction(0, context.getString(R.string.sync_transfer_cancel), transferAction(action = TosslingIntents.ACTION_DISCARD_SEND, extra = TosslingIntents.EXTRA_PAUSED, value = paused.id))
+            .build()
+        post(id = pausedId(id = paused.id), notification = notification)
+    }
+
+    fun clearPaused(id: String) {
+        manager.cancel(pausedId(id = id))
     }
 
     fun showSent(name: String, device: String) {
@@ -185,7 +216,7 @@ internal class SyncNotifications(private val context: Context) {
         post(id = ID_SENT, notification = notification)
     }
 
-    private fun transferNotification(transfer: Transfer, cancel: PendingIntent?): Notification {
+    private fun transferNotification(transfer: Transfer, work: UUID?): Notification {
         val title = when {
             transfer.incoming -> context.getString(R.string.sync_transfer_receive, transfer.name, transfer.device.ifEmpty { "?" })
             transfer.device.isEmpty() -> context.getString(R.string.sync_transfer_send, transfer.name)
@@ -208,9 +239,19 @@ internal class SyncNotifications(private val context: Context) {
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setGroup(GROUP_TRANSFER)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-        cancel?.let { builder.addAction(0, context.getString(R.string.sync_transfer_cancel), it) }
+        if (work != null && !transfer.incoming) {
+            builder.addAction(0, context.getString(R.string.sync_transfer_pause), transferAction(action = TosslingIntents.ACTION_PAUSE_SEND, extra = TosslingIntents.EXTRA_WORK, value = work.toString()))
+            builder.addAction(0, context.getString(R.string.sync_transfer_cancel), transferAction(action = TosslingIntents.ACTION_CANCEL_SEND, extra = TosslingIntents.EXTRA_WORK, value = work.toString()))
+        }
         return builder.build()
     }
+
+    private fun transferAction(action: String, extra: String, value: String): PendingIntent {
+        val intent = Intent(context, TransferActionReceiver::class.java).setAction(action).putExtra(extra, value)
+        return PendingIntent.getBroadcast(context, "$action$value".hashCode(), intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    private fun pausedId(id: String): Int = ID_PAUSED + (id.hashCode() and PAUSED_SPAN)
 
     private fun linkOf(text: String): Uri? {
         val clean = text.trim()
@@ -256,7 +297,8 @@ internal class SyncNotifications(private val context: Context) {
         private const val CHANNEL_WORK = "work"
         private const val CHANNEL_ERRORS = "errors"
         private const val CHANNEL_ROOM = "room"
-        private const val CHANNEL_TRANSFER = "transfer"
+        private const val CHANNEL_TRANSFER = "transfers"
+        private const val CHANNEL_TRANSFER_OLD = "transfer"
         private const val CHANNEL_LIVE = "live"
         private const val GROUP_TRANSFER = "transfer"
         private const val ID_RECEIVED = 1
@@ -268,6 +310,8 @@ internal class SyncNotifications(private val context: Context) {
         private const val SENT_TIMEOUT_MS = 60_000L
         private const val PERCENT = 100
         private const val ID_JOINED = 100
+        private const val ID_PAUSED = 1 shl 20
+        private const val PAUSED_SPAN = 0xFFFFF
         private const val ID_MISSED = 1000
         private const val RECEIVED_TIMEOUT_MS = 15_000L
         private const val FILE_TIMEOUT_MS = 10 * 60_000L

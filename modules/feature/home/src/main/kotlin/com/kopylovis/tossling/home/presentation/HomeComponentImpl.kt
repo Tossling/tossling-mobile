@@ -25,6 +25,7 @@ import com.kopylovis.tossling.sync.data.SyncCoordinator
 import com.kopylovis.tossling.sync.data.SyncSettings
 import com.kopylovis.tossling.sync.entry.ClipSender
 import com.kopylovis.tossling.sync.entry.Prepared
+import com.kopylovis.tossling.sync.work.PausedSend
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -54,6 +55,7 @@ internal class HomeComponentImpl(
             .combine(isRefreshing) { state, refreshing -> state.copy(isRefreshing = refreshing) }
             .combine(pick) { state, pick -> state.copy(pick = pick) }
             .combine(repository.transfer) { state, transfer -> state.copy(transfer = transfer) }
+            .combine(sender.paused) { state, paused -> state.copy(paused = paused.toImmutableList()) }
             .combine(preview) { state, preview -> state.copy(preview = preview) }
             .combine(query) { state, query -> state.copy(query = query) }
             .combine(leaving) { state, leaving -> state.copy(leaving = leaving) }
@@ -149,6 +151,18 @@ internal class HomeComponentImpl(
 
     override fun onTransferCancelled() {
         sender.cancelSending()
+    }
+
+    override fun onTransferPaused() {
+        sender.pauseSending()
+    }
+
+    override fun onPausedResumed(paused: PausedSend) {
+        sender.resume(id = paused.id)
+    }
+
+    override fun onPausedDiscarded(paused: PausedSend) {
+        sender.discard(id = paused.id)
     }
 
     override fun onPreviewCopied() {
