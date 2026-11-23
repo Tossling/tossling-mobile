@@ -316,6 +316,16 @@
         }
       }
     },
+    "%lld%% · %@ of %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld%% · %@ из %@"
+          }
+        }
+      }
+    },
     "23:00 to 08:00, urgent ones always come through": {
       "localizations": {
         "ru": {
@@ -589,6 +599,16 @@
         }
       }
     },
+    "Continue": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить"
+          }
+        }
+      }
+    },
     "Copied": {
       "localizations": {
         "ru": {
@@ -789,6 +809,16 @@
         }
       }
     },
+    "Encrypting · %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Шифрую · %@"
+          }
+        }
+      }
+    },
     "Events from your projects show up here: sign-ins, denials, rule hits.": {
       "localizations": {
         "ru": {
@@ -885,6 +915,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Скрытое содержимое: откройте Tossling, чтобы получить его"
+          }
+        }
+      }
+    },
+    "Hide, keep sending": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрыть, отправка продолжится"
           }
         }
       }
@@ -1229,6 +1269,16 @@
         }
       }
     },
+    "Not sent: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не отправилось: %@"
+          }
+        }
+      }
+    },
     "Nothing found": {
       "localizations": {
         "ru": {
@@ -1459,12 +1509,32 @@
         }
       }
     },
+    "Pause": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пауза"
+          }
+        }
+      }
+    },
     "Pause sending": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Пауза отправки"
+          }
+        }
+      }
+    },
+    "Paused · %@ · starts over": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На паузе · %@ · начнется заново"
           }
         }
       }
@@ -1811,6 +1881,16 @@
         }
       }
     },
+    "Send a file": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправить файл"
+          }
+        }
+      }
+    },
     "Send images": {
       "localizations": {
         "ru": {
@@ -1957,6 +2037,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Отправлено %@"
+          }
+        }
+      }
+    },
+    "Sent: %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправлено: %@"
           }
         }
       }
@@ -2351,6 +2441,16 @@
         }
       }
     },
+    "The upload was interrupted": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка прервалась"
+          }
+        }
+      }
+    },
     "This channel is already added": {
       "localizations": {
         "ru": {
@@ -2590,6 +2690,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tossling перестанет слушать канал %@, его уведомления исчезнут из ленты."
+          }
+        }
+      }
+    },
+    "Try again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить"
           }
         }
       }

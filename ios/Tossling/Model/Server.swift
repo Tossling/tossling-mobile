@@ -61,6 +61,16 @@ final class Server {
         try check(response, data)
     }
 
+    /// The PUT for a sealed file; the background session sends the body from the file.
+    func uploadRequest(_ config: RoomConfig, message: String) -> URLRequest {
+        var request = request(config, path: "/\(config.room)")
+        request.httpMethod = "PUT"
+        request.setValue("4", forHTTPHeaderField: "X-Priority")
+        request.setValue(message, forHTTPHeaderField: "X-Message")
+        request.setValue("clip.bin", forHTTPHeaderField: "X-Filename")
+        return request
+    }
+
     func events(_ config: RoomConfig, topics: [String]? = nil, since: String, onOpen: @escaping () -> Void) -> AsyncThrowingStream<NtfyEvent, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
