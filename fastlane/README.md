@@ -37,6 +37,22 @@ Build a release APK and send it to Firebase App Distribution testers
 
 Archive the iOS app and upload it to App Store Connect for TestFlight
 
+### play_check
+
+```sh
+[bundle exec] fastlane play_check
+```
+
+Verify the Google Play API key
+
+### play
+
+```sh
+[bundle exec] fastlane play
+```
+
+Build a release AAB and upload it to Google Play (production draft unless track:/status: say otherwise)
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
