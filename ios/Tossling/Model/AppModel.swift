@@ -52,6 +52,7 @@ final class AppModel {
     private(set) var projects: [Project] = []
     private(set) var alerts: [ProjectAlert] = []
     private(set) var island: IslandMessage?
+    private(set) var uploads: [Upload] = []
     var pending: Payload?
 
     private let store = Store.shared
@@ -77,6 +78,21 @@ final class AppModel {
                 refreshDevices()
             } else {
                 savedRoom = config
+            }
+        }
+        let uploader = Uploader.shared
+        uploads = uploader.uploads
+        uploader.onChange = { [weak self] uploads in
+            MainActor.assumeIsolated {
+                self?.uploads = uploads
+                if #available(iOS 26, *) { ContinuedUploads.update(uploads) }
+            }
+        }
+        uploader.onSent = { [weak self] clip in
+            MainActor.assumeIsolated {
+                guard let self else { return Outbox.add(clip) }
+                self.add(clip)
+                self.say(String(localized: "Sent: \(clip.name ?? "file")"), .done)
             }
         }
         NotificationCenter.default.addObserver(forName: .serverRefusal, object: nil, queue: .main) { [weak self] _ in
@@ -142,6 +158,7 @@ final class AppModel {
         }
         mergeInbox()
         updateRefusal()
+        Uploader.shared.activate()
         guard isPaired else { return }
         followPush()
         connect()
@@ -359,23 +376,64 @@ final class AppModel {
         let sender = Sender(core: core)
         let destination = target.map { Target(id: $0.id, name: $0.name) }
         let where_ = target?.name ?? (others.count > 1 ? String(localized: "all devices") : (others.first?.name ?? String(localized: "the computer")))
+        if case let .file(url) = outgoing { return await sendFile(url, to: destination, where: where_) }
         say(String(localized: "Sending to \(where_)"), .busy)
         switch outgoing {
         case let .text(text): rememberSent(Data(text.utf8))
         case let .image(data, _): rememberSent(data)
-        case .file: break
+        case .file: return
         }
         do {
             let clip: Clip = switch outgoing {
             case let .text(text): try await sender.text(text, to: destination)
             case let .image(data, type): try await sender.image(data, type: type, to: destination)
-            case let .file(url): try await sender.file(url, to: destination)
+            case .file: throw CancellationError()
             }
             add(clip)
             say(String(localized: "Sent to \(where_)"), .done)
         } catch {
             say(error.localizedDescription, .error)
         }
+    }
+
+    /// Big files go through the background session: progress, Pause and Cancel on the Clipboard page, and on iOS 26
+    /// the system's panel on the Lock Screen.
+    private func sendFile(_ url: URL, to target: Target?, where place: String) async {
+        guard let core else { return }
+        if #available(iOS 26, *) {
+            // Ask for the panel now, while the app is on screen: sealing a big file takes a while.
+            let id = UUID().uuidString
+            ContinuedUploads.begin(id: id, name: url.lastPathComponent, subtitle: String(localized: "Sending to \(place)"))
+            await startUpload(url, core: core, target: target, id: id)
+        } else {
+            await startUpload(url, core: core, target: target, id: nil)
+        }
+    }
+
+    private func startUpload(_ url: URL, core: RoomCore, target: Target?, id: String?) async {
+        do {
+            try await Uploader.shared.start(file: url, core: core, target: target, id: id)
+        } catch {
+            say(error.localizedDescription, .error)
+        }
+    }
+
+    func pauseUpload(_ upload: Upload) {
+        Uploader.shared.pause(upload.id)
+    }
+
+    func resumeUpload(_ upload: Upload) {
+        guard let core else { return }
+        if #available(iOS 26, *) {
+            let place = upload.toAll ? String(localized: "all devices") : upload.targetName
+            ContinuedUploads.begin(id: upload.id, name: upload.name, subtitle: String(localized: "Sending to \(place)"))
+        }
+        Uploader.shared.resume(upload.id, config: core.config)
+    }
+
+    func cancelUpload(_ upload: Upload) {
+        if #available(iOS 26, *) { ContinuedUploads.end(upload.id) }
+        Uploader.shared.cancel(upload.id)
     }
 
     func copy(_ clip: Clip) {

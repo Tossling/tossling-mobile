@@ -17,7 +17,7 @@ struct MainView: View {
             ZStack {
                 switch tab {
                 case .clipboard:
-                    ClipboardPage(path: $path).transition(slide(width: width, edge: .leading))
+                    ClipboardPage(path: $path, sendFile: sendFile).transition(slide(width: width, edge: .leading))
                 case .notifications:
                     FeedPage(path: $path).transition(slide(width: width, edge: .trailing))
                 }
@@ -43,6 +43,15 @@ struct MainView: View {
             insertion: .move(edge: edge),
             removal: .offset(x: away * width).combined(with: .opacity.animation(.easeOut(duration: 0.2)))
         )
+    }
+
+    private func sendFile(_ url: URL) {
+        guard model.isPaired else { return }
+        if model.others.count <= 1 {
+            Task { await model.send(.file(url)) }
+        } else {
+            picking = .file(url)
+        }
     }
 
     private func send() {

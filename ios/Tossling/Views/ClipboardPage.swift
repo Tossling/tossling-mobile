@@ -5,7 +5,9 @@ struct ClipboardPage: View {
 
     @Environment(AppModel.self) private var model
     @Binding var path: [Route]
+    let sendFile: (URL) -> Void
     @State private var query = ""
+    @State private var importing = false
     @State private var preview: URL?
     @State private var confirmLeave = false
 
@@ -23,6 +25,19 @@ struct ClipboardPage: View {
                 Section {
                     RefusalNotice(refusal: refusal) { path.append(.pairing) }
                         .glassRow()
+                }
+            }
+            if !model.uploads.isEmpty {
+                Section {
+                    ForEach(model.uploads) { upload in
+                        UploadRow(
+                            upload: upload,
+                            pause: { model.pauseUpload(upload) },
+                            resume: { model.resumeUpload(upload) },
+                            cancel: { withAnimation { model.cancelUpload(upload) } }
+                        )
+                        .glassRow()
+                    }
                 }
             }
             Section {
@@ -99,8 +114,13 @@ struct ClipboardPage: View {
         }
         .glassList()
         .animation(.spring(response: 0.31, dampingFraction: 0.8), value: model.clips)
+        .animation(.spring(response: 0.31, dampingFraction: 0.8), value: model.uploads.map(\.id))
         .navigationTitle(String(localized: "Clipboard"))
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { importing = true } label: { Image(systemName: "paperclip") }
+                    .accessibilityLabel(String(localized: "Send a file"))
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { path.append(.settings) } label: { Image(systemName: "slider.horizontal.3") }
                     .accessibilityLabel(String(localized: "Settings"))
@@ -112,6 +132,9 @@ struct ClipboardPage: View {
             model.say(ok ? String(localized: "Updated") : model.refusal?.message ?? String(localized: "No connection to the server"), ok ? .done : .error)
         }
         .quickLookPreview($preview)
+        .fileImporter(isPresented: $importing, allowedContentTypes: [.item]) { result in
+            if case let .success(url) = result { sendFile(url) }
+        }
         .onAppear { model.probe() }
         .confirmationDialog(String(localized: "Leave the room?"), isPresented: $confirmLeave, titleVisibility: .visible) {
             Button(String(localized: "Leave and remove the key"), role: .destructive) { Task { await leave() } }
@@ -188,6 +211,85 @@ struct RefusalNotice: View {
             }
         }
         .padding(.vertical, 8)
+    }
+}
+
+/// A file on its way: progress with Pause and Cancel, or Continue and Cancel once paused.
+struct UploadRow: View {
+
+    let upload: Upload
+    let pause: () -> Void
+    let resume: () -> Void
+    let cancel: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(upload.state == .failed ? Palette.dangerInk : Palette.accentInk)
+                .frame(width: 28, height: 28)
+                .background(upload.state == .failed ? Palette.dangerSoft : Palette.accentSoft, in: Circle())
+            VStack(alignment: .leading, spacing: 6) {
+                Text(upload.name).font(Fonts.row).foregroundStyle(Palette.ink).lineLimit(1)
+                if upload.state == .uploading || upload.state == .sealing {
+                    ProgressView(value: upload.fraction).tint(Palette.accent)
+                }
+                Text(status)
+                    .font(Fonts.footnote)
+                    .foregroundStyle(upload.state == .failed ? Palette.dangerInk : Palette.ink2)
+                    .lineLimit(2)
+                    .monospacedDigit()
+            }
+            switch upload.state {
+            case .uploading:
+                control("pause.fill", String(localized: "Pause"), pause)
+            case .paused:
+                control("play.fill", String(localized: "Continue"), resume)
+            case .failed:
+                control("arrow.clockwise", String(localized: "Try again"), resume)
+            case .sealing:
+                EmptyView()
+            }
+            control("xmark", String(localized: "Cancel"), cancel)
+        }
+        .padding(.vertical, 6)
+    }
+
+    private var icon: String {
+        switch upload.state {
+        case .sealing: "lock"
+        case .uploading: "arrow.up"
+        case .paused: "pause"
+        case .failed: "exclamationmark"
+        }
+    }
+
+    private var status: String {
+        let size = ByteCountFormatter.string(fromByteCount: upload.size, countStyle: .file)
+        switch upload.state {
+        case .sealing:
+            return String(localized: "Encrypting · \(size)")
+        case .uploading:
+            let sent = ByteCountFormatter.string(fromByteCount: upload.sent, countStyle: .file)
+            let total = ByteCountFormatter.string(fromByteCount: upload.total, countStyle: .file)
+            return String(localized: "\(upload.percent)% · \(sent) of \(total)")
+        case .paused:
+            return String(localized: "Paused · \(size) · starts over")
+        case .failed:
+            return String(localized: "Not sent: \(upload.error ?? "")")
+        }
+    }
+
+    private func control(_ symbol: String, _ label: String, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Palette.ink2)
+                .frame(width: 36, height: 36)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.borderless)
+        .accessibilityLabel(label)
     }
 }
 

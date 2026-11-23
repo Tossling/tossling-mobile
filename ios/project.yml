@@ -39,6 +39,7 @@ targets:
         FirebaseAppDelegateProxyEnabled: false
         UIAppFonts: [onest_regular.ttf, onest_medium.ttf, onest_semibold.ttf, onest_bold.ttf, jetbrains_mono_medium.ttf]
         UIBackgroundModes: [remote-notification]
+        BGTaskSchedulerPermittedIdentifiers: [com.kopylovis.tossling.upload.*]
         CFBundleURLTypes:
           - CFBundleURLName: com.kopylovis.tossling
             CFBundleURLSchemes: [tossling]
@@ -126,6 +127,7 @@ targets:
       - path: Tossling/Model/History.swift
       - path: Tossling/Model/Feed.swift
       - path: Tossling/Model/Sender.swift
+      - path: Tossling/Model/Uploads.swift
       - path: Tossling/Resources/Localizable.xcstrings
       - path: Tossling/Resources/PrivacyInfo.xcprivacy
     info:
