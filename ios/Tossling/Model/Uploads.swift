@@ -106,7 +106,7 @@ final class Uploader: NSObject, URLSessionDataDelegate {
             let live = Set(tasks.filter { $0.state == .running || $0.state == .suspended }.compactMap(\.taskDescription))
             let lost = uploads.filter { upload in
                 (upload.state == .uploading && !live.contains(upload.id) && Date().timeIntervalSince(upload.created) > 10)
-                    || (upload.state == .sealing && !sealing.contains(upload.id))
+                    || (upload.state == .sealing && !self.sealing.contains(upload.id))
             }
             guard !lost.isEmpty else { return notify(force: true) }
             let interrupted = String(localized: "The upload was interrupted")
